@@ -5,33 +5,41 @@ import '../controller/tenant_admin_controller.dart';
 import 'package:intl/intl.dart';
 import '../../../core/utils/snackbar_utils.dart';
 
-class AddVisitorScreen extends ConsumerStatefulWidget {
-  const AddVisitorScreen({super.key});
+class EditVisitorScreen extends ConsumerStatefulWidget {
+  final dynamic visitor;
+  const EditVisitorScreen({super.key, required this.visitor});
 
   @override
-  ConsumerState<AddVisitorScreen> createState() => _AddVisitorScreenState();
+  ConsumerState<EditVisitorScreen> createState() => _EditVisitorScreenState();
 }
 
-class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
+class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _mobileController = TextEditingController();
-  String? _selectedVisitType = "INTERVIEW";
-  DateTime _visitDate = DateTime.now();
+  late TextEditingController _nameController;
+  late TextEditingController _mobileController;
+  late String? _selectedVisitType;
+  late DateTime _visitDate;
 
-  final List<String> _visitTypes = [
-    "INTERVIEW",
-    "GUEST",
-    "VENDOR",
-    "DELIVERY",
-    "OTHER",
-  ];
+  final List<String> _visitTypes = ["GUEST", "VENDOR", "DELIVERY", "INTERVIEW", "OTHER"];
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.visitor['visitorName']);
+    _mobileController = TextEditingController(text: widget.visitor['mobileNumber']);
+    _selectedVisitType = widget.visitor['visitType'];
+    try {
+      _visitDate = DateFormat('yyyy-MM-dd').parse(widget.visitor['visitDate']);
+    } catch (_) {
+      _visitDate = DateTime.now();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(tenantAdminProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text("Schedule Visitor")),
+      appBar: AppBar(title: const Text("Edit Visitor")),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -41,10 +49,7 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: "Visitor Name",
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: "Visitor Name", border: OutlineInputBorder()),
                 inputFormatters: [
                   FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
                 ],
@@ -57,10 +62,7 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _mobileController,
-                decoration: const InputDecoration(
-                  labelText: "Mobile Number",
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: "Mobile Number", border: OutlineInputBorder()),
                 keyboardType: TextInputType.number,
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
@@ -75,15 +77,9 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: _selectedVisitType,
-                items:
-                    _visitTypes
-                        .map((t) => DropdownMenuItem(value: t, child: Text(t)))
-                        .toList(),
+                items: _visitTypes.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
                 onChanged: (v) => setState(() => _selectedVisitType = v),
-                decoration: const InputDecoration(
-                  labelText: "Visit Type",
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: "Visit Type", border: OutlineInputBorder()),
               ),
               const SizedBox(height: 16),
               ListTile(
@@ -91,9 +87,7 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
                   side: BorderSide(color: Colors.grey.shade400),
                   borderRadius: BorderRadius.circular(4),
                 ),
-                title: Text(
-                  "Date: ${DateFormat('yyyy-MM-dd').format(_visitDate)}",
-                ),
+                title: Text("Date: ${DateFormat('yyyy-MM-dd').format(_visitDate)}"),
                 trailing: const Icon(Icons.calendar_today),
                 onTap: () async {
                   final now = DateTime.now();
@@ -109,34 +103,35 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
               ),
               const SizedBox(height: 32),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.all(16),
-                ),
+                style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(16)),
                 onPressed: state.isOperationLoading
                     ? null
                     : () async {
                       if (_formKey.currentState!.validate()) {
                         final success = await ref
                             .read(tenantAdminProvider.notifier)
-                            .scheduleVisitor({
-                              "visitorName": _nameController.text,
-                              "mobileNumber": _mobileController.text,
-                              "visitDate": DateFormat(
-                                'yyyy-MM-dd',
-                              ).format(_visitDate),
-                              "visitType": _selectedVisitType,
-                            });
+                            .updateVisitor(
+                              widget.visitor['id'],
+                              {
+                                "visitorName": _nameController.text,
+                                "mobileNumber": _mobileController.text,
+                                "visitDate": DateFormat(
+                                  'yyyy-MM-dd',
+                                ).format(_visitDate),
+                                "visitType": _selectedVisitType,
+                              },
+                            );
                         if (context.mounted) {
                           if (success) {
                             SnackbarUtils.showSuccess(
                               context,
-                              "Visitor scheduled successfully",
+                              "Visitor updated successfully",
                             );
                             Navigator.pop(context);
                           } else {
                             SnackbarUtils.showError(
                               context,
-                              "Failed to schedule visitor",
+                              "Failed to update visitor",
                             );
                           }
                         }
@@ -152,7 +147,7 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
                             color: Colors.white,
                           ),
                         )
-                        : const Text("SCHEDULE"),
+                        : const Text("UPDATE"),
               ),
             ],
           ),

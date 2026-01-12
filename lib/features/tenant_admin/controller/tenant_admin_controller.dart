@@ -10,19 +10,27 @@ final tenantAdminProvider =
 class TenantAdminState {
   final AsyncValue<List<dynamic>> pendingApprovals;
   final AsyncValue<List<dynamic>> todayVisitors;
+  final AsyncValue<List<dynamic>> allVisitors;
+  final bool isOperationLoading;
 
   TenantAdminState({
     required this.pendingApprovals,
     required this.todayVisitors,
+    required this.allVisitors,
+    this.isOperationLoading = false,
   });
 
   TenantAdminState copyWith({
     AsyncValue<List<dynamic>>? pendingApprovals,
     AsyncValue<List<dynamic>>? todayVisitors,
+    AsyncValue<List<dynamic>>? allVisitors,
+    bool? isOperationLoading,
   }) {
     return TenantAdminState(
       pendingApprovals: pendingApprovals ?? this.pendingApprovals,
       todayVisitors: todayVisitors ?? this.todayVisitors,
+      allVisitors: allVisitors ?? this.allVisitors,
+      isOperationLoading: isOperationLoading ?? this.isOperationLoading,
     );
   }
 }
@@ -35,11 +43,16 @@ class TenantAdminController extends StateNotifier<TenantAdminState> {
         TenantAdminState(
           pendingApprovals: const AsyncValue.loading(),
           todayVisitors: const AsyncValue.loading(),
+          allVisitors: const AsyncValue.loading(),
         ),
       );
 
   Future<void> fetchDashboardData() async {
-    await Future.wait([fetchPendingApprovals(), fetchTodayVisitors()]);
+    await Future.wait([
+      fetchPendingApprovals(),
+      fetchTodayVisitors(),
+      fetchAllVisitors(),
+    ]);
   }
 
   Future<void> fetchPendingApprovals() async {
@@ -88,32 +101,97 @@ class TenantAdminController extends StateNotifier<TenantAdminState> {
     }
   }
 
+  Future<void> fetchAllVisitors() async {
+    state = state.copyWith(allVisitors: const AsyncValue.loading());
+    try {
+      final response = await _api.get("/tenant-admin/visitors");
+      print("response");
+      print(response.body);
+      print(response.statusCode);
+      if (response.statusCode == 200) {
+        state = state.copyWith(
+          allVisitors: AsyncValue.data(jsonDecode(response.body)),
+        );
+      } else {
+        state = state.copyWith(
+          allVisitors: AsyncValue.error(
+            "Failed to fetch visitors",
+            StackTrace.current,
+          ),
+        );
+      }
+    } catch (e) {
+      state = state.copyWith(
+        allVisitors: AsyncValue.error(e, StackTrace.current),
+      );
+    }
+  }
+
   Future<bool> approveOrReject(
     int visitorId,
     String status,
     String remarks,
   ) async {
+    state = state.copyWith(isOperationLoading: true);
     try {
       final response = await _api.patch("/tenant-admin/approvals/$visitorId", {
         "status": status,
         "remarks": remarks,
       });
       if (response.statusCode == 200) {
-        fetchDashboardData();
+        await fetchDashboardData();
         return true;
       }
-    } catch (_) {}
+    } catch (_) {} finally {
+      state = state.copyWith(isOperationLoading: false);
+    }
     return false;
   }
 
   Future<bool> scheduleVisitor(Map<String, dynamic> data) async {
+    state = state.copyWith(isOperationLoading: true);
     try {
       final response = await _api.post("/tenant-admin/visitors/schedule", data);
+      print(response.body);
+      print(response.statusCode);
       if (response.statusCode == 200) {
-        fetchDashboardData();
+        await fetchDashboardData();
         return true;
       }
-    } catch (_) {}
+    } catch (_) {} finally {
+      state = state.copyWith(isOperationLoading: false);
+    }
+    return false;
+  }
+
+  Future<bool> updateVisitor(int visitorId, Map<String, dynamic> data) async {
+    state = state.copyWith(isOperationLoading: true);
+    try {
+      final response = await _api.put(
+        "/tenant-admin/visitors/$visitorId",
+        data,
+      );
+      if (response.statusCode == 200) {
+        await fetchDashboardData();
+        return true;
+      }
+    } catch (_) {} finally {
+      state = state.copyWith(isOperationLoading: false);
+    }
+    return false;
+  }
+
+  Future<bool> deleteVisitor(int visitorId) async {
+    state = state.copyWith(isOperationLoading: true);
+    try {
+      final response = await _api.delete("/tenant-admin/visitors/$visitorId");
+      if (response.statusCode == 200) {
+        await fetchDashboardData();
+        return true;
+      }
+    } catch (_) {} finally {
+      state = state.copyWith(isOperationLoading: false);
+    }
     return false;
   }
 }

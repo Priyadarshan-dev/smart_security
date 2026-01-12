@@ -4,7 +4,7 @@ import '../storage/storage_service.dart';
 
 class ApiClient {
   final String baseUrl =
-      "http://192.168.1.52:8082/api/v1"; // Updated to match user configuration
+      "http://192.168.1.27:8080/api/v1"; // Updated to match user configuration
   final StorageService _storage = StorageService();
 
   Future<Map<String, String>> _getHeaders() async {
@@ -41,6 +41,24 @@ class ApiClient {
           headers: headers,
           body: jsonEncode(body),
         )
+        .timeout(const Duration(seconds: 10));
+  }
+
+  Future<http.Response> put(String path, Map<String, dynamic> body) async {
+    final headers = await _getHeaders();
+    return await http
+        .put(
+          Uri.parse("$baseUrl$path"),
+          headers: headers,
+          body: jsonEncode(body),
+        )
+        .timeout(const Duration(seconds: 10));
+  }
+
+  Future<http.Response> delete(String path) async {
+    final headers = await _getHeaders();
+    return await http
+        .delete(Uri.parse("$baseUrl$path"), headers: headers)
         .timeout(const Duration(seconds: 10));
   }
 }
