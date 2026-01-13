@@ -33,7 +33,7 @@ class _SmartSecurityAppState extends ConsumerState<SmartSecurityApp> {
       title: 'Smart Security',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.light,
       home: _getHome(authState),
     );
   }

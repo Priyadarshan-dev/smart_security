@@ -27,7 +27,15 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
     super.initState();
     _nameController = TextEditingController(text: widget.visitor['visitorName']);
     _mobileController = TextEditingController(text: widget.visitor['mobileNumber']);
-    _selectedVisitType = widget.visitor['visitType'];
+    
+    // Defensive value handling for DropdownButton
+    final String? incomingType = widget.visitor['visitType']?.toString().toUpperCase();
+    if (_visitTypes.contains(incomingType)) {
+      _selectedVisitType = incomingType;
+    } else {
+      _selectedVisitType = "OTHER";
+    }
+
     try {
       _visitDate = DateFormat('yyyy-MM-dd').parse(widget.visitor['visitDate']);
     } catch (_) {

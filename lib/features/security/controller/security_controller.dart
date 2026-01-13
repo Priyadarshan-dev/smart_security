@@ -113,6 +113,7 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
       final response = await _api.post("/security/visitors/walk-in", data);
       print(data);
       print("Walk-in Status: ${response.statusCode}");
+      print("Walk-in Data: ${data['assignedAdmins']}");
       print("Walk-in Body: ${response.body}");
       return response.statusCode == 200;
     } catch (_) {} finally {

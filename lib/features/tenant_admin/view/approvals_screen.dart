@@ -60,89 +60,129 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
                     margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.grey.shade200),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.04),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Stack(
                         children: [
-                          CircleAvatar(
-                            backgroundColor: Colors.orange.withOpacity(0.1),
-                            child: const Icon(Icons.person, color: Colors.orange),
+                          Positioned(
+                            left: 0,
+                            top: 0,
+                            bottom: 0,
+                            width: 5,
+                            child: Container(color: Colors.orange.shade300),
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Row(
                               children: [
-                                Text(
-                                  item['visitorName'],
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
+                                CircleAvatar(
+                                  radius: 26,
+                                  backgroundColor: Colors.orange.shade50,
+                                  child: Icon(
+                                    Icons.person_outline_rounded,
+                                    color: Colors.orange.shade700,
+                                    size: 28,
                                   ),
                                 ),
-                                Text(
-                                  "Mobile: ${item['mobileNumber']}",
-                                  style: const TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 12,
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item['visitorName'],
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 17,
+                                          letterSpacing: 0.3,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.phone_android_rounded,
+                                            size: 14,
+                                            color: Colors.grey.shade500,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            item['mobileNumber'],
+                                            style: TextStyle(
+                                              color: Colors.grey.shade600,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 5,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.blueGrey.shade50,
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Text(
+                                          (item['visitType'] ?? "GUEST")
+                                              .toString()
+                                              .toUpperCase(),
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w900,
+                                            color: Colors.blueGrey.shade700,
+                                            letterSpacing: 0.8,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                const SizedBox(height: 4),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade100,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    item['visitType'] ?? "GUEST",
-                                    style: const TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
+                                const SizedBox(width: 8),
+                                Column(
+                                  children: [
+                                    _buildCircleAction(
+                                      icon: Icons.check_rounded,
+                                      color: Colors.green.shade600,
+                                      isLoading: state.isOperationLoading,
+                                      onTap: () async {
+                                        final success = await ref
+                                            .read(tenantAdminProvider.notifier)
+                                            .approveOrReject(
+                                              item['id'],
+                                              "APPROVED",
+                                              "",
+                                            );
+                                        if (context.mounted && success) {
+                                          SnackbarUtils.showSuccess(
+                                            context,
+                                            "Visitor approved",
+                                          );
+                                        }
+                                      },
                                     ),
-                                  ),
+                                    const SizedBox(height: 12),
+                                    _buildCircleAction(
+                                      icon: Icons.close_rounded,
+                                      color: Colors.red.shade600,
+                                      isLoading: state.isOperationLoading,
+                                      onTap: () => _showRejectDialog(context, item['id']),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.check_circle, color: Colors.green),
-                            onPressed: state.isOperationLoading
-                                ? null
-                                : () async {
-                                  final success = await ref
-                                      .read(tenantAdminProvider.notifier)
-                                      .approveOrReject(
-                                        item['id'],
-                                        "APPROVED",
-                                        "",
-                                      );
-                                  if (context.mounted) {
-                                    if (success) {
-                                      SnackbarUtils.showSuccess(
-                                        context,
-                                        "Visitor approved successfully",
-                                      );
-                                    } else {
-                                      SnackbarUtils.showError(
-                                        context,
-                                        "Failed to approve visitor",
-                                      );
-                                    }
-                                  }
-                                },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.cancel, color: Colors.red),
-                            onPressed: state.isOperationLoading
-                                ? null
-                                : () => _showRejectDialog(context, item['id']),
                           ),
                         ],
                       ),
@@ -168,6 +208,25 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
             child: const Center(child: AppLoadingWidget()),
           ),
       ],
+    );
+  }
+
+  Widget _buildCircleAction({
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+    required bool isLoading,
+  }) {
+    return GestureDetector(
+      onTap: isLoading ? null : onTap,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.12),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: color, size: 22),
+      ),
     );
   }
 

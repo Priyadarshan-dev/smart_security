@@ -67,23 +67,7 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
               ),
               title: Text(item['visitorName']),
               subtitle: Text(item['mobileNumber']),
-              trailing: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade400,
-                  foregroundColor: Colors.white,
-                ),
-                onPressed: () async {
-                  final success = await ref
-                      .read(securityProvider.notifier)
-                      .checkOutVisitor(item['id']);
-                  if (context.mounted && success) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Visitor Checked Out")),
-                    );
-                  }
-                },
-                child: const Text("OUT"),
-              ),
+            
             );
           },
         );

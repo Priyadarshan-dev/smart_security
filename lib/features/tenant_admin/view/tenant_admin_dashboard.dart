@@ -44,7 +44,7 @@ class _TenantAdminDashboardState extends ConsumerState<TenantAdminDashboard> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => ref.read(authProvider.notifier).logout(),
+            onPressed: () => _showLogoutDialog(context, ref),
           ),
         ],
       ),
@@ -79,6 +79,35 @@ class _TenantAdminDashboardState extends ConsumerState<TenantAdminDashboard> {
                 icon: const Icon(Icons.add),
               )
               : null,
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text("Logout"),
+            content: const Text("Are you sure you want to logout?"),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("CANCEL"),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  ref.read(authProvider.notifier).logout();
+                },
+                child: const Text("LOGOUT"),
+              ),
+            ],
+          ),
     );
   }
 }
@@ -201,11 +230,6 @@ class _TenantHomeView extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    const Icon(
-                      Icons.chevron_right,
-                      color: Colors.grey,
-                      size: 20,
-                    ),
                   ],
                 ),
               );
@@ -267,6 +291,35 @@ class _TenantHomeView extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text("Logout"),
+            content: const Text("Are you sure you want to logout?"),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("CANCEL"),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  ref.read(authProvider.notifier).logout();
+                },
+                child: const Text("LOGOUT"),
+              ),
+            ],
+          ),
     );
   }
 }

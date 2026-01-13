@@ -38,7 +38,7 @@ class _SecurityDashboardState extends ConsumerState<SecurityDashboard> {
           ),
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => ref.read(authProvider.notifier).logout(),
+            onPressed: () => _showLogoutDialog(context, ref),
           ),
         ],
       ),
@@ -174,6 +174,35 @@ class _SecurityDashboardState extends ConsumerState<SecurityDashboard> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text("Logout"),
+            content: const Text("Are you sure you want to logout?"),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("CANCEL"),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  ref.read(authProvider.notifier).logout();
+                },
+                child: const Text("LOGOUT"),
+              ),
+            ],
+          ),
     );
   }
 }

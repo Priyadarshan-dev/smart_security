@@ -143,13 +143,19 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.blue, size: 20),
-                            onPressed: () => _showEditVehicleDialog(context, vehicle),
+                          GestureDetector(
+                            onTap: () => _showEditVehicleDialog(context, vehicle),
+                            child: const Padding(
+                              padding: EdgeInsets.all(6.0),
+                              child: Icon(Icons.edit, color: Colors.blue, size: 18),
+                            ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red, size: 20),
-                            onPressed: () => _showDeleteDialog(context, vehicle),
+                          GestureDetector(
+                            onTap: () => _showDeleteDialog(context, vehicle),
+                            child: const Padding(
+                              padding: EdgeInsets.all(6.0),
+                              child: Icon(Icons.delete, color: Colors.red, size: 18),
+                            ),
                           ),
                           const SizedBox(width: 4),
                           ElevatedButton(
@@ -253,13 +259,19 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.blue, size: 20),
-                            onPressed: () => _showEditVehicleDialog(context, vehicle),
+                          GestureDetector(
+                            onTap: () => _showEditVehicleDialog(context, vehicle),
+                            child: const Padding(
+                              padding: EdgeInsets.all(6.0),
+                              child: Icon(Icons.edit, color: Colors.blue, size: 18),
+                            ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red, size: 20),
-                            onPressed: () => _showDeleteDialog(context, vehicle),
+                          GestureDetector(
+                            onTap: () => _showDeleteDialog(context, vehicle),
+                            child: const Padding(
+                              padding: EdgeInsets.all(6.0),
+                              child: Icon(Icons.delete, color: Colors.red, size: 18),
+                            ),
                           ),
                           const SizedBox(width: 4),
                           ElevatedButton(
