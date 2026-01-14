@@ -20,7 +20,11 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
   late String? _selectedVisitType;
   late DateTime _visitDate;
 
-  final List<String> _visitTypes = ["GUEST", "VENDOR", "DELIVERY", "INTERVIEW", "OTHER"];
+  final List<String> _visitTypes = ["Interview",
+    "Visitor",
+    "Vendor",
+    "Delivery",
+    "Other",];
 
   @override
   void initState() {
@@ -29,11 +33,11 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
     _mobileController = TextEditingController(text: widget.visitor['mobileNumber']);
     
     // Defensive value handling for DropdownButton
-    final String? incomingType = widget.visitor['visitType']?.toString().toUpperCase();
+    final String? incomingType = widget.visitor['visitType']?.toString();
     if (_visitTypes.contains(incomingType)) {
       _selectedVisitType = incomingType;
     } else {
-      _selectedVisitType = "OTHER";
+      _selectedVisitType = "Other";
     }
 
     try {

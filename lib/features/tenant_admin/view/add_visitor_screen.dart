@@ -16,15 +16,15 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _mobileController = TextEditingController();
-  String? _selectedVisitType = "INTERVIEW";
+  String? _selectedVisitType = "Interview";
   DateTime _visitDate = DateTime.now();
 
   final List<String> _visitTypes = [
-    "INTERVIEW",
-    "GUEST",
-    "VENDOR",
-    "DELIVERY",
-    "OTHER",
+    "Interview",
+    "Visitor",
+    "Vendor",
+    "Delivery",
+    "Other",
   ];
 
   @override

@@ -4,6 +4,7 @@ import '../controller/security_controller.dart';
 import '../../../core/utils/snackbar_utils.dart';
 import '../../../core/widgets/app_loading_widget.dart';
 import '../../../core/widgets/app_error_widget.dart';
+import 'package:intl/intl.dart';
 
 class VehicleEntryScreen extends ConsumerStatefulWidget {
   const VehicleEntryScreen({super.key});
@@ -32,7 +33,7 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
     final state = ref.watch(securityProvider);
 
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Stack(
         children: [
           Scaffold(
@@ -67,13 +68,18 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                 labelColor: Colors.white,
                 unselectedLabelColor: Colors.white.withOpacity(0.7),
                 indicatorColor: Colors.white,
-                tabs: const [Tab(text: "Check-in"), Tab(text: "Check-out")],
+                tabs: const [
+                  Tab(text: "Check-in"),
+                  Tab(text: "Check-out"),
+                  Tab(text: "History"),
+                ],
               ),
             ),
             body: TabBarView(
               children: [
                 _buildCheckInTab(state),
                 _buildCheckOutTab(state),
+                _buildHistoryTab(state),
               ],
             ),
           ),
@@ -688,6 +694,85 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildHistoryTab(SecurityState state) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: "Search history...",
+              prefixIcon: const Icon(Icons.search),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              filled: true,
+              fillColor: Colors.grey.shade100,
+            ),
+            onChanged: (v) => setState(() => _checkInSearchQuery = v), // Reusing check-in query for simplicity or add history one
+          ),
+        ),
+        Expanded(
+          child: state.vehicles.when(
+            data: (list) {
+              final history = list.where((v) {
+                final num = (v['vehicleNumber'] ?? "").toString().toLowerCase();
+                return num.contains(_checkInSearchQuery.toLowerCase());
+              }).toList();
+
+              if (history.isEmpty) {
+                return const Center(child: Text("No history found"));
+              }
+
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: history.length,
+                itemBuilder: (context, index) {
+                  final vehicle = history[index];
+                  final entryTime = vehicle['entryTime'] != null 
+                    ? DateFormat('dd/MM HH:mm').format(DateTime.parse(vehicle['entryTime']))
+                    : 'N/A';
+                  final exitTime = vehicle['exitTime'] != null 
+                    ? DateFormat('dd/MM HH:mm').format(DateTime.parse(vehicle['exitTime']))
+                    : 'N/A';
+
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+                      leading: Icon(
+                        _getVehicleIcon(vehicle['vehicleType']),
+                        color: Colors.blueGrey,
+                      ),
+                      title: Text(
+                        vehicle['vehicleNumber'],
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text("${vehicle['driverName']} / ${vehicle['company'] ?? vehicle['companyName'] ?? 'N/A'}"),
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text("IN: $entryTime", style: const TextStyle(fontSize: 10, color: Colors.green)),
+                          Text("OUT: $exitTime", style: const TextStyle(fontSize: 10, color: Colors.red)),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+            loading: () => const AppLoadingWidget(),
+            error: (e, _) => AppErrorWidget(
+              message: e.toString(),
+              onRetry: () => ref.read(securityProvider.notifier).fetchVehicles(),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

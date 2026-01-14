@@ -7,6 +7,7 @@ import '../controller/tenant_admin_controller.dart';
 import 'add_visitor_screen.dart';
 import 'approvals_screen.dart';
 import 'visitors_list_screen.dart';
+import 'tenant_vehicles_screen.dart';
 
 class TenantAdminDashboard extends ConsumerStatefulWidget {
   const TenantAdminDashboard({super.key});
@@ -33,52 +34,73 @@ class _TenantAdminDashboardState extends ConsumerState<TenantAdminDashboard> {
       const _TenantHomeView(),
       const ApprovalsScreen(),
       const VisitorsListScreen(),
+      const TenantVehiclesScreen(),
     ];
 
-    final List<String> titles = ["Tenant Home", "Approvals", "Visitors"];
+    final List<String> titles = ["Tenant Home", "Approvals", "Visitors", "Vehicles"];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(titles[_currentIndex]),
-        elevation: 2,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => _showLogoutDialog(context, ref),
+    final state = ref.watch(tenantAdminProvider);
+
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: AppBar(
+            title: Text(titles[_currentIndex]),
+            elevation: 2,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.logout),
+                onPressed: () => _showLogoutDialog(context, ref),
+              ),
+            ],
           ),
-        ],
-      ),
-      body: pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        elevation: 8,
-        selectedItemColor: Theme.of(context).primaryColor,
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard_rounded), label: "Home"),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.fact_check_rounded),
-            label: "Approvals",
+          body: pages[_currentIndex],
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: (index) => setState(() => _currentIndex = index),
+            elevation: 8,
+            selectedItemColor: Theme.of(context).primaryColor,
+            unselectedItemColor: Colors.grey,
+            type: BottomNavigationBarType.fixed,
+            items: const [
+              BottomNavigationBarItem(icon: Icon(Icons.dashboard_rounded), label: "Home"),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.fact_check_rounded),
+                label: "Approvals",
+              ),
+              BottomNavigationBarItem(icon: Icon(Icons.group_rounded), label: "Visitors"),
+              BottomNavigationBarItem(icon: Icon(Icons.directions_car_rounded), label: "Vehicles"),
+            ],
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.group_rounded), label: "Visitors"),
-        ],
-      ),
-      floatingActionButton:
-          _currentIndex == 0
-              ? FloatingActionButton.extended(
-                onPressed:
-                    () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const AddVisitorScreen(),
-                      ),
-                    ),
-                label: const Text("Schedule"),
-                icon: const Icon(Icons.add),
-              )
-              : null,
+          floatingActionButton:
+              _currentIndex == 0
+                  ? FloatingActionButton.extended(
+                    onPressed:
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AddVisitorScreen(),
+                          ),
+                        ),
+                    label: const Text("Schedule"),
+                    icon: const Icon(Icons.add),
+                  )
+                  : _currentIndex == 3
+                      ? FloatingActionButton.extended(
+                        onPressed: () => TenantVehiclesScreen.showAddVehicleDialog(context, ref),
+                        label: const Text("Add Vehicle"),
+                        icon: const Icon(Icons.directions_car_filled),
+                      )
+                      : null,
+        ),
+        if (state.isOperationLoading)
+          Positioned.fill(
+            child: Material(
+              color: Colors.black.withOpacity(0.3),
+              child: const Center(child: AppLoadingWidget()),
+            ),
+          ),
+      ],
     );
   }
 

@@ -11,12 +11,14 @@ class TenantAdminState {
   final AsyncValue<List<dynamic>> pendingApprovals;
   final AsyncValue<List<dynamic>> todayVisitors;
   final AsyncValue<List<dynamic>> allVisitors;
+  final AsyncValue<List<dynamic>> vehicles;
   final bool isOperationLoading;
 
   TenantAdminState({
     required this.pendingApprovals,
     required this.todayVisitors,
     required this.allVisitors,
+    required this.vehicles,
     this.isOperationLoading = false,
   });
 
@@ -24,12 +26,14 @@ class TenantAdminState {
     AsyncValue<List<dynamic>>? pendingApprovals,
     AsyncValue<List<dynamic>>? todayVisitors,
     AsyncValue<List<dynamic>>? allVisitors,
+    AsyncValue<List<dynamic>>? vehicles,
     bool? isOperationLoading,
   }) {
     return TenantAdminState(
       pendingApprovals: pendingApprovals ?? this.pendingApprovals,
       todayVisitors: todayVisitors ?? this.todayVisitors,
       allVisitors: allVisitors ?? this.allVisitors,
+      vehicles: vehicles ?? this.vehicles,
       isOperationLoading: isOperationLoading ?? this.isOperationLoading,
     );
   }
@@ -44,6 +48,7 @@ class TenantAdminController extends StateNotifier<TenantAdminState> {
           pendingApprovals: const AsyncValue.loading(),
           todayVisitors: const AsyncValue.loading(),
           allVisitors: const AsyncValue.loading(),
+          vehicles: const AsyncValue.loading(),
         ),
       );
 
@@ -52,6 +57,7 @@ class TenantAdminController extends StateNotifier<TenantAdminState> {
       fetchPendingApprovals(),
       fetchTodayVisitors(),
       fetchAllVisitors(),
+      fetchTenantVehicles(),
     ]);
   }
 
@@ -187,6 +193,43 @@ class TenantAdminController extends StateNotifier<TenantAdminState> {
       final response = await _api.delete("/tenant-admin/visitors/$visitorId");
       if (response.statusCode == 200) {
         await fetchDashboardData();
+        return true;
+      }
+    } catch (_) {} finally {
+      state = state.copyWith(isOperationLoading: false);
+    }
+    return false;
+  }
+
+  Future<void> fetchTenantVehicles() async {
+    state = state.copyWith(vehicles: const AsyncValue.loading());
+    try {
+      final response = await _api.get("/tenant-admin/vehicles");
+      if (response.statusCode == 200) {
+        state = state.copyWith(
+          vehicles: AsyncValue.data(jsonDecode(response.body)),
+        );
+      } else {
+        state = state.copyWith(
+          vehicles: AsyncValue.error(
+            "Failed to fetch vehicles",
+            StackTrace.current,
+          ),
+        );
+      }
+    } catch (e) {
+      state = state.copyWith(
+        vehicles: AsyncValue.error(e, StackTrace.current),
+      );
+    }
+  }
+
+  Future<bool> addVehicle(Map<String, dynamic> data) async {
+    state = state.copyWith(isOperationLoading: true);
+    try {
+      final response = await _api.post("/tenant-admin/vehicles", data);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        await fetchTenantVehicles();
         return true;
       }
     } catch (_) {} finally {
