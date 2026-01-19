@@ -12,6 +12,8 @@ class SecurityState {
   final List<dynamic> tenants;
   final List<dynamic> tenantAdmins;
   final AsyncValue<List<dynamic>> vehicles;
+  final AsyncValue<List<dynamic>> visitorReports;
+  final AsyncValue<List<dynamic>> vehicleReports;
   final bool isOperationLoading;
 
   SecurityState({
@@ -19,6 +21,8 @@ class SecurityState {
     this.tenants = const [],
     this.tenantAdmins = const [],
     required this.vehicles,
+    required this.visitorReports,
+    required this.vehicleReports,
     this.isOperationLoading = false,
   });
 
@@ -27,6 +31,8 @@ class SecurityState {
     List<dynamic>? tenants,
     List<dynamic>? tenantAdmins,
     AsyncValue<List<dynamic>>? vehicles,
+    AsyncValue<List<dynamic>>? visitorReports,
+    AsyncValue<List<dynamic>>? vehicleReports,
     bool? isOperationLoading,
   }) {
     return SecurityState(
@@ -34,6 +40,8 @@ class SecurityState {
       tenants: tenants ?? this.tenants,
       tenantAdmins: tenantAdmins ?? this.tenantAdmins,
       vehicles: vehicles ?? this.vehicles,
+      visitorReports: visitorReports ?? this.visitorReports,
+      vehicleReports: vehicleReports ?? this.vehicleReports,
       isOperationLoading: isOperationLoading ?? this.isOperationLoading,
     );
   }
@@ -47,6 +55,8 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
         SecurityState(
           todayVisitors: const AsyncValue.loading(),
           vehicles: const AsyncValue.loading(),
+          visitorReports: const AsyncValue.data([]),
+          vehicleReports: const AsyncValue.data([]),
         ),
       );
 
@@ -243,6 +253,61 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
       state = state.copyWith(isOperationLoading: false);
     }
     return false;
+  }
+
+  Future<void> fetchVisitorReports(DateTime start, DateTime end) async {
+    state = state.copyWith(visitorReports: const AsyncValue.loading());
+    try {
+      final startDate = start.toIso8601String().split('T')[0];
+      final endDate = end.toIso8601String().split('T')[0];
+      final response = await _api.get(
+        "/security/reports/visitors?startDate=$startDate&endDate=$endDate",
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print("Visitor Reports Data: $data");
+        state = state.copyWith(visitorReports: AsyncValue.data(data));
+      } else {
+        state = state.copyWith(
+          visitorReports: AsyncValue.error(
+            "Failed to fetch visitor reports",
+            StackTrace.current,
+          ),
+        );
+      }
+    } catch (e) {
+      state = state.copyWith(
+        visitorReports: AsyncValue.error(e, StackTrace.current),
+      );
+    }
+  }
+
+  Future<void> fetchVehicleReports(DateTime start, DateTime end) async {
+    state = state.copyWith(vehicleReports: const AsyncValue.loading());
+    try {
+      final startDate = start.toIso8601String().split('T')[0];
+      final endDate = end.toIso8601String().split('T')[0];
+      final response = await _api.get(
+        "/security/reports/vehicles?startDate=$startDate&endDate=$endDate",
+      );
+      if (response.statusCode == 200) {
+        print("Vehicle Reports Data Loaded: ${jsonDecode(response.body)}");
+        state = state.copyWith(
+          vehicleReports: AsyncValue.data(jsonDecode(response.body)),
+        );
+      } else {
+        state = state.copyWith(
+          vehicleReports: AsyncValue.error(
+            "Failed to fetch vehicle reports",
+            StackTrace.current,
+          ),
+        );
+      }
+    } catch (e) {
+      state = state.copyWith(
+        vehicleReports: AsyncValue.error(e, StackTrace.current),
+      );
+    }
   }
 
   Future<void> refreshDashboard() async {

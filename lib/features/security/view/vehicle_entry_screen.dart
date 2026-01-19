@@ -19,6 +19,12 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
   final _checkOutSearchController = TextEditingController();
   String _checkInSearchQuery = "";
   String _checkOutSearchQuery = "";
+  DateTime _historyStartDate = DateTime(
+    DateTime.now().year,
+    DateTime.now().month,
+    1,
+  );
+  DateTime _historyEndDate = DateTime.now();
 
   @override
   void initState() {
@@ -26,7 +32,46 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
     Future.microtask(() {
       ref.read(securityProvider.notifier).fetchVehicles();
       ref.read(securityProvider.notifier).fetchTenants();
+      ref
+          .read(securityProvider.notifier)
+          .fetchVehicleReports(_historyStartDate, _historyEndDate);
     });
+  }
+
+  Future<void> _selectHistoryDate(BuildContext context, bool isStart) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: isStart ? _historyStartDate : _historyEndDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null) {
+      if (isStart && picked.isAfter(_historyEndDate)) {
+        if (context.mounted) {
+          SnackbarUtils.showError(context, "From date cannot be after To date");
+        }
+        return;
+      }
+      if (!isStart && picked.isBefore(_historyStartDate)) {
+        if (context.mounted) {
+          SnackbarUtils.showError(
+            context,
+            "To date cannot be before From date",
+          );
+        }
+        return;
+      }
+      setState(() {
+        if (isStart) {
+          _historyStartDate = picked;
+        } else {
+          _historyEndDate = picked;
+        }
+      });
+      ref
+          .read(securityProvider.notifier)
+          .fetchVehicleReports(_historyStartDate, _historyEndDate);
+    }
   }
 
   @override
@@ -979,96 +1024,95 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
   Widget _buildHistoryTab(SecurityState state) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: "Search history...",
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              filled: true,
-              fillColor: Colors.grey.shade100,
-            ),
-            onChanged:
-                (v) => setState(
-                  () => _checkInSearchQuery = v,
-                ), // Reusing check-in query for simplicity or add history one
-          ),
-        ),
+        _buildHistoryDateFilter(),
         Expanded(
-          child: state.vehicles.when(
-            data: (list) {
-              final history =
-                  list.where((v) {
-                    final num =
-                        (v['vehicleNumber'] ?? "").toString().toLowerCase();
-                    return num.contains(_checkInSearchQuery.toLowerCase());
-                  }).toList();
-
+          child: state.vehicleReports.when(
+            data: (history) {
               if (history.isEmpty) {
                 return const Center(child: Text("No history found"));
               }
 
-              return ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: history.length,
-                itemBuilder: (context, index) {
-                  final vehicle = history[index];
-                  final entryTime =
-                      vehicle['entryTime'] != null
-                          ? DateFormat(
-                            'dd/MM HH:mm',
-                          ).format(DateTime.parse(vehicle['entryTime']))
-                          : 'N/A';
-                  final exitTime =
-                      vehicle['exitTime'] != null
-                          ? DateFormat(
-                            'dd/MM HH:mm',
-                          ).format(DateTime.parse(vehicle['exitTime']))
-                          : 'N/A';
+              // Sort by check-in time descending (latest first)
+              final sortedHistory = List.from(history);
+              sortedHistory.sort((a, b) {
+                final aTime =
+                    a['checkInTime'] != null
+                        ? DateTime.parse(a['checkInTime'])
+                        : DateTime(2000);
+                final bTime =
+                    b['checkInTime'] != null
+                        ? DateTime.parse(b['checkInTime'])
+                        : DateTime(2000);
+                return bTime.compareTo(aTime);
+              });
 
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: ListTile(
-                      leading: Icon(
-                        _getVehicleIcon(vehicle['vehicleType']),
-                        color: Colors.blueGrey,
+              return RefreshIndicator(
+                onRefresh:
+                    () => ref
+                        .read(securityProvider.notifier)
+                        .fetchVehicleReports(
+                          _historyStartDate,
+                          _historyEndDate,
+                        ),
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: sortedHistory.length,
+                  itemBuilder: (context, index) {
+                    final vehicle = sortedHistory[index];
+                    final entryTime =
+                        vehicle['checkInTime'] != null
+                            ? DateFormat(
+                              'dd.MM.yy hh.mm a',
+                            ).format(DateTime.parse(vehicle['checkInTime']))
+                            : 'N/A';
+                    final exitTime =
+                        vehicle['checkOutTime'] != null
+                            ? DateFormat(
+                              'dd.MM.yy hh.mm a',
+                            ).format(DateTime.parse(vehicle['checkOutTime']))
+                            : 'N/A';
+
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      title: Text(
-                        vehicle['vehicleNumber'],
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Text(
-                        "${vehicle['driverName']} / ${vehicle['company'] ?? vehicle['companyName'] ?? 'N/A'}",
-                      ),
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            "IN: $entryTime",
-                            style: const TextStyle(
-                              fontSize: 10,
-                              color: Colors.green,
+                      child: ListTile(
+                        leading: Icon(
+                          _getVehicleIcon(vehicle['vehicleType']),
+                          color: Colors.blueGrey,
+                        ),
+                        title: Text(
+                          vehicle['vehicleNumber'],
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          "${vehicle['driverName']} / ${vehicle['company'] ?? vehicle['companyName'] ?? 'N/A'}",
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              "IN: $entryTime",
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: Colors.green,
+                              ),
                             ),
-                          ),
-                          Text(
-                            "OUT: $exitTime",
-                            style: const TextStyle(
-                              fontSize: 10,
-                              color: Colors.red,
+                            Text(
+                              "OUT: $exitTime",
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: Colors.red,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               );
             },
             loading: () => const AppLoadingWidget(),
@@ -1076,7 +1120,12 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                 (e, _) => AppErrorWidget(
                   message: e.toString(),
                   onRetry:
-                      () => ref.read(securityProvider.notifier).fetchVehicles(),
+                      () => ref
+                          .read(securityProvider.notifier)
+                          .fetchVehicleReports(
+                            _historyStartDate,
+                            _historyEndDate,
+                          ),
                 ),
           ),
         ),
@@ -1173,6 +1222,99 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
               ],
             ),
           ),
+    );
+  }
+
+  Widget _buildHistoryDateFilter() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(color: Colors.grey.shade100),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: InkWell(
+              onTap: () => _selectHistoryDate(context, true),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "FROM",
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey.shade600,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.calendar_today,
+                        size: 14,
+                        color: Colors.blue,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        DateFormat('dd MMM yyyy').format(_historyStartDate),
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Container(height: 30, width: 1, color: Colors.grey.shade200),
+          Expanded(
+            child: InkWell(
+              onTap: () => _selectHistoryDate(context, false),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    "TO",
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey.shade600,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        DateFormat('dd MMM yyyy').format(_historyEndDate),
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(
+                        Icons.calendar_today,
+                        size: 14,
+                        color: Colors.blue,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
