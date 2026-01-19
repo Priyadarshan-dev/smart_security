@@ -29,7 +29,10 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
       children: [
         RefreshIndicator(
           onRefresh:
-              () => ref.read(tenantAdminProvider.notifier).fetchPendingApprovals(),
+              () =>
+                  ref
+                      .read(tenantAdminProvider.notifier)
+                      .fetchPendingApprovals(),
           child: state.pendingApprovals.when(
             data: (list) {
               if (list.isEmpty) {
@@ -96,7 +99,8 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
                                 const SizedBox(width: 16),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         item['visitorName'],
@@ -132,7 +136,9 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
                                         ),
                                         decoration: BoxDecoration(
                                           color: Colors.blueGrey.shade50,
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                         child: Text(
                                           (item['visitType'] ?? "GUEST")
@@ -177,7 +183,11 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
                                       icon: Icons.close_rounded,
                                       color: Colors.red.shade600,
                                       isLoading: state.isOperationLoading,
-                                      onTap: () => _showRejectDialog(context, item['id']),
+                                      onTap:
+                                          () => _showRejectDialog(
+                                            context,
+                                            item['id'],
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -196,9 +206,10 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
                 (e, _) => AppErrorWidget(
                   message: e.toString(),
                   onRetry:
-                      () => ref
-                          .read(tenantAdminProvider.notifier)
-                          .fetchPendingApprovals(),
+                      () =>
+                          ref
+                              .read(tenantAdminProvider.notifier)
+                              .fetchPendingApprovals(),
                 ),
           ),
         ),
@@ -237,7 +248,9 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
       builder:
           (context) => AlertDialog(
             title: const Text("Rejection Reason"),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             content: TextField(
               controller: controller,
               decoration: const InputDecoration(

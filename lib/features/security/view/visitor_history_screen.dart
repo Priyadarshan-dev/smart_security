@@ -2,19 +2,23 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controller/security_controller.dart';
+import '../../../core/utils/snackbar_utils.dart';
 
 class VisitorHistoryScreen extends ConsumerStatefulWidget {
   const VisitorHistoryScreen({super.key});
 
   @override
-  ConsumerState<VisitorHistoryScreen> createState() => _VisitorHistoryScreenState();
+  ConsumerState<VisitorHistoryScreen> createState() =>
+      _VisitorHistoryScreenState();
 }
 
 class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(securityProvider.notifier).fetchTodayVisitors());
+    Future.microtask(
+      () => ref.read(securityProvider.notifier).fetchTodayVisitors(),
+    );
   }
 
   @override
@@ -30,10 +34,7 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white70,
             indicatorColor: Colors.white,
-            tabs: [
-              Tab(text: "Checked-In"),
-              Tab(text: "History"),
-            ],
+            tabs: [Tab(text: "Checked-In"), Tab(text: "History")],
           ),
         ),
         body: TabBarView(
@@ -49,7 +50,8 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
   Widget _buildCheckedInTab(AsyncValue<List<dynamic>> visitors) {
     return visitors.when(
       data: (list) {
-        final checkedIn = list.where((v) => v['status'] == 'CHECKED_IN').toList();
+        final checkedIn =
+            list.where((v) => v['status'] == 'CHECKED_IN').toList();
         if (checkedIn.isEmpty) {
           return const Center(child: Text("No visitors currently checked-in"));
         }
@@ -60,14 +62,37 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
             return ListTile(
               leading: CircleAvatar(
                 backgroundColor: Colors.grey.shade200,
-                backgroundImage: item['imageUrl'] != null
-                    ? MemoryImage(base64Decode(item['imageUrl']))
-                    : null,
-                child: item['imageUrl'] == null ? const Icon(Icons.person) : null,
+                backgroundImage:
+                    item['imageUrl'] != null
+                        ? MemoryImage(base64Decode(item['imageUrl']))
+                        : null,
+                child:
+                    item['imageUrl'] == null ? const Icon(Icons.person) : null,
               ),
               title: Text(item['visitorName']),
               subtitle: Text(item['mobileNumber']),
-            
+              trailing: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () async {
+                  final success = await ref
+                      .read(securityProvider.notifier)
+                      .checkOutVisitor(item['id']);
+                  if (context.mounted) {
+                    if (success) {
+                      SnackbarUtils.showSuccess(
+                        context,
+                        "Checked Out Successfully",
+                      );
+                    } else {
+                      SnackbarUtils.showError(context, "Failed to Check Out");
+                    }
+                  }
+                },
+                child: const Text("Check-Out"),
+              ),
             );
           },
         );
@@ -91,10 +116,12 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
             return ListTile(
               leading: CircleAvatar(
                 backgroundColor: Colors.grey.shade200,
-                backgroundImage: item['imageUrl'] != null
-                    ? MemoryImage(base64Decode(item['imageUrl']))
-                    : null,
-                child: item['imageUrl'] == null ? const Icon(Icons.person) : null,
+                backgroundImage:
+                    item['imageUrl'] != null
+                        ? MemoryImage(base64Decode(item['imageUrl']))
+                        : null,
+                child:
+                    item['imageUrl'] == null ? const Icon(Icons.person) : null,
               ),
               title: Text(item['visitorName']),
               subtitle: Text("${item['mobileNumber']} • ${item['status']}"),

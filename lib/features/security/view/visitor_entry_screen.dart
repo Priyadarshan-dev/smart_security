@@ -81,8 +81,15 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
     return visitors.when(
       data: (list) {
         final visibleVisitors =
-            list.where((v) => v['status'] != 'CHECKED_IN' && v['status'] != 'REJECTED').toList();
-        
+            list
+                .where(
+                  (v) =>
+                      v['status'] != 'CHECKED_IN' &&
+                      v['status'] != 'REJECTED' &&
+                      v['status'] != 'CHECKED_OUT',
+                )
+                .toList();
+
         if (visibleVisitors.isEmpty) {
           return const Center(
             child: Text(
@@ -92,39 +99,46 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
           );
         }
         return RefreshIndicator(
-          onRefresh: () => ref.read(securityProvider.notifier).fetchTodayVisitors(),
+          onRefresh:
+              () => ref.read(securityProvider.notifier).fetchTodayVisitors(),
           child: ListView.builder(
             physics: const AlwaysScrollableScrollPhysics(),
             itemCount: visibleVisitors.length,
             itemBuilder: (context, index) {
               final item = visibleVisitors[index];
-              final bool isAllowed = item['status'] == 'ALLOWED' || item['status'] == 'APPROVED';
+              final bool isAllowed =
+                  item['status'] == 'ALLOWED' || item['status'] == 'APPROVED';
               final bool isPending = item['status'] == 'PENDING';
 
               return ListTile(
                 leading: CircleAvatar(
                   backgroundColor: Colors.grey.shade200,
-                  backgroundImage: item['imageUrl'] != null
-                      ? MemoryImage(base64Decode(item['imageUrl']))
-                      : null,
-                  child: item['imageUrl'] == null ? const Icon(Icons.person) : null,
+                  backgroundImage:
+                      item['imageUrl'] != null
+                          ? MemoryImage(base64Decode(item['imageUrl']))
+                          : null,
+                  child:
+                      item['imageUrl'] == null
+                          ? const Icon(Icons.person)
+                          : null,
                 ),
                 title: Text(item['visitorName']),
                 subtitle: Text("${item['mobileNumber']} • ${item['status']}"),
-                trailing: isAllowed
-                    ? ElevatedButton(
-                      onPressed:
-                          () => ref
-                              .read(securityProvider.notifier)
-                              .checkInVisitor(item['id']),
-                      child: const Text("Check-In"),
-                    )
-                    : (isPending
+                trailing:
+                    isAllowed
                         ? ElevatedButton(
-                          onPressed: null, // Disabled until allowed
-                          child: const Text("Pending"),
+                          onPressed:
+                              () => ref
+                                  .read(securityProvider.notifier)
+                                  .checkInVisitor(item['id']),
+                          child: const Text("Check-In"),
                         )
-                        : Text(item['status'] ?? "Unknown")),
+                        : (isPending
+                            ? ElevatedButton(
+                              onPressed: null, // Disabled until allowed
+                              child: const Text("Pending"),
+                            )
+                            : Text(item['status'] ?? "Unknown")),
               );
             },
           ),
@@ -142,7 +156,8 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
       (t) => t['id'] == _selectedTenantId,
       orElse: () => null,
     );
-    final admins = selectedTenant != null ? selectedTenant['admins'] as List<dynamic> : [];
+    final admins =
+        selectedTenant != null ? selectedTenant['admins'] as List<dynamic> : [];
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -160,20 +175,24 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                   decoration: BoxDecoration(
                     color: Colors.grey.shade200,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Theme.of(context).primaryColor, width: 2),
+                    border: Border.all(
+                      color: Theme.of(context).primaryColor,
+                      width: 2,
+                    ),
                   ),
-                  child: _image64 != null
-                      ? ClipOval(
-                          child: Image.memory(
-                            base64Decode(_image64!),
-                            fit: BoxFit.cover,
+                  child:
+                      _image64 != null
+                          ? ClipOval(
+                            child: Image.memory(
+                              base64Decode(_image64!),
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                          : Icon(
+                            Icons.camera_alt,
+                            size: 40,
+                            color: Theme.of(context).primaryColor,
                           ),
-                        )
-                      : Icon(
-                          Icons.camera_alt,
-                          size: 40,
-                          color: Theme.of(context).primaryColor,
-                        ),
                 ),
               ),
             ),
@@ -181,7 +200,11 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
             const Center(
               child: Text(
                 "Capture Visitor Photo",
-                style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             const SizedBox(height: 24),
@@ -237,17 +260,16 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
             DropdownButtonFormField<int>(
               value: _selectedTenantId,
               items:
-                  state.tenants
-                      .map(
-                        (t) {
-                          print("Dropdown List Item: ${t['companyName']}");
-                          return DropdownMenuItem(
-                            value: t['id'] as int,
-                            child: Text((t['company'] ?? t['companyName'] ?? 'No Name').toString()),
-                          );
-                        },
-                      )
-                      .toList(),
+                  state.tenants.map((t) {
+                    print("Dropdown List Item: ${t['companyName']}");
+                    return DropdownMenuItem(
+                      value: t['id'] as int,
+                      child: Text(
+                        (t['company'] ?? t['companyName'] ?? 'No Name')
+                            .toString(),
+                      ),
+                    );
+                  }).toList(),
               onChanged: (v) {
                 final tenant = state.tenants.firstWhere((t) => t['id'] == v);
                 setState(() {
@@ -273,7 +295,9 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                 final adminId = admin['id'] as int;
                 final isSelected = _selectedAdminIds.contains(adminId);
                 return CheckboxListTile(
-                  title: Text(admin['fullName'] ?? admin['username'] ?? 'Admin'),
+                  title: Text(
+                    admin['fullName'] ?? admin['username'] ?? 'Admin',
+                  ),
                   subtitle: Text(admin['email'] ?? ''),
                   value: isSelected,
                   onChanged: (val) {
@@ -310,7 +334,8 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                 padding: const EdgeInsets.all(16),
               ),
               onPressed: () async {
-                if (formKey.currentState!.validate() && _selectedAdminIds.isNotEmpty) {
+                if (formKey.currentState!.validate() &&
+                    _selectedAdminIds.isNotEmpty) {
                   final success = await ref
                       .read(securityProvider.notifier)
                       .addWalkIn({
@@ -324,7 +349,10 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                       });
                   if (context.mounted) {
                     if (success) {
-                      SnackbarUtils.showSuccess(context, "Approval Request Sent");
+                      SnackbarUtils.showSuccess(
+                        context,
+                        "Approval Request Sent",
+                      );
                       Navigator.pop(context);
                     } else {
                       SnackbarUtils.showError(

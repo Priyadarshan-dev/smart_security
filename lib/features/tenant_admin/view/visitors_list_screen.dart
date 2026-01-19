@@ -17,7 +17,9 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(tenantAdminProvider.notifier).fetchAllVisitors());
+    Future.microtask(
+      () => ref.read(tenantAdminProvider.notifier).fetchAllVisitors(),
+    );
   }
 
   @override
@@ -69,9 +71,9 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
                     child: ListTile(
                       contentPadding: const EdgeInsets.all(16),
                       leading: CircleAvatar(
-                        backgroundColor: Theme.of(context)
-                            .primaryColor
-                            .withOpacity(0.1),
+                        backgroundColor: Theme.of(
+                          context,
+                        ).primaryColor.withOpacity(0.1),
                         child: Icon(
                           Icons.person,
                           color: Theme.of(context).primaryColor,
@@ -105,26 +107,28 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
                               Icons.edit_outlined,
                               color: Colors.blue,
                             ),
-                            onPressed: state.isOperationLoading
-                                ? null
-                                : () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (_) => EditVisitorScreen(
-                                          visitor: visitor,
-                                        ),
-                                  ),
-                                ),
+                            onPressed:
+                                state.isOperationLoading
+                                    ? null
+                                    : () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (_) => EditVisitorScreen(
+                                              visitor: visitor,
+                                            ),
+                                      ),
+                                    ),
                           ),
                           IconButton(
                             icon: const Icon(
                               Icons.delete_outline,
                               color: Colors.red,
                             ),
-                            onPressed: state.isOperationLoading
-                                ? null
-                                : () => _showDeleteDialog(context, visitor),
+                            onPressed:
+                                state.isOperationLoading
+                                    ? null
+                                    : () => _showDeleteDialog(context, visitor),
                           ),
                         ],
                       ),
@@ -138,9 +142,10 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
                 (e, _) => AppErrorWidget(
                   message: e.toString(),
                   onRetry:
-                      () => ref
-                          .read(tenantAdminProvider.notifier)
-                          .fetchAllVisitors(),
+                      () =>
+                          ref
+                              .read(tenantAdminProvider.notifier)
+                              .fetchAllVisitors(),
                 ),
           ),
         ),
@@ -156,40 +161,48 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
   void _showDeleteDialog(BuildContext context, dynamic visitor) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Delete Visitor"),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        content: Text("Are you sure you want to delete ${visitor['visitorName']}?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("CANCEL"),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+      builder:
+          (context) => AlertDialog(
+            title: const Text("Delete Visitor"),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-            onPressed: () async {
-              final success = await ref
-                  .read(tenantAdminProvider.notifier)
-                  .deleteVisitor(visitor['id']);
-              if (context.mounted) {
-                Navigator.pop(context);
-                if (success) {
-                  SnackbarUtils.showSuccess(
-                    context,
-                    "Visitor deleted successfully",
-                  );
-                } else {
-                  SnackbarUtils.showError(context, "Failed to delete visitor");
-                }
-              }
-            },
-            child: const Text("DELETE"),
+            content: Text(
+              "Are you sure you want to delete ${visitor['visitorName']}?",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("CANCEL"),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () async {
+                  final success = await ref
+                      .read(tenantAdminProvider.notifier)
+                      .deleteVisitor(visitor['id']);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    if (success) {
+                      SnackbarUtils.showSuccess(
+                        context,
+                        "Visitor deleted successfully",
+                      );
+                    } else {
+                      SnackbarUtils.showError(
+                        context,
+                        "Failed to delete visitor",
+                      );
+                    }
+                  }
+                },
+                child: const Text("DELETE"),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }

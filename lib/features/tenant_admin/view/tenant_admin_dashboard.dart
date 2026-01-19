@@ -37,7 +37,12 @@ class _TenantAdminDashboardState extends ConsumerState<TenantAdminDashboard> {
       const TenantVehiclesScreen(),
     ];
 
-    final List<String> titles = ["Tenant Home", "Approvals", "Visitors", "Vehicles"];
+    final List<String> titles = [
+      "Tenant Home",
+      "Approvals",
+      "Visitors",
+      "Vehicles",
+    ];
 
     final state = ref.watch(tenantAdminProvider);
 
@@ -63,13 +68,22 @@ class _TenantAdminDashboardState extends ConsumerState<TenantAdminDashboard> {
             unselectedItemColor: Colors.grey,
             type: BottomNavigationBarType.fixed,
             items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.dashboard_rounded), label: "Home"),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.dashboard_rounded),
+                label: "Home",
+              ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.fact_check_rounded),
                 label: "Approvals",
               ),
-              BottomNavigationBarItem(icon: Icon(Icons.group_rounded), label: "Visitors"),
-              BottomNavigationBarItem(icon: Icon(Icons.directions_car_rounded), label: "Vehicles"),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.group_rounded),
+                label: "Visitors",
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.directions_car_rounded),
+                label: "Vehicles",
+              ),
             ],
           ),
           floatingActionButton:
@@ -86,12 +100,16 @@ class _TenantAdminDashboardState extends ConsumerState<TenantAdminDashboard> {
                     icon: const Icon(Icons.add),
                   )
                   : _currentIndex == 3
-                      ? FloatingActionButton.extended(
-                        onPressed: () => TenantVehiclesScreen.showAddVehicleDialog(context, ref),
-                        label: const Text("Add Vehicle"),
-                        icon: const Icon(Icons.directions_car_filled),
-                      )
-                      : null,
+                  ? FloatingActionButton.extended(
+                    onPressed:
+                        () => TenantVehiclesScreen.showAddVehicleDialog(
+                          context,
+                          ref,
+                        ),
+                    label: const Text("Add Vehicle"),
+                    icon: const Icon(Icons.directions_car_filled),
+                  )
+                  : null,
         ),
         if (state.isOperationLoading)
           Positioned.fill(
@@ -111,7 +129,9 @@ class _TenantAdminDashboardState extends ConsumerState<TenantAdminDashboard> {
           (context) => AlertDialog(
             title: const Text("Logout"),
             content: const Text("Are you sure you want to logout?"),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -142,16 +162,21 @@ class _TenantHomeView extends ConsumerWidget {
     final state = ref.watch(tenantAdminProvider);
 
     // Unify loading/error from multiple providers
-    final isLoading = state.todayVisitors.isLoading || state.pendingApprovals.isLoading;
-    final hasError = state.todayVisitors.hasError || state.pendingApprovals.hasError;
-    final errorMessage = state.todayVisitors.error?.toString() ?? 
-                         state.pendingApprovals.error?.toString() ?? "Unknown error";
+    final isLoading =
+        state.todayVisitors.isLoading || state.pendingApprovals.isLoading;
+    final hasError =
+        state.todayVisitors.hasError || state.pendingApprovals.hasError;
+    final errorMessage =
+        state.todayVisitors.error?.toString() ??
+        state.pendingApprovals.error?.toString() ??
+        "Unknown error";
 
     if (isLoading) return const AppLoadingWidget();
     if (hasError) {
       return AppErrorWidget(
         message: errorMessage,
-        onRetry: () => ref.read(tenantAdminProvider.notifier).fetchDashboardData(),
+        onRetry:
+            () => ref.read(tenantAdminProvider.notifier).fetchDashboardData(),
       );
     }
 
@@ -189,9 +214,9 @@ class _TenantHomeView extends ConsumerWidget {
           const SizedBox(height: 32),
           Text(
             "Recent Activity",
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
           // Placeholder or empty state for activity
@@ -224,9 +249,9 @@ class _TenantHomeView extends ConsumerWidget {
                 child: Row(
                   children: [
                     CircleAvatar(
-                      backgroundColor: Theme.of(context)
-                          .primaryColor
-                          .withOpacity(0.1),
+                      backgroundColor: Theme.of(
+                        context,
+                      ).primaryColor.withOpacity(0.1),
                       child: Icon(
                         Icons.person,
                         color: Theme.of(context).primaryColor,
@@ -298,18 +323,17 @@ class _TenantHomeView extends ConsumerWidget {
           Text(
             value,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: color,
-                  fontWeight: FontWeight.bold,
-                ),
+              color: color,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 4),
-          Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
+          Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
           Text(
             subtitle,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: Colors.grey),
           ),
         ],
       ),
@@ -323,7 +347,9 @@ class _TenantHomeView extends ConsumerWidget {
           (context) => AlertDialog(
             title: const Text("Logout"),
             content: const Text("Are you sure you want to logout?"),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),

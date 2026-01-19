@@ -50,7 +50,8 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
                 ],
                 validator: (v) {
                   if (v == null || v.isEmpty) return "Required";
-                  if (RegExp(r'[0-9]').hasMatch(v)) return "Numbers not allowed";
+                  if (RegExp(r'[0-9]').hasMatch(v))
+                    return "Numbers not allowed";
                   return null;
                 },
               ),
@@ -100,7 +101,8 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
                   final today = DateTime(now.year, now.month, now.day);
                   final picked = await showDatePicker(
                     context: context,
-                    initialDate: _visitDate.isBefore(today) ? today : _visitDate,
+                    initialDate:
+                        _visitDate.isBefore(today) ? today : _visitDate,
                     firstDate: today,
                     lastDate: today.add(const Duration(days: 365)),
                   );
@@ -112,36 +114,37 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.all(16),
                 ),
-                onPressed: state.isOperationLoading
-                    ? null
-                    : () async {
-                      if (_formKey.currentState!.validate()) {
-                        final success = await ref
-                            .read(tenantAdminProvider.notifier)
-                            .scheduleVisitor({
-                              "visitorName": _nameController.text,
-                              "mobileNumber": _mobileController.text,
-                              "visitDate": DateFormat(
-                                'yyyy-MM-dd',
-                              ).format(_visitDate),
-                              "visitType": _selectedVisitType,
-                            });
-                        if (context.mounted) {
-                          if (success) {
-                            SnackbarUtils.showSuccess(
-                              context,
-                              "Visitor scheduled successfully",
-                            );
-                            Navigator.pop(context);
-                          } else {
-                            SnackbarUtils.showError(
-                              context,
-                              "Failed to schedule visitor",
-                            );
+                onPressed:
+                    state.isOperationLoading
+                        ? null
+                        : () async {
+                          if (_formKey.currentState!.validate()) {
+                            final success = await ref
+                                .read(tenantAdminProvider.notifier)
+                                .scheduleVisitor({
+                                  "visitorName": _nameController.text,
+                                  "mobileNumber": _mobileController.text,
+                                  "visitDate": DateFormat(
+                                    'yyyy-MM-dd',
+                                  ).format(_visitDate),
+                                  "visitType": _selectedVisitType,
+                                });
+                            if (context.mounted) {
+                              if (success) {
+                                SnackbarUtils.showSuccess(
+                                  context,
+                                  "Visitor scheduled successfully",
+                                );
+                                Navigator.pop(context);
+                              } else {
+                                SnackbarUtils.showError(
+                                  context,
+                                  "Failed to schedule visitor",
+                                );
+                              }
+                            }
                           }
-                        }
-                      }
-                    },
+                        },
                 child:
                     state.isOperationLoading
                         ? const SizedBox(

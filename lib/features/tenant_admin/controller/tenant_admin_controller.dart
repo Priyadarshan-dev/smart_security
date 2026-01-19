@@ -148,7 +148,8 @@ class TenantAdminController extends StateNotifier<TenantAdminState> {
         await fetchDashboardData();
         return true;
       }
-    } catch (_) {} finally {
+    } catch (_) {
+    } finally {
       state = state.copyWith(isOperationLoading: false);
     }
     return false;
@@ -164,7 +165,8 @@ class TenantAdminController extends StateNotifier<TenantAdminState> {
         await fetchDashboardData();
         return true;
       }
-    } catch (_) {} finally {
+    } catch (_) {
+    } finally {
       state = state.copyWith(isOperationLoading: false);
     }
     return false;
@@ -181,7 +183,8 @@ class TenantAdminController extends StateNotifier<TenantAdminState> {
         await fetchDashboardData();
         return true;
       }
-    } catch (_) {} finally {
+    } catch (_) {
+    } finally {
       state = state.copyWith(isOperationLoading: false);
     }
     return false;
@@ -195,7 +198,8 @@ class TenantAdminController extends StateNotifier<TenantAdminState> {
         await fetchDashboardData();
         return true;
       }
-    } catch (_) {} finally {
+    } catch (_) {
+    } finally {
       state = state.copyWith(isOperationLoading: false);
     }
     return false;
@@ -204,7 +208,9 @@ class TenantAdminController extends StateNotifier<TenantAdminState> {
   Future<void> fetchTenantVehicles() async {
     state = state.copyWith(vehicles: const AsyncValue.loading());
     try {
-      final response = await _api.get("/tenant-admin/vehicles");
+      final response = await _api.get("/security/vehicles/tenant");
+      print(response.body);
+      print(response.statusCode);
       if (response.statusCode == 200) {
         state = state.copyWith(
           vehicles: AsyncValue.data(jsonDecode(response.body)),
@@ -218,21 +224,61 @@ class TenantAdminController extends StateNotifier<TenantAdminState> {
         );
       }
     } catch (e) {
-      state = state.copyWith(
-        vehicles: AsyncValue.error(e, StackTrace.current),
-      );
+      state = state.copyWith(vehicles: AsyncValue.error(e, StackTrace.current));
     }
   }
 
   Future<bool> addVehicle(Map<String, dynamic> data) async {
     state = state.copyWith(isOperationLoading: true);
     try {
-      final response = await _api.post("/tenant-admin/vehicles", data);
+      final response = await _api.post(
+        "/tenant-admin/tenantsVehicles/entry",
+        data,
+      );
+      print(response.body);
+      print(response.statusCode);
       if (response.statusCode == 200 || response.statusCode == 201) {
         await fetchTenantVehicles();
         return true;
       }
-    } catch (_) {} finally {
+    } catch (_) {
+    } finally {
+      state = state.copyWith(isOperationLoading: false);
+    }
+    return false;
+  }
+
+  Future<bool> updateVehicle(int id, Map<String, dynamic> data) async {
+    state = state.copyWith(isOperationLoading: true);
+    try {
+      // Assuming ID is passed in path
+      final response = await _api.put(
+        "/tenant-admin/tenantsVehicles/$id",
+        data,
+      );
+      print("Update Vehicle Response: ${response.statusCode} ${response.body}");
+      if (response.statusCode == 200) {
+        await fetchTenantVehicles();
+        return true;
+      }
+    } catch (_) {
+    } finally {
+      state = state.copyWith(isOperationLoading: false);
+    }
+    return false;
+  }
+
+  Future<bool> deleteVehicle(int id) async {
+    state = state.copyWith(isOperationLoading: true);
+    try {
+      final response = await _api.delete("/tenant-admin/tenantsVehicles/$id");
+      print("Delete Vehicle Response: ${response.statusCode} ${response.body}");
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        await fetchTenantVehicles();
+        return true;
+      }
+    } catch (_) {
+    } finally {
       state = state.copyWith(isOperationLoading: false);
     }
     return false;

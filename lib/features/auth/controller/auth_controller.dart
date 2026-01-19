@@ -24,8 +24,10 @@ class AuthController extends StateNotifier<AuthState> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        print("Login Response: $data"); // Debug log using print as requested
         await _storage.saveToken(data['token']);
         await _storage.saveRole(data['role']);
+
         state = state.copyWith(
           status: AuthStatus.authenticated,
           role: data['role'],

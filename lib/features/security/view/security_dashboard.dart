@@ -20,7 +20,9 @@ class _SecurityDashboardState extends ConsumerState<SecurityDashboard> {
     Future.microtask(() {
       print("SecurityDashboard: Initializing data...");
       ref.read(securityProvider.notifier).fetchTodayVisitors();
-      ref.read(securityProvider.notifier).fetchTenants(); // Proper place to init
+      ref
+          .read(securityProvider.notifier)
+          .fetchTenants(); // Proper place to init
     });
   }
 
@@ -34,7 +36,8 @@ class _SecurityDashboardState extends ConsumerState<SecurityDashboard> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => ref.read(securityProvider.notifier).refreshDashboard(),
+            onPressed:
+                () => ref.read(securityProvider.notifier).refreshDashboard(),
           ),
           IconButton(
             icon: const Icon(Icons.logout),
@@ -52,10 +55,13 @@ class _SecurityDashboardState extends ConsumerState<SecurityDashboard> {
               state.todayVisitors.when(
                 data:
                     (list) => InkWell(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const VisitorHistoryScreen()),
-                      ),
+                      onTap:
+                          () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const VisitorHistoryScreen(),
+                            ),
+                          ),
                       child: _buildSummaryCard(
                         context,
                         "Visitors Checked-In",
@@ -86,7 +92,9 @@ class _SecurityDashboardState extends ConsumerState<SecurityDashboard> {
                 Colors.purple,
                 () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const VisitorHistoryScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => const VisitorHistoryScreen(),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -184,7 +192,9 @@ class _SecurityDashboardState extends ConsumerState<SecurityDashboard> {
           (context) => AlertDialog(
             title: const Text("Logout"),
             content: const Text("Are you sure you want to logout?"),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),

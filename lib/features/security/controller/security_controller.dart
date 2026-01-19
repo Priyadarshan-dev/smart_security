@@ -4,8 +4,8 @@ import '../../../core/api/api_client.dart';
 
 final securityProvider =
     StateNotifierProvider<SecurityMobileController, SecurityState>((ref) {
-  return SecurityMobileController(ApiClient());
-});
+      return SecurityMobileController(ApiClient());
+    });
 
 class SecurityState {
   final AsyncValue<List<dynamic>> todayVisitors;
@@ -84,7 +84,8 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
         await fetchTodayVisitors();
         return true;
       }
-    } catch (_) {} finally {
+    } catch (_) {
+    } finally {
       state = state.copyWith(isOperationLoading: false);
     }
     return false;
@@ -94,14 +95,15 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
     state = state.copyWith(isOperationLoading: true);
     try {
       final response = await _api.post(
-        "/security/visitors/$visitorId/exit",
+        "/security/visitors/$visitorId/check-out",
         {},
       );
       if (response.statusCode == 200) {
         await fetchTodayVisitors();
         return true;
       }
-    } catch (_) {} finally {
+    } catch (_) {
+    } finally {
       state = state.copyWith(isOperationLoading: false);
     }
     return false;
@@ -116,7 +118,8 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
       print("Walk-in Data: ${data['assignedAdmins']}");
       print("Walk-in Body: ${response.body}");
       return response.statusCode == 200;
-    } catch (_) {} finally {
+    } catch (_) {
+    } finally {
       state = state.copyWith(isOperationLoading: false);
     }
     return false;
@@ -132,7 +135,8 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
         await fetchVehicles();
         return true;
       }
-    } catch (_) {} finally {
+    } catch (_) {
+    } finally {
       state = state.copyWith(isOperationLoading: false);
     }
     return false;
@@ -146,7 +150,8 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
         await fetchVehicles();
         return true;
       }
-    } catch (_) {} finally {
+    } catch (_) {
+    } finally {
       state = state.copyWith(isOperationLoading: false);
     }
     return false;
@@ -162,7 +167,8 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
         await fetchVehicles();
         return true;
       }
-    } catch (_) {} finally {
+    } catch (_) {
+    } finally {
       state = state.copyWith(isOperationLoading: false);
     }
     return false;
@@ -173,19 +179,20 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
       // Reverting to /common/tenants because /super-admin/tenants gives 403 Forbidden for Security users
       final response = await _api.get("/security/tenants");
       print("Fetch /common/tenants Status: ${response.statusCode}");
-      
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         print("Tenants Data Loaded: ${data.length} items");
         state = state.copyWith(tenants: data);
       } else {
-        print("Fetch Tenants Failed: Status ${response.statusCode}, Body: ${response.body}");
+        print(
+          "Fetch Tenants Failed: Status ${response.statusCode}, Body: ${response.body}",
+        );
       }
     } catch (e) {
       print("Fetch Tenants Error: $e");
     }
   }
-
 
   Future<void> fetchVehicles() async {
     state = state.copyWith(vehicles: const AsyncValue.loading());
@@ -216,7 +223,8 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
         await fetchVehicles();
         return true;
       }
-    } catch (_) {} finally {
+    } catch (_) {
+    } finally {
       state = state.copyWith(isOperationLoading: false);
     }
     return false;
@@ -230,7 +238,8 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
         await fetchVehicles();
         return true;
       }
-    } catch (_) {} finally {
+    } catch (_) {
+    } finally {
       state = state.copyWith(isOperationLoading: false);
     }
     return false;

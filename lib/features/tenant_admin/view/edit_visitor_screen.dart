@@ -20,18 +20,24 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
   late String? _selectedVisitType;
   late DateTime _visitDate;
 
-  final List<String> _visitTypes = ["Interview",
+  final List<String> _visitTypes = [
+    "Interview",
     "Visitor",
     "Vendor",
     "Delivery",
-    "Other",];
+    "Other",
+  ];
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.visitor['visitorName']);
-    _mobileController = TextEditingController(text: widget.visitor['mobileNumber']);
-    
+    _nameController = TextEditingController(
+      text: widget.visitor['visitorName'],
+    );
+    _mobileController = TextEditingController(
+      text: widget.visitor['mobileNumber'],
+    );
+
     // Defensive value handling for DropdownButton
     final String? incomingType = widget.visitor['visitType']?.toString();
     if (_visitTypes.contains(incomingType)) {
@@ -61,20 +67,27 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: "Visitor Name", border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: "Visitor Name",
+                  border: OutlineInputBorder(),
+                ),
                 inputFormatters: [
                   FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
                 ],
                 validator: (v) {
                   if (v == null || v.isEmpty) return "Required";
-                  if (RegExp(r'[0-9]').hasMatch(v)) return "Numbers not allowed";
+                  if (RegExp(r'[0-9]').hasMatch(v))
+                    return "Numbers not allowed";
                   return null;
                 },
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _mobileController,
-                decoration: const InputDecoration(labelText: "Mobile Number", border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: "Mobile Number",
+                  border: OutlineInputBorder(),
+                ),
                 keyboardType: TextInputType.number,
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
@@ -89,9 +102,15 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: _selectedVisitType,
-                items: _visitTypes.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
+                items:
+                    _visitTypes
+                        .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+                        .toList(),
                 onChanged: (v) => setState(() => _selectedVisitType = v),
-                decoration: const InputDecoration(labelText: "Visit Type", border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: "Visit Type",
+                  border: OutlineInputBorder(),
+                ),
               ),
               const SizedBox(height: 16),
               ListTile(
@@ -99,14 +118,17 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
                   side: BorderSide(color: Colors.grey.shade400),
                   borderRadius: BorderRadius.circular(4),
                 ),
-                title: Text("Date: ${DateFormat('yyyy-MM-dd').format(_visitDate)}"),
+                title: Text(
+                  "Date: ${DateFormat('yyyy-MM-dd').format(_visitDate)}",
+                ),
                 trailing: const Icon(Icons.calendar_today),
                 onTap: () async {
                   final now = DateTime.now();
                   final today = DateTime(now.year, now.month, now.day);
                   final picked = await showDatePicker(
                     context: context,
-                    initialDate: _visitDate.isBefore(today) ? today : _visitDate,
+                    initialDate:
+                        _visitDate.isBefore(today) ? today : _visitDate,
                     firstDate: today,
                     lastDate: today.add(const Duration(days: 365)),
                   );
@@ -115,40 +137,40 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
               ),
               const SizedBox(height: 32),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(16)),
-                onPressed: state.isOperationLoading
-                    ? null
-                    : () async {
-                      if (_formKey.currentState!.validate()) {
-                        final success = await ref
-                            .read(tenantAdminProvider.notifier)
-                            .updateVisitor(
-                              widget.visitor['id'],
-                              {
-                                "visitorName": _nameController.text,
-                                "mobileNumber": _mobileController.text,
-                                "visitDate": DateFormat(
-                                  'yyyy-MM-dd',
-                                ).format(_visitDate),
-                                "visitType": _selectedVisitType,
-                              },
-                            );
-                        if (context.mounted) {
-                          if (success) {
-                            SnackbarUtils.showSuccess(
-                              context,
-                              "Visitor updated successfully",
-                            );
-                            Navigator.pop(context);
-                          } else {
-                            SnackbarUtils.showError(
-                              context,
-                              "Failed to update visitor",
-                            );
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.all(16),
+                ),
+                onPressed:
+                    state.isOperationLoading
+                        ? null
+                        : () async {
+                          if (_formKey.currentState!.validate()) {
+                            final success = await ref
+                                .read(tenantAdminProvider.notifier)
+                                .updateVisitor(widget.visitor['id'], {
+                                  "visitorName": _nameController.text,
+                                  "mobileNumber": _mobileController.text,
+                                  "visitDate": DateFormat(
+                                    'yyyy-MM-dd',
+                                  ).format(_visitDate),
+                                  "visitType": _selectedVisitType,
+                                });
+                            if (context.mounted) {
+                              if (success) {
+                                SnackbarUtils.showSuccess(
+                                  context,
+                                  "Visitor updated successfully",
+                                );
+                                Navigator.pop(context);
+                              } else {
+                                SnackbarUtils.showError(
+                                  context,
+                                  "Failed to update visitor",
+                                );
+                              }
+                            }
                           }
-                        }
-                      }
-                    },
+                        },
                 child:
                     state.isOperationLoading
                         ? const SizedBox(
