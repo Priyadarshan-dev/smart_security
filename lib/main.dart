@@ -7,7 +7,14 @@ import 'features/auth/view/login_screen.dart';
 import 'features/tenant_admin/view/tenant_admin_dashboard.dart';
 import 'features/security/view/security_dashboard.dart';
 
-void main() {
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'core/services/notification_service.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await NotificationService().initializeNotifications();
   runApp(const ProviderScope(child: SmartSecurityApp()));
 }
 

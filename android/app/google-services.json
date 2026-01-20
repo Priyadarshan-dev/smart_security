@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "757179306658",
+    "project_id": "smart-security-b1d60",
+    "storage_bucket": "smart-security-b1d60.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:757179306658:android:4b7fcce2a0197867a8bdfb",
+        "android_client_info": {
+          "package_name": "com.example.flutter_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_F--hLxkVpmv9HLVI4mm9B2KUkkXHS3Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
