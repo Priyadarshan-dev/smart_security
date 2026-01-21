@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../storage/storage_service.dart';
-
+// 192.168.1.2
 class ApiClient {
   final String baseUrl =
       "http://192.168.1.19:8080/api/v1"; // Updated to match user configuration

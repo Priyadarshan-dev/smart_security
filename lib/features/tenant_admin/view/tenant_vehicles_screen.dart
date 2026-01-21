@@ -32,88 +32,338 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
       "Other",
     ];
 
+    const primaryColor = Color(0xFF1E3A8A);
+
     showDialog(
       context: context,
       builder:
           (context) => StatefulBuilder(
             builder:
                 (context, setState) => AlertDialog(
+                  backgroundColor: Colors.white,
+                  surfaceTintColor: Colors.white,
                   title: const Text(
                     "Add New Vehicle",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  content: Form(
-                    key: formKey,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TextFormField(
-                          controller: numberController,
-                          decoration: const InputDecoration(
-                            labelText: "Vehicle Number",
-                            hintText: "e.g. TN01AB1234",
-                            border: OutlineInputBorder(),
-                          ),
-                          textCapitalization: TextCapitalization.characters,
-                          validator: (v) => v!.isEmpty ? "Required" : null,
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: driverController,
-                          decoration: const InputDecoration(
-                            labelText: "Driver Name",
-                            border: OutlineInputBorder(),
-                          ),
-                          validator: (v) => v!.isEmpty ? "Required" : null,
-                        ),
-                        const SizedBox(height: 16),
-                        DropdownButtonFormField<String>(
-                          value: selectedVehicleType,
-                          items:
-                              vehicleTypes
-                                  .map(
-                                    (t) => DropdownMenuItem(
-                                      value: t,
-                                      child: Text(t),
-                                    ),
-                                  )
-                                  .toList(),
-                          onChanged:
-                              (v) => setState(() => selectedVehicleType = v!),
-                          decoration: const InputDecoration(
-                            labelText: "Vehicle Type",
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        DropdownButtonFormField<String>(
-                          value: selectedPurpose,
-                          items:
-                              purposes
-                                  .map(
-                                    (p) => DropdownMenuItem(
-                                      value: p,
-                                      child: Text(p),
-                                    ),
-                                  )
-                                  .toList(),
-                          onChanged:
-                              (v) => setState(() => selectedPurpose = v!),
-                          decoration: const InputDecoration(
-                            labelText: "Purpose",
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ],
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
                   ),
-                  actionsPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 16,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
                   ),
+                  content: SingleChildScrollView(
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: numberController,
+                            decoration: InputDecoration(
+                              labelText: "Vehicle Number",
+                              labelStyle: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              floatingLabelStyle: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              hintText: "e.g. TN01AB1234",
+                              hintStyle: TextStyle(color: Colors.grey.shade400),
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.always,
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 20,
+                                horizontal: 15,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFCBD5E1),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFCBD5E1),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade400,
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                            textCapitalization: TextCapitalization.characters,
+                            validator: (v) => v!.isEmpty ? "Required" : null,
+                          ),
+                          const SizedBox(height: 20),
+                          TextFormField(
+                            controller: driverController,
+                            decoration: InputDecoration(
+                              labelText: "Driver Name",
+                              labelStyle: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              floatingLabelStyle: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              hintText: "Enter Driver Name",
+                              hintStyle: TextStyle(color: Colors.grey.shade400),
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.always,
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 20,
+                                horizontal: 15,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFCBD5E1),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFCBD5E1),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade400,
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                            validator: (v) => v!.isEmpty ? "Required" : null,
+                          ),
+                          const SizedBox(height: 20),
+                          DropdownButtonFormField<String>(
+                            value: selectedVehicleType,
+                            icon: const Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: Colors.grey,
+                            ),
+                            isDense: true,
+                            selectedItemBuilder: (context) {
+                              return vehicleTypes.map((t) {
+                                String assetPath;
+                                switch (t) {
+                                  case "CAR":
+                                    assetPath = 'assets/icons/car_icon.png';
+                                    break;
+                                  default:
+                                    assetPath = 'assets/icons/other_icon.png';
+                                }
+                                return Row(
+                                  children: [
+                                    Image.asset(
+                                      assetPath,
+                                      width: 24,
+                                      height: 24,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(t),
+                                  ],
+                                );
+                              }).toList();
+                            },
+                            decoration: InputDecoration(
+                              labelText: "Vehicle Type",
+                              labelStyle: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              floatingLabelStyle: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.always,
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 15,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFCBD5E1),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFCBD5E1),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade400,
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                            items:
+                                vehicleTypes.map((t) {
+                                  String assetPath;
+                                  switch (t) {
+                                    case "CAR":
+                                      assetPath = 'assets/icons/car_icon.png';
+                                      break;
+                                    default:
+                                      assetPath = 'assets/icons/other_icon.png';
+                                  }
+                                  return DropdownMenuItem(
+                                    value: t,
+                                    child: Row(
+                                      children: [
+                                        Image.asset(
+                                          assetPath,
+                                          width: 24,
+                                          height: 24,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(t),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                            onChanged:
+                                (v) => setState(() => selectedVehicleType = v!),
+                          ),
+                          const SizedBox(height: 20),
+                          DropdownButtonFormField<String>(
+                            value: selectedPurpose,
+                            icon: const Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: Colors.grey,
+                            ),
+                            isDense: true,
+                            selectedItemBuilder: (context) {
+                              return purposes.map((p) {
+                                String assetPath;
+                                switch (p) {
+                                  case "Employee":
+                                    assetPath =
+                                        'assets/icons/interview_icon.png';
+                                    break;
+                                  case "Visitor":
+                                    assetPath = 'assets/icons/visitor_icon.png';
+                                    break;
+                                  case "Delivery":
+                                    assetPath =
+                                        'assets/icons/delivery_icon.png';
+                                    break;
+                                  case "Vendor":
+                                    assetPath = 'assets/icons/vendor_icon.png';
+                                    break;
+                                  default:
+                                    assetPath = 'assets/icons/other_icon.png';
+                                }
+                                return Row(
+                                  children: [
+                                    Image.asset(
+                                      assetPath,
+                                      width: 24,
+                                      height: 24,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(p),
+                                  ],
+                                );
+                              }).toList();
+                            },
+                            decoration: InputDecoration(
+                              labelText: "Purpose",
+                              labelStyle: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              floatingLabelStyle: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.always,
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 15,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFCBD5E1),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFCBD5E1),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade400,
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                            items:
+                                purposes.map((p) {
+                                  String assetPath;
+                                  switch (p) {
+                                    case "Employee":
+                                      assetPath =
+                                          'assets/icons/interview_icon.png';
+                                      break;
+                                    case "Visitor":
+                                      assetPath =
+                                          'assets/icons/visitor_icon.png';
+                                      break;
+                                    case "Delivery":
+                                      assetPath =
+                                          'assets/icons/delivery_icon.png';
+                                      break;
+                                    case "Vendor":
+                                      assetPath =
+                                          'assets/icons/vendor_icon.png';
+                                      break;
+                                    default:
+                                      assetPath = 'assets/icons/other_icon.png';
+                                  }
+                                  return DropdownMenuItem(
+                                    value: p,
+                                    child: Row(
+                                      children: [
+                                        Image.asset(
+                                          assetPath,
+                                          width: 24,
+                                          height: 24,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(p),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                            onChanged:
+                                (v) => setState(() => selectedPurpose = v!),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  actionsPadding: const EdgeInsets.all(16),
                   actions: [
                     Row(
                       children: [
@@ -122,20 +372,24 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                             onPressed: () => Navigator.pop(context),
                             child: const Text(
                               "CANCEL",
-                              style: TextStyle(color: Colors.grey),
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).primaryColor,
+                              backgroundColor: const Color(0xFF3B82F6),
                               foregroundColor: Colors.white,
+                              elevation: 2,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                             onPressed: () async {
                               if (formKey.currentState!.validate()) {
@@ -165,7 +419,10 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                             },
                             child: const Text(
                               "ADD VEHICLE",
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
                             ),
                           ),
                         ),
@@ -203,87 +460,344 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
     ];
     if (!purposes.contains(selectedPurpose)) selectedPurpose = "Other";
 
+    const primaryColor = Color(0xFF1E3A8A);
+
     showDialog(
       context: context,
       builder:
           (context) => StatefulBuilder(
             builder:
                 (context, setState) => AlertDialog(
+                  backgroundColor: Colors.white,
+                  surfaceTintColor: Colors.white,
                   title: const Text(
                     "Edit Vehicle",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  content: Form(
-                    key: formKey,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TextFormField(
-                          controller: numberController,
-                          decoration: const InputDecoration(
-                            labelText: "Vehicle Number",
-                            border: OutlineInputBorder(),
-                          ),
-                          textCapitalization: TextCapitalization.characters,
-                          validator: (v) => v!.isEmpty ? "Required" : null,
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: driverController,
-                          decoration: const InputDecoration(
-                            labelText: "Driver Name",
-                            border: OutlineInputBorder(),
-                          ),
-                          validator: (v) => v!.isEmpty ? "Required" : null,
-                        ),
-                        const SizedBox(height: 16),
-                        DropdownButtonFormField<String>(
-                          value: selectedVehicleType,
-                          items:
-                              vehicleTypes
-                                  .map(
-                                    (t) => DropdownMenuItem(
-                                      value: t,
-                                      child: Text(t),
-                                    ),
-                                  )
-                                  .toList(),
-                          onChanged:
-                              (v) => setState(() => selectedVehicleType = v!),
-                          decoration: const InputDecoration(
-                            labelText: "Vehicle Type",
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        DropdownButtonFormField<String>(
-                          value: selectedPurpose,
-                          items:
-                              purposes
-                                  .map(
-                                    (p) => DropdownMenuItem(
-                                      value: p,
-                                      child: Text(p),
-                                    ),
-                                  )
-                                  .toList(),
-                          onChanged:
-                              (v) => setState(() => selectedPurpose = v!),
-                          decoration: const InputDecoration(
-                            labelText: "Purpose",
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ],
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
                   ),
-                  actionsPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 16,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
                   ),
+                  content: SingleChildScrollView(
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: numberController,
+                            decoration: InputDecoration(
+                              labelText: "Vehicle Number",
+                              labelStyle: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              floatingLabelStyle: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              hintText: "e.g. TN01AB1234",
+                              hintStyle: TextStyle(color: Colors.grey.shade400),
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.always,
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 20,
+                                horizontal: 15,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFCBD5E1),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFCBD5E1),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade400,
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                            textCapitalization: TextCapitalization.characters,
+                            validator: (v) => v!.isEmpty ? "Required" : null,
+                          ),
+                          const SizedBox(height: 20),
+                          TextFormField(
+                            controller: driverController,
+                            decoration: InputDecoration(
+                              labelText: "Driver Name",
+                              labelStyle: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              floatingLabelStyle: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              hintText: "Enter Driver Name",
+                              hintStyle: TextStyle(color: Colors.grey.shade400),
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.always,
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 20,
+                                horizontal: 15,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFCBD5E1),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFCBD5E1),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade400,
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                            validator: (v) => v!.isEmpty ? "Required" : null,
+                          ),
+                          const SizedBox(height: 20),
+                          DropdownButtonFormField<String>(
+                            value: selectedVehicleType,
+                            icon: const Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: Colors.grey,
+                            ),
+                            isDense: true,
+                            selectedItemBuilder: (context) {
+                              return vehicleTypes.map((t) {
+                                IconData iconData;
+                                switch (t) {
+                                  case "CAR":
+                                    iconData = Icons.directions_car_rounded;
+                                    break;
+                                  case "BIKE":
+                                    iconData = Icons.two_wheeler_rounded;
+                                    break;
+                                  case "TRUCK":
+                                    iconData = Icons.local_shipping_rounded;
+                                    break;
+                                  default:
+                                    iconData = Icons.more_horiz_rounded;
+                                }
+                                return Row(
+                                  children: [
+                                    Icon(
+                                      iconData,
+                                      size: 20,
+                                      color: Colors.grey.shade700,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(t),
+                                  ],
+                                );
+                              }).toList();
+                            },
+                            decoration: InputDecoration(
+                              labelText: "Vehicle Type",
+                              labelStyle: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              floatingLabelStyle: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.always,
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 15,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFCBD5E1),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFCBD5E1),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade400,
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                            items:
+                                vehicleTypes.map((t) {
+                                  String assetPath;
+                                  switch (t) {
+                                    case "CAR":
+                                      assetPath = 'assets/icons/car_icon.png';
+                                      break;
+                                    default:
+                                      assetPath = 'assets/icons/other_icon.png';
+                                  }
+                                  return DropdownMenuItem(
+                                    value: t,
+                                    child: Row(
+                                      children: [
+                                        Image.asset(
+                                          assetPath,
+                                          width: 24,
+                                          height: 24,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(t),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                            onChanged:
+                                (v) => setState(() => selectedVehicleType = v!),
+                          ),
+                          const SizedBox(height: 20),
+                          DropdownButtonFormField<String>(
+                            value: selectedPurpose,
+                            icon: const Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: Colors.grey,
+                            ),
+                            isDense: true,
+                            selectedItemBuilder: (context) {
+                              return purposes.map((p) {
+                                String assetPath;
+                                switch (p) {
+                                  case "Employee":
+                                    assetPath =
+                                        'assets/icons/interview_icon.png';
+                                    break;
+                                  case "Visitor":
+                                    assetPath = 'assets/icons/visitor_icon.png';
+                                    break;
+                                  case "Delivery":
+                                    assetPath =
+                                        'assets/icons/delivery_icon.png';
+                                    break;
+                                  case "Vendor":
+                                    assetPath = 'assets/icons/vendor_icon.png';
+                                    break;
+                                  default:
+                                    assetPath = 'assets/icons/other_icon.png';
+                                }
+                                return Row(
+                                  children: [
+                                    Image.asset(
+                                      assetPath,
+                                      width: 24,
+                                      height: 24,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(p),
+                                  ],
+                                );
+                              }).toList();
+                            },
+                            decoration: InputDecoration(
+                              labelText: "Purpose",
+                              labelStyle: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              floatingLabelStyle: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.always,
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 15,
+                                horizontal: 15,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFCBD5E1),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFCBD5E1),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade400,
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                            items:
+                                purposes.map((p) {
+                                  String assetPath;
+                                  switch (p) {
+                                    case "Employee":
+                                      assetPath =
+                                          'assets/icons/interview_icon.png';
+                                      break;
+                                    case "Visitor":
+                                      assetPath =
+                                          'assets/icons/visitor_icon.png';
+                                      break;
+                                    case "Delivery":
+                                      assetPath =
+                                          'assets/icons/delivery_icon.png';
+                                      break;
+                                    case "Vendor":
+                                      assetPath =
+                                          'assets/icons/vendor_icon.png';
+                                      break;
+                                    default:
+                                      assetPath = 'assets/icons/other_icon.png';
+                                  }
+                                  return DropdownMenuItem(
+                                    value: p,
+                                    child: Row(
+                                      children: [
+                                        Image.asset(
+                                          assetPath,
+                                          width: 24,
+                                          height: 24,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(p),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                            onChanged:
+                                (v) => setState(() => selectedPurpose = v!),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  actionsPadding: const EdgeInsets.all(16),
                   actions: [
                     Row(
                       children: [
@@ -292,20 +806,24 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                             onPressed: () => Navigator.pop(context),
                             child: const Text(
                               "CANCEL",
-                              style: TextStyle(color: Colors.grey),
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).primaryColor,
+                              backgroundColor: const Color(0xFF6366F1),
                               foregroundColor: Colors.white,
+                              elevation: 2,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                             onPressed: () async {
                               if (formKey.currentState!.validate()) {
@@ -335,7 +853,10 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                             },
                             child: const Text(
                               "UPDATE",
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
                             ),
                           ),
                         ),
@@ -356,39 +877,81 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text("Delete Vehicle"),
+            backgroundColor: Colors.white,
+            surfaceTintColor: Colors.white,
+            title: const Text(
+              "Delete Vehicle",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
+            ),
             content: const Text(
               "Are you sure you want to delete this vehicle?",
             ),
             actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("CANCEL"),
-              ),
-              TextButton(
-                onPressed: () async {
-                  Navigator.pop(context);
-                  final success = await ref
-                      .read(tenantAdminProvider.notifier)
-                      .deleteVehicle(vehicleId);
-                  if (context.mounted) {
-                    if (success) {
-                      SnackbarUtils.showSuccess(
-                        context,
-                        "Vehicle deleted successfully",
-                      );
-                    } else {
-                      SnackbarUtils.showError(
-                        context,
-                        "Failed to delete vehicle",
-                      );
-                    }
-                  }
-                },
-                child: const Text(
-                  "DELETE",
-                  style: TextStyle(color: Colors.red),
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                        ),
+                        side: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      child: const Text(
+                        "CANCEL",
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFEF4444),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                        ),
+                        elevation: 0,
+                      ),
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        final success = await ref
+                            .read(tenantAdminProvider.notifier)
+                            .deleteVehicle(vehicleId);
+                        if (context.mounted) {
+                          if (success) {
+                            SnackbarUtils.showSuccess(
+                              context,
+                              "Vehicle deleted successfully",
+                            );
+                          } else {
+                            SnackbarUtils.showError(
+                              context,
+                              "Failed to delete vehicle",
+                            );
+                          }
+                        }
+                      },
+                      child: const Text(
+                        "DELETE",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -422,13 +985,35 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
           padding: const EdgeInsets.all(16.0),
           child: TextField(
             decoration: InputDecoration(
-              hintText: "Search vehicles...",
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+              labelText: "Search",
+              labelStyle: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
               ),
-              filled: true,
-              fillColor: Colors.grey.shade100,
+              floatingLabelStyle: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+              hintText: "Search vehicles...",
+              hintStyle: TextStyle(color: Colors.grey.shade400),
+              prefixIcon: const Icon(Icons.search),
+              floatingLabelBehavior: FloatingLabelBehavior.always,
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 20,
+                horizontal: 20,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: Color(0xFFCBD5E1)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: Color(0xFFCBD5E1)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: Colors.grey.shade400, width: 2),
+              ),
             ),
             onChanged: (v) => setState(() => _searchQuery = v),
           ),
@@ -457,57 +1042,165 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
                 itemBuilder: (context, index) {
                   final vehicle = filtered[index];
                   return Card(
-                    margin: const EdgeInsets.only(bottom: 12),
+                    margin: const EdgeInsets.only(bottom: 20),
+                    elevation: 2,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Theme.of(
-                          context,
-                        ).primaryColor.withOpacity(0.1),
-                        child: Icon(
-                          Icons.directions_car,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
-                      title: Text(
-                        vehicle['vehicleNumber'] ?? "N/A",
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Text(
-                        vehicle['driverName'] ?? "No driver assigned",
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
                         children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.blue),
-                            onPressed:
-                                () =>
-                                    TenantVehiclesScreen.showEditVehicleDialog(
-                                      context,
-                                      ref,
-                                      vehicle,
-                                    ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed:
-                                () =>
-                                    TenantVehiclesScreen.showDeleteVehicleDialog(
-                                      context,
-                                      ref,
-                                      vehicle['id'],
-                                    ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.qr_code),
-                            onPressed:
-                                () => _showQRDialog(
-                                  context,
-                                  vehicle['vehicleNumber'],
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Vehicle Icon
+                              CircleAvatar(
+                                radius: 35,
+                                backgroundColor: Colors.grey.shade100,
+                                child: Image.asset(
+                                  'assets/icons/car_icon.png',
+                                  width: 40,
+                                  height: 40,
                                 ),
+                              ),
+                              const SizedBox(width: 20),
+                              // Vehicle Details
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Vehicle: ${vehicle['vehicleNumber'] ?? 'N/A'}",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    // Driver Name
+                                    Text(
+                                      "Driver: ${vehicle['driverName'] ?? 'No driver assigned'}",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    // Purpose
+                                    Text(
+                                      "Purpose: ${vehicle['purpose'] ?? 'N/A'}",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          // Action Buttons
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed:
+                                      () =>
+                                          TenantVehiclesScreen.showEditVehicleDialog(
+                                            context,
+                                            ref,
+                                            vehicle,
+                                          ),
+                                  icon: Image.asset(
+                                    'assets/icons/edit_icon.png',
+                                    width: 18,
+                                    height: 18,
+                                    color: Colors.white,
+                                  ),
+                                  label: const Text(
+                                    "Edit",
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF6366F1),
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
+                                    elevation: 2,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed:
+                                      () =>
+                                          TenantVehiclesScreen.showDeleteVehicleDialog(
+                                            context,
+                                            ref,
+                                            vehicle['id'],
+                                          ),
+                                  icon: Image.asset(
+                                    'assets/icons/delete_icon.png',
+                                    width: 18,
+                                    height: 18,
+                                    color: Colors.white,
+                                  ),
+                                  label: const Text(
+                                    "Delete",
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFF43F5E),
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
+                                    elevation: 2,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed:
+                                      () => _showQRDialog(
+                                        context,
+                                        vehicle['vehicleNumber'],
+                                      ),
+                                  icon: Image.asset(
+                                    'assets/icons/qr_code_icon.png',
+                                    width: 18,
+                                    height: 18,
+                                    color: Colors.white,
+                                  ),
+                                  label: const Text(
+                                    "QR",
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.black87,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -528,6 +1221,36 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
                 ),
           ),
         ),
+        // Sticky Add Vehicle Button
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          child: SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton.icon(
+              onPressed:
+                  () => TenantVehiclesScreen.showAddVehicleDialog(context, ref),
+              icon: Image.asset(
+                'assets/icons/car_icon.png',
+                width: 24,
+                height: 24,
+                color: Colors.white,
+              ),
+              label: const Text(
+                "Add Vehicle",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF3B82F6),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 4,
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -538,8 +1261,8 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
       builder:
           (context) => AlertDialog(
             title: Text("QR Code: $vehicleNumber"),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,

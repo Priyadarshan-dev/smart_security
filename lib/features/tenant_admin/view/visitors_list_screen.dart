@@ -42,7 +42,7 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
                       Icon(
                         Icons.people_outline,
                         size: 64,
-                        color: Colors.grey.shade300,
+                        color: Color(0xFFF1F5F9),
                       ),
                       const SizedBox(height: 16),
                       const Text("No visitors found"),
@@ -55,80 +55,144 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
                 itemCount: visitors.length,
                 itemBuilder: (context, index) {
                   final visitor = visitors[index];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.all(16),
-                      leading: CircleAvatar(
-                        backgroundColor: Theme.of(
-                          context,
-                        ).primaryColor.withOpacity(0.1),
-                        child: Icon(
-                          Icons.person,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
-                      title: Text(
-                        visitor['visitorName'] ?? "N/A",
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
                         children: [
-                          const SizedBox(height: 4),
-                          Text(
-                            "${visitor['visitType']} • ${visitor['visitDate']}",
-                          ),
-                          Text(
-                            "Mobile: ${visitor['mobileNumber']}",
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(
-                              Icons.edit_outlined,
-                              color: Colors.blue,
-                            ),
-                            onPressed:
-                                state.isOperationLoading
-                                    ? null
-                                    : () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (_) => EditVisitorScreen(
-                                              visitor: visitor,
-                                            ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Visitor Icon
+                              CircleAvatar(
+                                radius: 35,
+                                backgroundColor: Colors.grey.shade100,
+                                child: Icon(
+                                  Icons.person_rounded,
+                                  size: 40,
+                                  color: Colors.grey.shade400,
+                                ),
+                              ),
+                              const SizedBox(width: 20),
+                              // Visitor Details
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Name: ${visitor['visitorName'] ?? 'N/A'}",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
                                       ),
                                     ),
+                                    const SizedBox(height: 4),
+                                    // Mobile
+                                    Text(
+                                      "Mobile: ${visitor['mobileNumber'] ?? 'N/A'}",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    // Purpose / Visit Type
+                                    Text(
+                                      "Purpose: ${visitor['visitType'] ?? 'N/A'}",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    // Date
+                                    Text(
+                                      "Date: ${visitor['visitDate'] ?? 'N/A'}",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.delete_outline,
-                              color: Colors.red,
-                            ),
-                            onPressed:
-                                state.isOperationLoading
-                                    ? null
-                                    : () => _showDeleteDialog(context, visitor),
+                          const SizedBox(height: 20),
+                          // Action Buttons
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed:
+                                      state.isOperationLoading
+                                          ? null
+                                          : () => Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (_) => EditVisitorScreen(
+                                                    visitor: visitor,
+                                                  ),
+                                            ),
+                                          ),
+                                  icon: Image.asset(
+                                    'assets/icons/edit_icon.png',
+                                    width: 18,
+                                    height: 18,
+                                    color: Colors.white,
+                                  ),
+                                  label: const Text("Edit"),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF6366F1),
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
+                                    elevation: 2,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed:
+                                      state.isOperationLoading
+                                          ? null
+                                          : () => _showDeleteDialog(
+                                            context,
+                                            visitor,
+                                          ),
+                                  icon: Image.asset(
+                                    'assets/icons/delete_icon.png',
+                                    width: 18,
+                                    height: 18,
+                                    color: Colors.white,
+                                  ),
+                                  label: const Text("Delete"),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFF43F5E),
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
+                                    elevation: 2,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -163,43 +227,81 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text("Delete Visitor"),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+            backgroundColor: Colors.white,
+            surfaceTintColor: Colors.white,
+            title: const Text(
+              "Delete Visitor",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
             ),
             content: Text(
               "Are you sure you want to delete ${visitor['visitorName']}?",
             ),
             actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("CANCEL"),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                ),
-                onPressed: () async {
-                  final success = await ref
-                      .read(tenantAdminProvider.notifier)
-                      .deleteVisitor(visitor['id']);
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                    if (success) {
-                      SnackbarUtils.showSuccess(
-                        context,
-                        "Visitor deleted successfully",
-                      );
-                    } else {
-                      SnackbarUtils.showError(
-                        context,
-                        "Failed to delete visitor",
-                      );
-                    }
-                  }
-                },
-                child: const Text("DELETE"),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                        ),
+                        side: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      child: const Text(
+                        "CANCEL",
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFEF4444),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                        ),
+                        elevation: 0,
+                      ),
+                      onPressed: () async {
+                        final success = await ref
+                            .read(tenantAdminProvider.notifier)
+                            .deleteVisitor(visitor['id']);
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                          if (success) {
+                            SnackbarUtils.showSuccess(
+                              context,
+                              "Visitor deleted successfully",
+                            );
+                          } else {
+                            SnackbarUtils.showError(
+                              context,
+                              "Failed to delete visitor",
+                            );
+                          }
+                        }
+                      },
+                      child: const Text(
+                        "DELETE",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

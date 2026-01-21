@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/app_error_widget.dart';
@@ -49,42 +50,100 @@ class _TenantAdminDashboardState extends ConsumerState<TenantAdminDashboard> {
     return Stack(
       children: [
         Scaffold(
+          backgroundColor: const Color(0xFFF5F9FF),
           appBar: AppBar(
             title: Text(titles[_currentIndex]),
+            centerTitle: true,
+            backgroundColor: const Color(0xFF60A5FA),
+            foregroundColor: Colors.white,
             elevation: 2,
             actions: [
-              IconButton(
-                icon: const Icon(Icons.logout),
-                onPressed: () => _showLogoutDialog(context, ref),
-              ),
+              if (_currentIndex == 0)
+                IconButton(
+                  icon: const Icon(Icons.logout),
+                  onPressed: () => _showLogoutDialog(context, ref),
+                ),
             ],
           ),
           body: pages[_currentIndex],
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: _currentIndex,
-            onTap: (index) => setState(() => _currentIndex = index),
-            elevation: 8,
-            selectedItemColor: Theme.of(context).primaryColor,
-            unselectedItemColor: Colors.grey,
-            type: BottomNavigationBarType.fixed,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.dashboard_rounded),
-                label: "Home",
+          bottomNavigationBar: Container(
+            decoration: const BoxDecoration(
+              color: Color(0xFFE0ECFF),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 8,
+                  offset: Offset(0, -2),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8, bottom: 4),
+                child: SizedBox(
+                  height: 90,
+                  child: BottomNavigationBar(
+                    currentIndex: _currentIndex,
+                    onTap: (index) => setState(() => _currentIndex = index),
+                    elevation: 0,
+                    backgroundColor: Colors.transparent,
+                    selectedItemColor: const Color(0xFF60A5FA),
+                    unselectedItemColor: Colors.grey,
+                    type: BottomNavigationBarType.fixed,
+                    items: [
+                      BottomNavigationBarItem(
+                        icon: Image.asset(
+                          'assets/icons/home_icon.png',
+                          height: 24,
+                          width: 24,
+                          color:
+                              _currentIndex == 0
+                                  ? const Color(0xFF60A5FA)
+                                  : Colors.grey,
+                        ),
+                        label: "Home",
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Image.asset(
+                          'assets/icons/approvals_icon.png',
+                          height: 24,
+                          width: 24,
+                          color:
+                              _currentIndex == 1
+                                  ? const Color(0xFF60A5FA)
+                                  : Colors.grey,
+                        ),
+                        label: "Approvals",
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Image.asset(
+                          'assets/icons/schedule_visitors_icon.png',
+                          height: 24,
+                          width: 24,
+                          color:
+                              _currentIndex == 2
+                                  ? const Color(0xFF60A5FA)
+                                  : Colors.grey,
+                        ),
+                        label: "Visitors",
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Image.asset(
+                          'assets/icons/car_icon.png',
+                          height: 24,
+                          width: 24,
+                          color:
+                              _currentIndex == 3
+                                  ? const Color(0xFF60A5FA)
+                                  : Colors.grey,
+                        ),
+                        label: "Vehicles",
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.fact_check_rounded),
-                label: "Approvals",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.group_rounded),
-                label: "Visitors",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.directions_car_rounded),
-                label: "Vehicles",
-              ),
-            ],
+            ),
           ),
           floatingActionButton:
               _currentIndex == 0
@@ -96,18 +155,10 @@ class _TenantAdminDashboardState extends ConsumerState<TenantAdminDashboard> {
                             builder: (_) => const AddVisitorScreen(),
                           ),
                         ),
+                    backgroundColor: const Color(0xFF60A5FA),
+                    foregroundColor: Colors.white,
                     label: const Text("Schedule"),
                     icon: const Icon(Icons.add),
-                  )
-                  : _currentIndex == 3
-                  ? FloatingActionButton.extended(
-                    onPressed:
-                        () => TenantVehiclesScreen.showAddVehicleDialog(
-                          context,
-                          ref,
-                        ),
-                    label: const Text("Add Vehicle"),
-                    icon: const Icon(Icons.directions_car_filled),
                   )
                   : null,
         ),
@@ -129,24 +180,54 @@ class _TenantAdminDashboardState extends ConsumerState<TenantAdminDashboard> {
           (context) => AlertDialog(
             title: const Text("Logout"),
             content: const Text("Are you sure you want to logout?"),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
             ),
             actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("CANCEL"),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                  ref.read(authProvider.notifier).logout();
-                },
-                child: const Text("LOGOUT"),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                        ),
+                        side: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      child: const Text(
+                        "CANCEL",
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFEF4444),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                        ),
+                        elevation: 0,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        ref.read(authProvider.notifier).logout();
+                      },
+                      child: const Text(
+                        "LOGOUT",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -195,7 +276,12 @@ class _TenantHomeView extends ConsumerWidget {
                   "Today",
                   "${state.todayVisitors.value?.length ?? 0}",
                   Theme.of(context).colorScheme.primary,
-                  Icons.people_alt_rounded,
+                  Image.asset(
+                    'assets/icons/schedule_visitors_icon.png',
+                    width: 24,
+                    height: 24,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
               ),
               const SizedBox(width: 16),
@@ -206,7 +292,12 @@ class _TenantHomeView extends ConsumerWidget {
                   "Pending",
                   "${state.pendingApprovals.value?.length ?? 0}",
                   Theme.of(context).colorScheme.secondary,
-                  Icons.pending_actions_rounded,
+                  Image.asset(
+                    'assets/icons/approvals_icon.png',
+                    width: 24,
+                    height: 24,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
                 ),
               ),
             ],
@@ -226,7 +317,11 @@ class _TenantHomeView extends ConsumerWidget {
                 padding: const EdgeInsets.all(40.0),
                 child: Column(
                   children: [
-                    Icon(Icons.history, size: 64, color: Colors.grey.shade300),
+                    Icon(
+                      Icons.history,
+                      size: 64,
+                      color: const Color(0xFFF1F5F9),
+                    ),
                     const SizedBox(height: 16),
                     const Text(
                       "No activity today",
@@ -238,51 +333,94 @@ class _TenantHomeView extends ConsumerWidget {
             )
           else
             ...state.todayVisitors.value!.map((visitor) {
-              return Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey.shade100),
+              return Card(
+                margin: const EdgeInsets.only(bottom: 16),
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: Theme.of(
-                        context,
-                      ).primaryColor.withOpacity(0.1),
-                      child: Icon(
-                        Icons.person,
-                        color: Theme.of(context).primaryColor,
-                        size: 20,
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 35,
+                        backgroundColor: Colors.grey.shade100,
+                        backgroundImage:
+                            (visitor['imageUrl'] != null &&
+                                    visitor['imageUrl'].toString().isNotEmpty)
+                                ? MemoryImage(base64Decode(visitor['imageUrl']))
+                                : null,
+                        child:
+                            (visitor['imageUrl'] == null ||
+                                    visitor['imageUrl'].toString().isEmpty)
+                                ? Icon(
+                                  Icons.person_rounded,
+                                  color: Colors.grey.shade400,
+                                  size: 40,
+                                )
+                                : null,
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            visitor['visitorName'] ?? "N/A",
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            "${visitor['visitType']} • ${visitor['visitStatus'] ?? 'SCHEDULED'}",
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildInfoRow(
+                              "Name",
+                              visitor['visitorName'] ?? "N/A",
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 4),
+                            _buildInfoRow(
+                              "Purpose",
+                              visitor['visitType'] ?? "N/A",
+                            ),
+                            const SizedBox(height: 4),
+                            _buildInfoRow(
+                              "Status",
+                              visitor['visitStatus'] ?? 'Scheduled',
+                              color: Colors.green.shade600,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             }),
         ],
       ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value, {Color? color}) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 60,
+          child: Text(
+            "$label: ",
+            style: const TextStyle(
+              fontSize: 13,
+              color: Colors.grey,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: color ?? Colors.black87,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -292,7 +430,7 @@ class _TenantHomeView extends ConsumerWidget {
     String subtitle,
     String value,
     Color color,
-    IconData icon,
+    Widget icon,
   ) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -317,7 +455,7 @@ class _TenantHomeView extends ConsumerWidget {
               color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: color, size: 24),
+            child: SizedBox(width: 24, height: 24, child: icon),
           ),
           const SizedBox(height: 16),
           Text(
@@ -347,24 +485,54 @@ class _TenantHomeView extends ConsumerWidget {
           (context) => AlertDialog(
             title: const Text("Logout"),
             content: const Text("Are you sure you want to logout?"),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
             ),
             actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("CANCEL"),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                  ref.read(authProvider.notifier).logout();
-                },
-                child: const Text("LOGOUT"),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                        ),
+                        side: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      child: const Text(
+                        "CANCEL",
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFEF4444),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                        ),
+                        elevation: 0,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        ref.read(authProvider.notifier).logout();
+                      },
+                      child: const Text(
+                        "LOGOUT",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

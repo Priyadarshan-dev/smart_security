@@ -65,15 +65,12 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
     try {
       final response = await _api.get("/security/visitors/today");
       if (response.statusCode == 200) {
-        state = state.copyWith(
-          todayVisitors: AsyncValue.data(jsonDecode(response.body)),
-        );
+        final decoded = jsonDecode(response.body);
+        final List<dynamic> list = decoded is List ? decoded : [];
+        state = state.copyWith(todayVisitors: AsyncValue.data(list));
       } else {
         state = state.copyWith(
-          todayVisitors: AsyncValue.error(
-            "Failed to fetch visitors",
-            StackTrace.current,
-          ),
+          todayVisitors: const AsyncValue.data([]),
         );
       }
     } catch (e) {
@@ -209,15 +206,12 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
     try {
       final response = await _api.get("/security/vehicles");
       if (response.statusCode == 200) {
-        state = state.copyWith(
-          vehicles: AsyncValue.data(jsonDecode(response.body)),
-        );
+        final decoded = jsonDecode(response.body);
+        final List<dynamic> list = decoded is List ? decoded : [];
+        state = state.copyWith(vehicles: AsyncValue.data(list));
       } else {
         state = state.copyWith(
-          vehicles: AsyncValue.error(
-            "Failed to fetch vehicles",
-            StackTrace.current,
-          ),
+          vehicles: const AsyncValue.data([]),
         );
       }
     } catch (e) {

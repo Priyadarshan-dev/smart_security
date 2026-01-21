@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:ceedeeyes/core/theme/app_theme.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -49,20 +50,73 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
         DefaultTabController(
           length: 2,
           child: Scaffold(
+            backgroundColor: AppTheme.securityBackgroundColor,
             appBar: AppBar(
-              title: const Text("Visitor Management"),
-              bottom: TabBar(
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.white.withOpacity(0.7),
-                indicatorColor: Colors.white,
-                tabs: const [Tab(text: "Scheduled"), Tab(text: "Walk-in")],
+              backgroundColor: AppTheme.securityAppBarColor,
+              elevation: 0,
+              centerTitle: true,
+              leading: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+              ),
+              title: Text(
+                "Visitor Management",
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
             ),
-            body: TabBarView(
-              children: [
-                _buildScheduledTab(state.todayVisitors),
-                _buildWalkInTab(state),
-              ],
+            body: SafeArea(
+              child: Column(
+                children: [
+                  const SizedBox(height: 16),
+                  // Custom Pill TabBar
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: AppTheme.securityTabBarColor,
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: TabBar(
+                      dividerColor: Colors.transparent,
+                      indicatorSize: TabBarIndicatorSize.label,
+                      indicator: const UnderlineTabIndicator(
+                        borderSide: BorderSide(
+                          width: 3.0,
+                          color: Color(0xFF5D4037),
+                        ),
+                        insets: EdgeInsets.symmetric(horizontal: 16.0),
+                      ),
+                      labelColor: const Color(0xFF5D4037),
+                      unselectedLabelColor: Colors.grey.shade400,
+                      overlayColor: MaterialStateProperty.all(
+                        Colors.transparent,
+                      ),
+                      tabs: const [
+                        Tab(text: "Scheduled"),
+                        Tab(text: "Walk-in"),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        _buildScheduledTab(state.todayVisitors),
+                        _buildWalkInTab(state),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -110,35 +164,143 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                   item['status'] == 'ALLOWED' || item['status'] == 'APPROVED';
               final bool isPending = item['status'] == 'PENDING';
 
-              return ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Colors.grey.shade200,
-                  backgroundImage:
-                      item['imageUrl'] != null
-                          ? MemoryImage(base64Decode(item['imageUrl']))
-                          : null,
-                  child:
-                      item['imageUrl'] == null
-                          ? const Icon(Icons.person)
-                          : null,
+              return Card(
+                elevation: 2,
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
                 ),
-                title: Text(item['visitorName']),
-                subtitle: Text("${item['mobileNumber']} • ${item['status']}"),
-                trailing:
-                    isAllowed
-                        ? ElevatedButton(
-                          onPressed:
-                              () => ref
-                                  .read(securityProvider.notifier)
-                                  .checkInVisitor(item['id']),
-                          child: const Text("Check-In"),
-                        )
-                        : (isPending
-                            ? ElevatedButton(
-                              onPressed: null, // Disabled until allowed
-                              child: const Text("Pending"),
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundColor: Colors.grey.shade200,
+                            backgroundImage:
+                                item['imageUrl'] != null
+                                    ? MemoryImage(
+                                      base64Decode(item['imageUrl']),
+                                    )
+                                    : null,
+                            child:
+                                item['imageUrl'] == null
+                                    ? const Icon(Icons.person, size: 30)
+                                    : null,
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item['visitorName'] ?? 'Unknown',
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  "+91 ${item['mobileNumber'] ?? ''}",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (isAllowed)
+                            ElevatedButton(
+                              onPressed:
+                                  () => ref
+                                      .read(securityProvider.notifier)
+                                      .checkInVisitor(item['id']),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.successColor,
+                                foregroundColor: Colors.white,
+                                side: BorderSide.none,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Icon(Icons.check_circle_outline, size: 18),
+                                  SizedBox(width: 4),
+                                  Text("Check-In"),
+                                ],
+                              ),
                             )
-                            : Text(item['status'] ?? "Unknown")),
+                          else if (isPending)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.withOpacity(0.1),
+                                border: Border.all(
+                                  color: Colors.orange.shade200,
+                                ),
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.access_time,
+                                    size: 18,
+                                    color: Colors.orange.shade800,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    "Pending",
+                                    style: TextStyle(
+                                      color: Colors.orange.shade800,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              item['visitType'] ?? item['purpose'] ?? 'Visitor',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               );
             },
           ),
@@ -175,10 +337,7 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                   decoration: BoxDecoration(
                     color: Colors.grey.shade200,
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Theme.of(context).primaryColor,
-                      width: 2,
-                    ),
+                    border: Border.all(color: AppTheme.primaryBlue, width: 2.5),
                   ),
                   child:
                       _image64 != null
@@ -210,9 +369,38 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
             const SizedBox(height: 24),
             TextFormField(
               controller: _mobileController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: "Mobile Number",
-                border: OutlineInputBorder(),
+                hintText: "Mobile Number",
+                hintStyle: TextStyle(
+                  color: Colors.grey.shade400,
+                  fontWeight: FontWeight.normal,
+                ),
+                labelStyle: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+                floatingLabelStyle: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 20,
+                  horizontal: 20,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey.shade400),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey.shade400),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey.shade400, width: 2),
+                ),
               ),
               keyboardType: TextInputType.phone,
               inputFormatters: [
@@ -229,9 +417,38 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: "Visitor Name",
-                border: OutlineInputBorder(),
+                hintText: "Visitor Name",
+                hintStyle: TextStyle(
+                  color: Colors.grey.shade400,
+                  fontWeight: FontWeight.normal,
+                ),
+                labelStyle: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+                floatingLabelStyle: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 20,
+                  horizontal: 20,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey.shade400),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey.shade400),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey.shade400, width: 2),
+                ),
               ),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
@@ -246,13 +463,26 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
             DropdownButtonFormField<String>(
               value: _selectedPurpose,
               items:
-                  _purposes
-                      .map((p) => DropdownMenuItem(value: p, child: Text(p)))
-                      .toList(),
+                  _purposes.map((p) {
+                    return DropdownMenuItem(value: p, child: Text(p));
+                  }).toList(),
               onChanged: (v) => setState(() => _selectedPurpose = v),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: "Visit Type",
-                border: OutlineInputBorder(),
+                hintText: "Select Type",
+                labelStyle: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey.shade400),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey.shade400),
+                ),
               ),
               validator: (v) => v == null ? "Required" : null,
             ),
@@ -278,9 +508,22 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                   _selectedAdminIds.clear();
                 });
               },
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: "Select Company",
-                border: OutlineInputBorder(),
+                hintText: "Select Company",
+                labelStyle: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey.shade400),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey.shade400),
+                ),
               ),
               validator: (v) => v == null ? "Required" : null,
             ),
@@ -331,7 +574,12 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
             const SizedBox(height: 32),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryBlue,
+                foregroundColor: Colors.white,
                 padding: const EdgeInsets.all(16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
               onPressed: () async {
                 if (formKey.currentState!.validate() &&
@@ -344,7 +592,7 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                         "visitType": _selectedPurpose,
                         "company": _selectedCompany,
                         "tenantId": _selectedTenantId,
-                        "assignedAdmins": _selectedAdminIds,
+                        "assignedAdminIds": _selectedAdminIds,
                         "imageUrl": _image64,
                       });
                   if (context.mounted) {
@@ -388,6 +636,7 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
     } catch (e) {
       if (mounted) {
         SnackbarUtils.showError(context, "Error capturing image");
+        print("Error While Capturing Image ${e.toString()}");
       }
     }
   }

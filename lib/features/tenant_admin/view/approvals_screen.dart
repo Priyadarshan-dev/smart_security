@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/app_error_widget.dart';
@@ -43,7 +44,7 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
                       Icon(
                         Icons.check_circle_outline,
                         size: 64,
-                        color: Colors.grey.shade300,
+                        color: Color(0xFFCBD5E1),
                       ),
                       const SizedBox(height: 16),
                       const Text(
@@ -59,140 +60,181 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
                 itemCount: list.length,
                 itemBuilder: (context, index) {
                   final item = list[index];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Stack(
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
                         children: [
-                          Positioned(
-                            left: 0,
-                            top: 0,
-                            bottom: 0,
-                            width: 5,
-                            child: Container(color: Colors.orange.shade300),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 26,
-                                  backgroundColor: Colors.orange.shade50,
-                                  child: Icon(
-                                    Icons.person_outline_rounded,
-                                    color: Colors.orange.shade700,
-                                    size: 28,
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        item['visitorName'],
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 17,
-                                          letterSpacing: 0.3,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.phone_android_rounded,
-                                            size: 14,
-                                            color: Colors.grey.shade500,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            item['mobileNumber'],
-                                            style: TextStyle(
-                                              color: Colors.grey.shade600,
-                                              fontSize: 13,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 5,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.blueGrey.shade50,
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          (item['visitType'] ?? "GUEST")
-                                              .toString()
-                                              .toUpperCase(),
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w900,
-                                            color: Colors.blueGrey.shade700,
-                                            letterSpacing: 0.8,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Column(
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Visitor Image
+                              CircleAvatar(
+                                radius: 35,
+                                backgroundColor: Colors.grey.shade100,
+                                backgroundImage:
+                                    (item['imageUrl'] != null &&
+                                            item['imageUrl']
+                                                .toString()
+                                                .isNotEmpty)
+                                        ? MemoryImage(
+                                          base64Decode(item['imageUrl']),
+                                        )
+                                        : null,
+                                child:
+                                    (item['imageUrl'] == null ||
+                                            item['imageUrl'].toString().isEmpty)
+                                        ? Icon(
+                                          Icons.person_rounded,
+                                          size: 40,
+                                          color: Colors.grey.shade400,
+                                        )
+                                        : null,
+                              ),
+                              const SizedBox(width: 20),
+                              // Visitor Details
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    _buildCircleAction(
-                                      icon: Icons.check_rounded,
-                                      color: Colors.green.shade600,
-                                      isLoading: state.isOperationLoading,
-                                      onTap: () async {
-                                        final success = await ref
-                                            .read(tenantAdminProvider.notifier)
-                                            .approveOrReject(
-                                              item['id'],
-                                              "APPROVED",
-                                              "",
-                                            );
-                                        if (context.mounted && success) {
-                                          SnackbarUtils.showSuccess(
-                                            context,
-                                            "Visitor approved",
-                                          );
-                                        }
-                                      },
+                                    Text(
+                                      "Name: ${item['visitorName']}",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                      ),
                                     ),
-                                    const SizedBox(height: 12),
-                                    _buildCircleAction(
-                                      icon: Icons.close_rounded,
-                                      color: Colors.red.shade600,
-                                      isLoading: state.isOperationLoading,
-                                      onTap:
-                                          () => _showRejectDialog(
-                                            context,
-                                            item['id'],
-                                          ),
+                                    const SizedBox(height: 4),
+                                    // Mobile
+                                    Text(
+                                      "Mobile: ${item['mobileNumber']}",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    // Purpose / Visit Type
+                                    Text(
+                                      "Purpose: ${item['visitType'] ?? 'Guest'}",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                      ),
                                     ),
                                   ],
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          // Action Buttons
+                          Row(
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    final success = await ref
+                                        .read(tenantAdminProvider.notifier)
+                                        .approveOrReject(
+                                          item['id'],
+                                          "APPROVED",
+                                          "",
+                                        );
+                                    if (context.mounted && success) {
+                                      SnackbarUtils.showSuccess(
+                                        context,
+                                        "Visitor approved",
+                                      );
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: [
+                                          Color(0xFF10B981),
+                                          Color(0xFF059669),
+                                        ],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
+                                      borderRadius: BorderRadius.circular(30),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(
+                                            0xFF10B981,
+                                          ).withOpacity(0.3),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: const Text(
+                                      "Accept",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap:
+                                      () => _showRejectDialog(
+                                        context,
+                                        item['id'],
+                                      ),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: [
+                                          Color(0xFFEF4444),
+                                          Color(0xFFB91C1C),
+                                        ],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
+                                      borderRadius: BorderRadius.circular(30),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(
+                                            0xFFEF4444,
+                                          ).withOpacity(0.3),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: const Text(
+                                      "Reject",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -222,68 +264,121 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
     );
   }
 
-  Widget _buildCircleAction({
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-    required bool isLoading,
-  }) {
-    return GestureDetector(
-      onTap: isLoading ? null : onTap,
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.12),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(icon, color: color, size: 22),
-      ),
-    );
-  }
-
   void _showRejectDialog(BuildContext context, int visitorId) {
     final controller = TextEditingController();
     showDialog(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text("Rejection Reason"),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+            backgroundColor: Colors.white,
+            surfaceTintColor: Colors.white,
+            title: const Text(
+              "Rejection Reason",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
             ),
             content: TextField(
               controller: controller,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
+                labelText: "Reason",
+                labelStyle: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+                floatingLabelStyle: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
                 hintText: "Enter reason for rejection",
-                border: OutlineInputBorder(),
+                hintStyle: TextStyle(color: Colors.grey.shade400),
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 20,
+                  horizontal: 20,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Color(0xFFCBD5E1)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Color(0xFFCBD5E1)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey.shade400, width: 2),
+                ),
               ),
             ),
             actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("CANCEL"),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  final success = await ref
-                      .read(tenantAdminProvider.notifier)
-                      .approveOrReject(visitorId, "REJECTED", controller.text);
-                  if (context.mounted) {
-                    if (success) {
-                      SnackbarUtils.showSuccess(
-                        context,
-                        "Visitor rejected successfully",
-                      );
-                      Navigator.pop(context);
-                    } else {
-                      SnackbarUtils.showError(
-                        context,
-                        "Failed to reject visitor",
-                      );
-                    }
-                  }
-                },
-                child: const Text("REJECT"),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                        ),
+                        side: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      child: const Text(
+                        "CANCEL",
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFEF4444),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                        ),
+                        elevation: 0,
+                      ),
+                      onPressed: () async {
+                        final success = await ref
+                            .read(tenantAdminProvider.notifier)
+                            .approveOrReject(
+                              visitorId,
+                              "REJECTED",
+                              controller.text,
+                            );
+                        if (context.mounted) {
+                          if (success) {
+                            SnackbarUtils.showSuccess(
+                              context,
+                              "Visitor rejected successfully",
+                            );
+                            Navigator.pop(context);
+                          } else {
+                            SnackbarUtils.showError(
+                              context,
+                              "Failed to reject visitor",
+                            );
+                          }
+                        }
+                      },
+                      child: const Text(
+                        "REJECT",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

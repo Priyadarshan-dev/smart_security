@@ -50,9 +50,11 @@ class _SmartSecurityAppState extends ConsumerState<SmartSecurityApp> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     if (state.status == AuthStatus.authenticated) {
-      if (state.role == "TENANT_ADMIN") {
+      final role = state.role?.toUpperCase().trim();
+      if (role == "TENANT_ADMIN") {
         return const TenantAdminDashboard();
       } else {
+        // Default to SecurityDashboard for security guards or other roles
         return const SecurityDashboard();
       }
     }
