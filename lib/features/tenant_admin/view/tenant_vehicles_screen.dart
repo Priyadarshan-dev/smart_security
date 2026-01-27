@@ -467,7 +467,7 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
     ];
     if (!purposes.contains(selectedPurpose)) selectedPurpose = "Other";
 
-    const primaryColor = Color(0xFF1E3A8A);
+  //  const primaryColor = Color(0xFF1E3A8A);
 
     showDialog(
       context: context,
