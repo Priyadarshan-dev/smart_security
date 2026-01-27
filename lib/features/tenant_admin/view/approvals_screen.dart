@@ -243,7 +243,11 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
                 },
               );
             },
-            loading: () => const AppLoadingWidget(),
+            loading:
+                () =>
+                    state.isOperationLoading
+                        ? const SizedBox.shrink()
+                        : const AppLoadingWidget(),
             error:
                 (e, _) => AppErrorWidget(
                   message: e.toString(),

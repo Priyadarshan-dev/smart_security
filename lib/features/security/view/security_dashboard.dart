@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ceedeeyes/core/theme/app_theme.dart';
@@ -18,6 +19,7 @@ class _SecurityDashboardState extends ConsumerState<SecurityDashboard> {
   @override
   void initState() {
     super.initState();
+    //  NotificationService().initializeNotifications();
     Future.microtask(() {
       print("SecurityDashboard: Initializing data...");
       ref.read(securityProvider.notifier).fetchTodayVisitors();

@@ -110,7 +110,7 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                   Expanded(
                     child: TabBarView(
                       children: [
-                        _buildScheduledTab(state.todayVisitors),
+                        _buildScheduledTab(state),
                         _buildWalkInTab(state),
                       ],
                     ),
@@ -131,8 +131,8 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
     );
   }
 
-  Widget _buildScheduledTab(AsyncValue<List<dynamic>> visitors) {
-    return visitors.when(
+  Widget _buildScheduledTab(SecurityState state) {
+    return state.todayVisitors.when(
       data: (list) {
         final visibleVisitors =
             list
@@ -306,7 +306,11 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
           ),
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading:
+          () =>
+              state.isOperationLoading
+                  ? const SizedBox.shrink()
+                  : const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text(e.toString())),
     );
   }
@@ -460,72 +464,203 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
               },
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: _selectedPurpose,
-              items:
-                  _purposes.map((p) {
-                    return DropdownMenuItem(value: p, child: Text(p));
-                  }).toList(),
-              onChanged: (v) => setState(() => _selectedPurpose = v),
-              decoration: InputDecoration(
-                labelText: "Visit Type",
-                hintText: "Select Type",
-                labelStyle: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: Colors.grey.shade400),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: Colors.grey.shade400),
-                ),
-              ),
+            FormField<String>(
+              initialValue: _selectedPurpose,
               validator: (v) => v == null ? "Required" : null,
+              builder: (fieldState) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DropdownMenu<String>(
+                      width: double.infinity,
+                      expandedInsets: EdgeInsets.zero,
+                      initialSelection: _selectedPurpose,
+                      label: const Text(
+                        "Visit Type",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      hintText: "Select Type",
+                      leadingIcon: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Image.asset(
+                          _selectedPurpose == null
+                              ? 'assets/icons/other_icon.png'
+                              : (() {
+                                switch (_selectedPurpose) {
+                                  case "Interview":
+                                    return 'assets/icons/interview_icon.png';
+                                  case "Visitor":
+                                    return 'assets/icons/visitor_icon.png';
+                                  case "Vendor":
+                                    return 'assets/icons/vendor_icon.png';
+                                  case "Delivery":
+                                    return 'assets/icons/delivery_icon.png';
+                                  default:
+                                    return 'assets/icons/other_icon.png';
+                                }
+                              })(),
+                          width: 24,
+                          height: 24,
+                        ),
+                      ),
+                      inputDecorationTheme: InputDecorationTheme(
+                        filled: false,
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 15,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(color: Colors.grey.shade400),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: Colors.grey.shade400,
+                            width: 2,
+                          ),
+                        ),
+                        floatingLabelBehavior: FloatingLabelBehavior.always,
+                      ),
+                      dropdownMenuEntries:
+                          _purposes.map((p) {
+                            String assetPath;
+                            switch (p) {
+                              case "Interview":
+                                assetPath = 'assets/icons/interview_icon.png';
+                                break;
+                              case "Visitor":
+                                assetPath = 'assets/icons/visitor_icon.png';
+                                break;
+                              case "Vendor":
+                                assetPath = 'assets/icons/vendor_icon.png';
+                                break;
+                              case "Delivery":
+                                assetPath = 'assets/icons/delivery_icon.png';
+                                break;
+                              default:
+                                assetPath = 'assets/icons/other_icon.png';
+                            }
+                            return DropdownMenuEntry<String>(
+                              value: p,
+                              label: p,
+                              leadingIcon: Image.asset(
+                                assetPath,
+                                width: 24,
+                                height: 24,
+                              ),
+                            );
+                          }).toList(),
+                      onSelected: (v) {
+                        setState(() => _selectedPurpose = v);
+                        fieldState.didChange(v);
+                      },
+                    ),
+                    if (fieldState.hasError)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 12, top: 6),
+                        child: Text(
+                          fieldState.errorText!,
+                          style: TextStyle(
+                            color: Colors.red.shade700,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField<int>(
-              value: _selectedTenantId,
-              items:
-                  state.tenants.map((t) {
-                    print("Dropdown List Item: ${t['companyName']}");
-                    return DropdownMenuItem(
-                      value: t['id'] as int,
-                      child: Text(
-                        (t['company'] ?? t['companyName'] ?? 'No Name')
-                            .toString(),
-                      ),
-                    );
-                  }).toList(),
-              onChanged: (v) {
-                final tenant = state.tenants.firstWhere((t) => t['id'] == v);
-                setState(() {
-                  _selectedTenantId = v;
-                  _selectedCompany = tenant['company'] ?? tenant['companyName'];
-                  _selectedAdminIds.clear();
-                });
-              },
-              decoration: InputDecoration(
-                labelText: "Select Company",
-                hintText: "Select Company",
-                labelStyle: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: Colors.grey.shade400),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: Colors.grey.shade400),
-                ),
-              ),
+            FormField<int>(
+              initialValue: _selectedTenantId,
               validator: (v) => v == null ? "Required" : null,
+              builder: (fieldState) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DropdownMenu<int>(
+                      width: double.infinity,
+                      expandedInsets: EdgeInsets.zero,
+                      initialSelection: _selectedTenantId,
+                      label: const Text(
+                        "Select Company",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      hintText: "Select Company",
+                      inputDecorationTheme: InputDecorationTheme(
+                        filled: false,
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 15,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(color: Colors.grey.shade400),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: Colors.grey.shade400,
+                            width: 2,
+                          ),
+                        ),
+                        floatingLabelBehavior: FloatingLabelBehavior.always,
+                      ),
+                      dropdownMenuEntries:
+                          state.tenants.map((t) {
+                            return DropdownMenuEntry<int>(
+                              value: t['id'] as int,
+                              label:
+                                  (t['company'] ??
+                                          t['companyName'] ??
+                                          'No Name')
+                                      .toString(),
+                            );
+                          }).toList(),
+                      onSelected: (v) {
+                        if (v != null) {
+                          final tenant = state.tenants.firstWhere(
+                            (t) => t['id'] == v,
+                          );
+                          setState(() {
+                            _selectedTenantId = v;
+                            _selectedCompany =
+                                tenant['company'] ?? tenant['companyName'];
+                            _selectedAdminIds.clear();
+                          });
+                          fieldState.didChange(v);
+                        }
+                      },
+                    ),
+                    if (fieldState.hasError)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 12, top: 6),
+                        child: Text(
+                          fieldState.errorText!,
+                          style: TextStyle(
+                            color: Colors.red.shade700,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 16),
             if (admins.isNotEmpty) ...[

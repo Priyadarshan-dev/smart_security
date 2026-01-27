@@ -146,218 +146,225 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                             validator: (v) => v!.isEmpty ? "Required" : null,
                           ),
                           const SizedBox(height: 20),
-                          DropdownButtonFormField<String>(
-                            value: selectedVehicleType,
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: Colors.grey,
-                            ),
-                            isDense: true,
-                            selectedItemBuilder: (context) {
-                              return vehicleTypes.map((t) {
-                                String assetPath;
-                                switch (t) {
-                                  case "CAR":
-                                    assetPath = 'assets/icons/car_icon.png';
-                                    break;
-                                  default:
-                                    assetPath = 'assets/icons/other_icon.png';
-                                }
-                                return Row(
-                                  children: [
-                                    Image.asset(
-                                      assetPath,
-                                      width: 24,
-                                      height: 24,
+                          FormField<String>(
+                            initialValue: selectedVehicleType,
+                            validator: (v) => v == null ? "Required" : null,
+                            builder: (fieldState) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  DropdownMenu<String>(
+                                    width: double.infinity,
+                                    expandedInsets: EdgeInsets.zero,
+                                    initialSelection: selectedVehicleType,
+                                    label: const Text(
+                                      "Vehicle Type",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                    const SizedBox(width: 12),
-                                    Text(t),
-                                  ],
-                                );
-                              }).toList();
-                            },
-                            decoration: InputDecoration(
-                              labelText: "Vehicle Type",
-                              labelStyle: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              floatingLabelStyle: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.always,
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 12,
-                                horizontal: 15,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Color(0xFFCBD5E1),
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Color(0xFFCBD5E1),
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Colors.grey.shade400,
-                                  width: 2,
-                                ),
-                              ),
-                            ),
-                            items:
-                                vehicleTypes.map((t) {
-                                  String assetPath;
-                                  switch (t) {
-                                    case "CAR":
-                                      assetPath = 'assets/icons/car_icon.png';
-                                      break;
-                                    default:
-                                      assetPath = 'assets/icons/other_icon.png';
-                                  }
-                                  return DropdownMenuItem(
-                                    value: t,
-                                    child: Row(
-                                      children: [
-                                        Image.asset(
-                                          assetPath,
-                                          width: 24,
-                                          height: 24,
+                                    leadingIcon: Padding(
+                                      padding: const EdgeInsets.all(12),
+                                      child: Image.asset(
+                                        selectedVehicleType == "CAR"
+                                            ? 'assets/icons/car_icon.png'
+                                            : 'assets/icons/other_icon.png',
+                                        width: 24,
+                                        height: 24,
+                                      ),
+                                    ),
+                                    inputDecorationTheme: InputDecorationTheme(
+                                      filled: false,
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                            vertical: 12,
+                                            horizontal: 15,
+                                          ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: const BorderSide(
+                                          color: Color(0xFFCBD5E1),
                                         ),
-                                        const SizedBox(width: 12),
-                                        Text(t),
-                                      ],
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: const BorderSide(
+                                          color: Color(0xFFCBD5E1),
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: BorderSide(
+                                          color: Colors.grey.shade400,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      floatingLabelBehavior:
+                                          FloatingLabelBehavior.always,
                                     ),
-                                  );
-                                }).toList(),
-                            onChanged:
-                                (v) => setState(() => selectedVehicleType = v!),
+                                    dropdownMenuEntries:
+                                        vehicleTypes.map((t) {
+                                          return DropdownMenuEntry<String>(
+                                            value: t,
+                                            label: t,
+                                            leadingIcon: Image.asset(
+                                              t == "CAR"
+                                                  ? 'assets/icons/car_icon.png'
+                                                  : 'assets/icons/other_icon.png',
+                                              width: 24,
+                                              height: 24,
+                                            ),
+                                          );
+                                        }).toList(),
+                                    onSelected: (v) {
+                                      setState(() => selectedVehicleType = v!);
+                                      fieldState.didChange(v);
+                                    },
+                                  ),
+                                  if (fieldState.hasError)
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 12,
+                                        top: 6,
+                                      ),
+                                      child: Text(
+                                        fieldState.errorText!,
+                                        style: TextStyle(
+                                          color: Colors.red.shade700,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              );
+                            },
                           ),
                           const SizedBox(height: 20),
-                          DropdownButtonFormField<String>(
-                            value: selectedPurpose,
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: Colors.grey,
-                            ),
-                            isDense: true,
-                            selectedItemBuilder: (context) {
-                              return purposes.map((p) {
-                                String assetPath;
-                                switch (p) {
-                                  case "Employee":
-                                    assetPath =
-                                        'assets/icons/interview_icon.png';
-                                    break;
-                                  case "Visitor":
-                                    assetPath = 'assets/icons/visitor_icon.png';
-                                    break;
-                                  case "Delivery":
-                                    assetPath =
-                                        'assets/icons/delivery_icon.png';
-                                    break;
-                                  case "Vendor":
-                                    assetPath = 'assets/icons/vendor_icon.png';
-                                    break;
-                                  default:
-                                    assetPath = 'assets/icons/other_icon.png';
-                                }
-                                return Row(
-                                  children: [
-                                    Image.asset(
-                                      assetPath,
-                                      width: 24,
-                                      height: 24,
+                          FormField<String>(
+                            initialValue: selectedPurpose,
+                            validator: (v) => v == null ? "Required" : null,
+                            builder: (fieldState) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  DropdownMenu<String>(
+                                    width: double.infinity,
+                                    expandedInsets: EdgeInsets.zero,
+                                    initialSelection: selectedPurpose,
+                                    label: const Text(
+                                      "Purpose",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                    const SizedBox(width: 12),
-                                    Text(p),
-                                  ],
-                                );
-                              }).toList();
-                            },
-                            decoration: InputDecoration(
-                              labelText: "Purpose",
-                              labelStyle: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              floatingLabelStyle: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.always,
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 12,
-                                horizontal: 15,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Color(0xFFCBD5E1),
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Color(0xFFCBD5E1),
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Colors.grey.shade400,
-                                  width: 2,
-                                ),
-                              ),
-                            ),
-                            items:
-                                purposes.map((p) {
-                                  String assetPath;
-                                  switch (p) {
-                                    case "Employee":
-                                      assetPath =
-                                          'assets/icons/interview_icon.png';
-                                      break;
-                                    case "Visitor":
-                                      assetPath =
-                                          'assets/icons/visitor_icon.png';
-                                      break;
-                                    case "Delivery":
-                                      assetPath =
-                                          'assets/icons/delivery_icon.png';
-                                      break;
-                                    case "Vendor":
-                                      assetPath =
-                                          'assets/icons/vendor_icon.png';
-                                      break;
-                                    default:
-                                      assetPath = 'assets/icons/other_icon.png';
-                                  }
-                                  return DropdownMenuItem(
-                                    value: p,
-                                    child: Row(
-                                      children: [
-                                        Image.asset(
-                                          assetPath,
-                                          width: 24,
-                                          height: 24,
+                                    leadingIcon: Padding(
+                                      padding: const EdgeInsets.all(12),
+                                      child: Image.asset(
+                                        (() {
+                                          switch (selectedPurpose) {
+                                            case "Employee":
+                                              return 'assets/icons/interview_icon.png';
+                                            case "Visitor":
+                                              return 'assets/icons/visitor_icon.png';
+                                            case "Delivery":
+                                              return 'assets/icons/delivery_icon.png';
+                                            case "Vendor":
+                                              return 'assets/icons/vendor_icon.png';
+                                            default:
+                                              return 'assets/icons/other_icon.png';
+                                          }
+                                        })(),
+                                        width: 24,
+                                        height: 24,
+                                      ),
+                                    ),
+                                    inputDecorationTheme: InputDecorationTheme(
+                                      filled: false,
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                            vertical: 12,
+                                            horizontal: 15,
+                                          ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: const BorderSide(
+                                          color: Color(0xFFCBD5E1),
                                         ),
-                                        const SizedBox(width: 12),
-                                        Text(p),
-                                      ],
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: const BorderSide(
+                                          color: Color(0xFFCBD5E1),
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: BorderSide(
+                                          color: Colors.grey.shade400,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      floatingLabelBehavior:
+                                          FloatingLabelBehavior.always,
                                     ),
-                                  );
-                                }).toList(),
-                            onChanged:
-                                (v) => setState(() => selectedPurpose = v!),
+                                    dropdownMenuEntries:
+                                        purposes.map((p) {
+                                          String assetPath;
+                                          switch (p) {
+                                            case "Employee":
+                                              assetPath =
+                                                  'assets/icons/interview_icon.png';
+                                              break;
+                                            case "Visitor":
+                                              assetPath =
+                                                  'assets/icons/visitor_icon.png';
+                                              break;
+                                            case "Delivery":
+                                              assetPath =
+                                                  'assets/icons/delivery_icon.png';
+                                              break;
+                                            case "Vendor":
+                                              assetPath =
+                                                  'assets/icons/vendor_icon.png';
+                                              break;
+                                            default:
+                                              assetPath =
+                                                  'assets/icons/other_icon.png';
+                                          }
+                                          return DropdownMenuEntry<String>(
+                                            value: p,
+                                            label: p,
+                                            leadingIcon: Image.asset(
+                                              assetPath,
+                                              width: 24,
+                                              height: 24,
+                                            ),
+                                          );
+                                        }).toList(),
+                                    onSelected: (v) {
+                                      setState(() => selectedPurpose = v!);
+                                      fieldState.didChange(v);
+                                    },
+                                  ),
+                                  if (fieldState.hasError)
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 12,
+                                        top: 6,
+                                      ),
+                                      child: Text(
+                                        fieldState.errorText!,
+                                        style: TextStyle(
+                                          color: Colors.red.shade700,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -574,224 +581,225 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                             validator: (v) => v!.isEmpty ? "Required" : null,
                           ),
                           const SizedBox(height: 20),
-                          DropdownButtonFormField<String>(
-                            value: selectedVehicleType,
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: Colors.grey,
-                            ),
-                            isDense: true,
-                            selectedItemBuilder: (context) {
-                              return vehicleTypes.map((t) {
-                                IconData iconData;
-                                switch (t) {
-                                  case "CAR":
-                                    iconData = Icons.directions_car_rounded;
-                                    break;
-                                  case "BIKE":
-                                    iconData = Icons.two_wheeler_rounded;
-                                    break;
-                                  case "TRUCK":
-                                    iconData = Icons.local_shipping_rounded;
-                                    break;
-                                  default:
-                                    iconData = Icons.more_horiz_rounded;
-                                }
-                                return Row(
-                                  children: [
-                                    Icon(
-                                      iconData,
-                                      size: 20,
-                                      color: Colors.grey.shade700,
+                          FormField<String>(
+                            initialValue: selectedVehicleType,
+                            validator: (v) => v == null ? "Required" : null,
+                            builder: (fieldState) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  DropdownMenu<String>(
+                                    width: double.infinity,
+                                    expandedInsets: EdgeInsets.zero,
+                                    initialSelection: selectedVehicleType,
+                                    label: const Text(
+                                      "Vehicle Type",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                    const SizedBox(width: 12),
-                                    Text(t),
-                                  ],
-                                );
-                              }).toList();
-                            },
-                            decoration: InputDecoration(
-                              labelText: "Vehicle Type",
-                              labelStyle: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              floatingLabelStyle: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.always,
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 12,
-                                horizontal: 15,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Color(0xFFCBD5E1),
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Color(0xFFCBD5E1),
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Colors.grey.shade400,
-                                  width: 2,
-                                ),
-                              ),
-                            ),
-                            items:
-                                vehicleTypes.map((t) {
-                                  String assetPath;
-                                  switch (t) {
-                                    case "CAR":
-                                      assetPath = 'assets/icons/car_icon.png';
-                                      break;
-                                    default:
-                                      assetPath = 'assets/icons/other_icon.png';
-                                  }
-                                  return DropdownMenuItem(
-                                    value: t,
-                                    child: Row(
-                                      children: [
-                                        Image.asset(
-                                          assetPath,
-                                          width: 24,
-                                          height: 24,
+                                    leadingIcon: Padding(
+                                      padding: const EdgeInsets.all(12),
+                                      child: Image.asset(
+                                        selectedVehicleType == "CAR"
+                                            ? 'assets/icons/car_icon.png'
+                                            : 'assets/icons/other_icon.png',
+                                        width: 24,
+                                        height: 24,
+                                      ),
+                                    ),
+                                    inputDecorationTheme: InputDecorationTheme(
+                                      filled: false,
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                            vertical: 12,
+                                            horizontal: 15,
+                                          ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: const BorderSide(
+                                          color: Color(0xFFCBD5E1),
                                         ),
-                                        const SizedBox(width: 12),
-                                        Text(t),
-                                      ],
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: const BorderSide(
+                                          color: Color(0xFFCBD5E1),
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: BorderSide(
+                                          color: Colors.grey.shade400,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      floatingLabelBehavior:
+                                          FloatingLabelBehavior.always,
                                     ),
-                                  );
-                                }).toList(),
-                            onChanged:
-                                (v) => setState(() => selectedVehicleType = v!),
+                                    dropdownMenuEntries:
+                                        vehicleTypes.map((t) {
+                                          return DropdownMenuEntry<String>(
+                                            value: t,
+                                            label: t,
+                                            leadingIcon: Image.asset(
+                                              t == "CAR"
+                                                  ? 'assets/icons/car_icon.png'
+                                                  : 'assets/icons/other_icon.png',
+                                              width: 24,
+                                              height: 24,
+                                            ),
+                                          );
+                                        }).toList(),
+                                    onSelected: (v) {
+                                      setState(() => selectedVehicleType = v!);
+                                      fieldState.didChange(v);
+                                    },
+                                  ),
+                                  if (fieldState.hasError)
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 12,
+                                        top: 6,
+                                      ),
+                                      child: Text(
+                                        fieldState.errorText!,
+                                        style: TextStyle(
+                                          color: Colors.red.shade700,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              );
+                            },
                           ),
                           const SizedBox(height: 20),
-                          DropdownButtonFormField<String>(
-                            value: selectedPurpose,
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: Colors.grey,
-                            ),
-                            isDense: true,
-                            selectedItemBuilder: (context) {
-                              return purposes.map((p) {
-                                String assetPath;
-                                switch (p) {
-                                  case "Employee":
-                                    assetPath =
-                                        'assets/icons/interview_icon.png';
-                                    break;
-                                  case "Visitor":
-                                    assetPath = 'assets/icons/visitor_icon.png';
-                                    break;
-                                  case "Delivery":
-                                    assetPath =
-                                        'assets/icons/delivery_icon.png';
-                                    break;
-                                  case "Vendor":
-                                    assetPath = 'assets/icons/vendor_icon.png';
-                                    break;
-                                  default:
-                                    assetPath = 'assets/icons/other_icon.png';
-                                }
-                                return Row(
-                                  children: [
-                                    Image.asset(
-                                      assetPath,
-                                      width: 24,
-                                      height: 24,
+                          FormField<String>(
+                            initialValue: selectedPurpose,
+                            validator: (v) => v == null ? "Required" : null,
+                            builder: (fieldState) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  DropdownMenu<String>(
+                                    width: double.infinity,
+                                    expandedInsets: EdgeInsets.zero,
+                                    initialSelection: selectedPurpose,
+                                    label: const Text(
+                                      "Purpose",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                    const SizedBox(width: 12),
-                                    Text(p),
-                                  ],
-                                );
-                              }).toList();
-                            },
-                            decoration: InputDecoration(
-                              labelText: "Purpose",
-                              labelStyle: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              floatingLabelStyle: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.always,
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 15,
-                                horizontal: 15,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Color(0xFFCBD5E1),
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Color(0xFFCBD5E1),
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Colors.grey.shade400,
-                                  width: 2,
-                                ),
-                              ),
-                            ),
-                            items:
-                                purposes.map((p) {
-                                  String assetPath;
-                                  switch (p) {
-                                    case "Employee":
-                                      assetPath =
-                                          'assets/icons/interview_icon.png';
-                                      break;
-                                    case "Visitor":
-                                      assetPath =
-                                          'assets/icons/visitor_icon.png';
-                                      break;
-                                    case "Delivery":
-                                      assetPath =
-                                          'assets/icons/delivery_icon.png';
-                                      break;
-                                    case "Vendor":
-                                      assetPath =
-                                          'assets/icons/vendor_icon.png';
-                                      break;
-                                    default:
-                                      assetPath = 'assets/icons/other_icon.png';
-                                  }
-                                  return DropdownMenuItem(
-                                    value: p,
-                                    child: Row(
-                                      children: [
-                                        Image.asset(
-                                          assetPath,
-                                          width: 24,
-                                          height: 24,
+                                    leadingIcon: Padding(
+                                      padding: const EdgeInsets.all(12),
+                                      child: Image.asset(
+                                        (() {
+                                          switch (selectedPurpose) {
+                                            case "Employee":
+                                              return 'assets/icons/interview_icon.png';
+                                            case "Visitor":
+                                              return 'assets/icons/visitor_icon.png';
+                                            case "Delivery":
+                                              return 'assets/icons/delivery_icon.png';
+                                            case "Vendor":
+                                              return 'assets/icons/vendor_icon.png';
+                                            default:
+                                              return 'assets/icons/other_icon.png';
+                                          }
+                                        })(),
+                                        width: 24,
+                                        height: 24,
+                                      ),
+                                    ),
+                                    inputDecorationTheme: InputDecorationTheme(
+                                      filled: false,
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                            vertical: 15,
+                                            horizontal: 15,
+                                          ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: const BorderSide(
+                                          color: Color(0xFFCBD5E1),
                                         ),
-                                        const SizedBox(width: 12),
-                                        Text(p),
-                                      ],
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: const BorderSide(
+                                          color: Color(0xFFCBD5E1),
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: BorderSide(
+                                          color: Colors.grey.shade400,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      floatingLabelBehavior:
+                                          FloatingLabelBehavior.always,
                                     ),
-                                  );
-                                }).toList(),
-                            onChanged:
-                                (v) => setState(() => selectedPurpose = v!),
+                                    dropdownMenuEntries:
+                                        purposes.map((p) {
+                                          String assetPath;
+                                          switch (p) {
+                                            case "Employee":
+                                              assetPath =
+                                                  'assets/icons/interview_icon.png';
+                                              break;
+                                            case "Visitor":
+                                              assetPath =
+                                                  'assets/icons/visitor_icon.png';
+                                              break;
+                                            case "Delivery":
+                                              assetPath =
+                                                  'assets/icons/delivery_icon.png';
+                                              break;
+                                            case "Vendor":
+                                              assetPath =
+                                                  'assets/icons/vendor_icon.png';
+                                              break;
+                                            default:
+                                              assetPath =
+                                                  'assets/icons/other_icon.png';
+                                          }
+                                          return DropdownMenuEntry<String>(
+                                            value: p,
+                                            label: p,
+                                            leadingIcon: Image.asset(
+                                              assetPath,
+                                              width: 24,
+                                              height: 24,
+                                            ),
+                                          );
+                                        }).toList(),
+                                    onSelected: (v) {
+                                      setState(() => selectedPurpose = v!);
+                                      fieldState.didChange(v);
+                                    },
+                                  ),
+                                  if (fieldState.hasError)
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 12,
+                                        top: 6,
+                                      ),
+                                      child: Text(
+                                        fieldState.errorText!,
+                                        style: TextStyle(
+                                          color: Colors.red.shade700,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              );
+                            },
                           ),
                         ],
                       ),

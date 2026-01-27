@@ -144,111 +144,123 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
                 },
               ),
               const SizedBox(height: 24),
-              DropdownButtonFormField<String>(
-                value: _selectedVisitType,
-                icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                isDense: true,
-                selectedItemBuilder: (context) {
-                  return _visitTypes.map((t) {
-                    String assetPath;
-                    switch (t) {
-                      case "Interview":
-                        assetPath = 'assets/icons/interview_icon.png';
-                        break;
-                      case "Visitor":
-                        assetPath = 'assets/icons/visitor_icon.png';
-                        break;
-                      case "Vendor":
-                        assetPath = 'assets/icons/vendor_icon.png';
-                        break;
-                      case "Delivery":
-                        assetPath = 'assets/icons/delivery_icon.png';
-                        break;
-                      default:
-                        assetPath = 'assets/icons/other_icon.png';
-                    }
-                    return Row(
-                      children: [
-                        Image.asset(assetPath, width: 24, height: 24),
-                        const SizedBox(width: 12),
-                        Text(t),
-                      ],
-                    );
-                  }).toList();
-                },
-                decoration: InputDecoration(
-                  labelText: "Visit Type",
-                  labelStyle: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  floatingLabelStyle: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  hintText: "Select Visit Type",
-                  prefixIcon:
-                      _selectedVisitType == null
-                          ? Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Image.asset(
-                              'assets/icons/other_icon.png',
-                              width: 24,
-                              height: 24,
-                            ),
-                          )
-                          : null,
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                    horizontal: 15,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: Color(0xFFCBD5E1)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: Color(0xFFCBD5E1)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(
-                      color: Colors.grey.shade400,
-                      width: 2,
-                    ),
-                  ),
-                ),
-                items:
-                    _visitTypes.map((t) {
-                      String assetPath;
-                      switch (t) {
-                        case "Interview":
-                          assetPath = 'assets/icons/interview_icon.png';
-                          break;
-                        case "Visitor":
-                          assetPath = 'assets/icons/visitor_icon.png';
-                          break;
-                        case "Vendor":
-                          assetPath = 'assets/icons/vendor_icon.png';
-                          break;
-                        case "Delivery":
-                          assetPath = 'assets/icons/delivery_icon.png';
-                          break;
-                        default:
-                          assetPath = 'assets/icons/other_icon.png';
-                      }
-                      return DropdownMenuItem(
-                        value: t,
-                        child: Row(
-                          children: [
-                            Image.asset(assetPath, width: 24, height: 24),
-                            const SizedBox(width: 12),
-                            Text(t),
-                          ],
+              FormField<String>(
+                initialValue: _selectedVisitType,
+                validator: (v) => v == null ? "Required" : null,
+                builder: (fieldState) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      DropdownMenu<String>(
+                        width: double.infinity,
+                        expandedInsets: EdgeInsets.zero,
+                        initialSelection: _selectedVisitType,
+                        label: const Text(
+                          "Visit Type",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      );
-                    }).toList(),
-                onChanged: (v) => setState(() => _selectedVisitType = v),
+                        hintText: "Select Visit Type",
+                        leadingIcon: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Image.asset(
+                            _selectedVisitType == null
+                                ? 'assets/icons/other_icon.png'
+                                : (() {
+                                  switch (_selectedVisitType) {
+                                    case "Interview":
+                                      return 'assets/icons/interview_icon.png';
+                                    case "Visitor":
+                                      return 'assets/icons/visitor_icon.png';
+                                    case "Vendor":
+                                      return 'assets/icons/vendor_icon.png';
+                                    case "Delivery":
+                                      return 'assets/icons/delivery_icon.png';
+                                    default:
+                                      return 'assets/icons/other_icon.png';
+                                  }
+                                })(),
+                            width: 24,
+                            height: 24,
+                          ),
+                        ),
+                        inputDecorationTheme: InputDecorationTheme(
+                          filled: false,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 15,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFCBD5E1),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFCBD5E1),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 2,
+                            ),
+                          ),
+                          floatingLabelBehavior: FloatingLabelBehavior.always,
+                        ),
+                        dropdownMenuEntries:
+                            _visitTypes.map((t) {
+                              String assetPath;
+                              switch (t) {
+                                case "Interview":
+                                  assetPath = 'assets/icons/interview_icon.png';
+                                  break;
+                                case "Visitor":
+                                  assetPath = 'assets/icons/visitor_icon.png';
+                                  break;
+                                case "Vendor":
+                                  assetPath = 'assets/icons/vendor_icon.png';
+                                  break;
+                                case "Delivery":
+                                  assetPath = 'assets/icons/delivery_icon.png';
+                                  break;
+                                default:
+                                  assetPath = 'assets/icons/other_icon.png';
+                              }
+                              return DropdownMenuEntry<String>(
+                                value: t,
+                                label: t,
+                                leadingIcon: Image.asset(
+                                  assetPath,
+                                  width: 24,
+                                  height: 24,
+                                ),
+                              );
+                            }).toList(),
+                        onSelected: (v) {
+                          setState(() => _selectedVisitType = v);
+                          fieldState.didChange(v);
+                        },
+                      ),
+                      if (fieldState.hasError)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 12, top: 6),
+                          child: Text(
+                            fieldState.errorText!,
+                            style: TextStyle(
+                              color: Colors.red.shade700,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: 24),
               // Visit Date
@@ -259,6 +271,7 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
                   final today = DateTime(now.year, now.month, now.day);
                   final picked = await showDatePicker(
                     context: context,
+                    helpText: "",
                     initialDate:
                         _visitDate.isBefore(today) ? today : _visitDate,
                     firstDate: today,
@@ -270,6 +283,11 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
                             primary: primaryColor,
                             onPrimary: Colors.white,
                             onSurface: Colors.black,
+                          ),
+                          datePickerTheme: const DatePickerThemeData(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.zero,
+                            ),
                           ),
                           textButtonTheme: TextButtonThemeData(
                             style: TextButton.styleFrom(

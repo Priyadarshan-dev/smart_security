@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:ceedeeyes/core/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/app_error_widget.dart';
@@ -24,6 +25,7 @@ class _TenantAdminDashboardState extends ConsumerState<TenantAdminDashboard> {
   @override
   void initState() {
     super.initState();
+
     Future.microtask(() {
       ref.read(tenantAdminProvider.notifier).fetchDashboardData();
       ref.read(authProvider.notifier).syncFcmToken();
@@ -479,64 +481,64 @@ class _TenantHomeView extends ConsumerWidget {
     );
   }
 
-  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text("Logout"),
-            content: const Text("Are you sure you want to logout?"),
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
-            ),
-            actions: [
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.zero,
-                        ),
-                        side: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      child: const Text(
-                        "CANCEL",
-                        style: TextStyle(
-                          color: Colors.black87,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFEF4444),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.zero,
-                        ),
-                        elevation: 0,
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        ref.read(authProvider.notifier).logout();
-                      },
-                      child: const Text(
-                        "LOGOUT",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-    );
-  }
+  // void _showLogoutDialog(BuildContext context, WidgetRef ref) {
+  //   showDialog(
+  //     context: context,
+  //     builder:
+  //         (context) => AlertDialog(
+  //           title: const Text("Logout"),
+  //           content: const Text("Are you sure you want to logout?"),
+  //           shape: const RoundedRectangleBorder(
+  //             borderRadius: BorderRadius.zero,
+  //           ),
+  //           actions: [
+  //             Row(
+  //               children: [
+  //                 Expanded(
+  //                   child: OutlinedButton(
+  //                     onPressed: () => Navigator.pop(context),
+  //                     style: OutlinedButton.styleFrom(
+  //                       padding: const EdgeInsets.symmetric(vertical: 14),
+  //                       shape: const RoundedRectangleBorder(
+  //                         borderRadius: BorderRadius.zero,
+  //                       ),
+  //                       side: BorderSide(color: Colors.grey.shade300),
+  //                     ),
+  //                     child: const Text(
+  //                       "CANCEL",
+  //                       style: TextStyle(
+  //                         color: Colors.black87,
+  //                         fontWeight: FontWeight.bold,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 const SizedBox(width: 12),
+  //                 Expanded(
+  //                   child: ElevatedButton(
+  //                     style: ElevatedButton.styleFrom(
+  //                       backgroundColor: const Color(0xFFEF4444),
+  //                       foregroundColor: Colors.white,
+  //                       padding: const EdgeInsets.symmetric(vertical: 14),
+  //                       shape: const RoundedRectangleBorder(
+  //                         borderRadius: BorderRadius.zero,
+  //                       ),
+  //                       elevation: 0,
+  //                     ),
+  //                     onPressed: () {
+  //                       Navigator.pop(context);
+  //                       ref.read(authProvider.notifier).logout();
+  //                     },
+  //                     child: const Text(
+  //                       "LOGOUT",
+  //                       style: TextStyle(fontWeight: FontWeight.bold),
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ],
+  //         ),
+  //   );
+  // }
 }

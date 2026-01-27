@@ -1,3 +1,5 @@
+import 'package:ceedeeyes/core/storage/storage_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/app_theme.dart';
@@ -6,15 +8,40 @@ import 'features/auth/controller/auth_state.dart';
 import 'features/auth/view/login_screen.dart';
 import 'features/tenant_admin/view/tenant_admin_dashboard.dart';
 import 'features/security/view/security_dashboard.dart';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'core/services/notification_service.dart';
 
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  print("Handling a background message: ${message.messageId}");
+  // Check if user is logged in even in background
+  final storage = StorageService();
+  final token = await storage.getToken();
+  if (token != null) {
+    // You can trigger a notification here if needed,
+    // but usually FCM shows notifications automatically in background unless data-only.
+    print("User is logged in (Background), processing notification...");
+  } else {
+    print("User is logged out (Background), skipping notification.");
+  }
+}
+
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+//   await NotificationService().initializeNotifications();
+//   runApp(const ProviderScope(child: SmartSecurityApp()));
+// }
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await NotificationService().initializeNotifications();
+
+  // ✅ Register background handler BEFORE runApp
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
   runApp(const ProviderScope(child: SmartSecurityApp()));
 }
 
@@ -38,6 +65,12 @@ class _SmartSecurityAppState extends ConsumerState<SmartSecurityApp> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<AuthState>(authProvider, (previous, next) {
+      if (previous?.status != AuthStatus.authenticated &&
+          next.status == AuthStatus.authenticated) {
+        NotificationService().initializeNotifications();
+      }
+    });
     final authState = ref.watch(authProvider);
 
     return MaterialApp(

@@ -47,6 +47,7 @@ class AuthController extends StateNotifier<AuthState> {
         state = state.copyWith(status: AuthStatus.error, error: errorMessage);
       }
     } catch (e) {
+      print("Login Error: $e");
       String message = "Server unreachable. Please check your connection.";
       if (e.toString().contains("TimeoutException")) {
         message = "Connection timeout. Server might be slow or down.";
