@@ -22,4 +22,12 @@ class StorageService {
   Future<void> clear() async {
     await _storage.deleteAll();
   }
+
+  Future<void> saveLastFcmToken(String token) async {
+    await _storage.write(key: 'last_fcm_token', value: token);
+  }
+
+  Future<String?> getLastFcmToken() async {
+    return await _storage.read(key: 'last_fcm_token');
+  }
 }

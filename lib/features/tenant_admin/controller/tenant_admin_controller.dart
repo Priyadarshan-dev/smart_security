@@ -159,13 +159,15 @@ class TenantAdminController extends StateNotifier<TenantAdminState> {
     state = state.copyWith(isOperationLoading: true);
     try {
       final response = await _api.post("/tenant-admin/visitors/schedule", data);
+      print('LIIII');
       print(response.body);
       print(response.statusCode);
       if (response.statusCode == 200) {
         await fetchDashboardData();
         return true;
       }
-    } catch (_) {
+    } catch (e) {
+      print(e);
     } finally {
       state = state.copyWith(isOperationLoading: false);
     }

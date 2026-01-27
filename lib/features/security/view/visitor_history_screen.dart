@@ -522,7 +522,7 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
                             ),
                             const SizedBox(height: 12),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Container(
                                   padding: const EdgeInsets.symmetric(
@@ -542,6 +542,29 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    if (item['checkInTime'] != null)
+                                      Text(
+                                        "In: ${DateFormat('dd.MM.yy h.mm a').format(DateTime.parse(item['checkInTime']))}",
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.green.shade700,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    if (item['checkOutTime'] != null)
+                                      Text(
+                                        "Out: ${DateFormat('dd.MM.yy h.mm a').format(DateTime.parse(item['checkOutTime']))}",
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.red.shade700,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ],
                             ),

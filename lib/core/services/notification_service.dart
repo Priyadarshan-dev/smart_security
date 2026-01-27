@@ -30,21 +30,8 @@ class NotificationService {
       debug: true,
     );
 
-    // Request permissions
-    await AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
-      if (!isAllowed) {
-        AwesomeNotifications().requestPermissionToSendNotifications();
-      }
-    });
-
     // Initialize Firebase Messaging
     FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-    await messaging.requestPermission(alert: true, badge: true, sound: true);
-
-    // Get FCM Token (for server-side integration)
-    String? token = await messaging.getToken();
-    print("FCM Token: $token");
 
     // Listen to foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -59,6 +46,22 @@ class NotificationService {
 
     // Listen to background messages
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+    // Get FCM Token (for server-side integration)
+    String? token = await messaging.getToken();
+    print("FCM Token: $token");
+  }
+
+  Future<void> requestFullPermissions() async {
+    // Request Awesome Notifications permissions
+    bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
+    if (!isAllowed) {
+      await AwesomeNotifications().requestPermissionToSendNotifications();
+    }
+
+    // Request Firebase Messaging permissions
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    await messaging.requestPermission(alert: true, badge: true, sound: true);
   }
 
   static Future<void> _firebaseMessagingBackgroundHandler(

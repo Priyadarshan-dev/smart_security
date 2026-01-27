@@ -29,7 +29,11 @@ class _SmartSecurityAppState extends ConsumerState<SmartSecurityApp> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(authProvider.notifier).checkAuth());
+    Future.microtask(() async {
+      await ref.read(authProvider.notifier).checkAuth();
+      // Request notification permissions after the app has started and initial auth check is done
+      await NotificationService().requestFullPermissions();
+    });
   }
 
   @override

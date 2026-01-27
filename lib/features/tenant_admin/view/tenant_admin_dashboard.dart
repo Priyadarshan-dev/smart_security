@@ -24,9 +24,10 @@ class _TenantAdminDashboardState extends ConsumerState<TenantAdminDashboard> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-      () => ref.read(tenantAdminProvider.notifier).fetchDashboardData(),
-    );
+    Future.microtask(() {
+      ref.read(tenantAdminProvider.notifier).fetchDashboardData();
+      ref.read(authProvider.notifier).syncFcmToken();
+    });
   }
 
   @override

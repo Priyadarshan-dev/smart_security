@@ -21,9 +21,8 @@ class _SecurityDashboardState extends ConsumerState<SecurityDashboard> {
     Future.microtask(() {
       print("SecurityDashboard: Initializing data...");
       ref.read(securityProvider.notifier).fetchTodayVisitors();
-      ref
-          .read(securityProvider.notifier)
-          .fetchTenants(); // Proper place to init
+      ref.read(securityProvider.notifier).fetchTenants();
+      ref.read(authProvider.notifier).syncFcmToken();
     });
   }
 

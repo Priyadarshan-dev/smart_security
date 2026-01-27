@@ -1780,7 +1780,7 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                   child: Text(
                                     checkInTime != null
                                         ? DateFormat(
-                                          'd|M|yyyy',
+                                          'dd.MM.yy h.mm a',
                                         ).format(checkInTime)
                                         : 'N/A',
                                     style: TextStyle(
@@ -1807,7 +1807,7 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                   child: Text(
                                     checkOutTime != null
                                         ? DateFormat(
-                                          'd|M|yyyy',
+                                          'dd.MM.yy h.mm a',
                                         ).format(checkOutTime)
                                         : 'Pending',
                                     style: TextStyle(

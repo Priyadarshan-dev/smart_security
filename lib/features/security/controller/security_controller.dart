@@ -69,9 +69,7 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
         final List<dynamic> list = decoded is List ? decoded : [];
         state = state.copyWith(todayVisitors: AsyncValue.data(list));
       } else {
-        state = state.copyWith(
-          todayVisitors: const AsyncValue.data([]),
-        );
+        state = state.copyWith(todayVisitors: const AsyncValue.data([]));
       }
     } catch (e) {
       state = state.copyWith(
@@ -210,9 +208,7 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
         final List<dynamic> list = decoded is List ? decoded : [];
         state = state.copyWith(vehicles: AsyncValue.data(list));
       } else {
-        state = state.copyWith(
-          vehicles: const AsyncValue.data([]),
-        );
+        state = state.copyWith(vehicles: const AsyncValue.data([]));
       }
     } catch (e) {
       state = state.copyWith(vehicles: AsyncValue.error(e, StackTrace.current));

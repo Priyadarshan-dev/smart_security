@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/storage/storage_service.dart';
@@ -66,6 +67,40 @@ class AuthController extends StateNotifier<AuthState> {
       state = state.copyWith(status: AuthStatus.authenticated, role: role);
     } else {
       state = state.copyWith(status: AuthStatus.unauthenticated);
+    }
+  }
+
+  Future<void> syncFcmToken() async {
+    try {
+      final messaging = FirebaseMessaging.instance;
+      final token = await messaging.getToken();
+
+      if (token == null) {
+        print("FCM Token is null, skipping sync.");
+        return;
+      }
+
+      final lastSyncedToken = await _storage.getLastFcmToken();
+      if (token == lastSyncedToken) {
+        print("FCM Token is already synced.");
+        return;
+      }
+
+      print("Syncing FCM Token: $token");
+      final response = await _api.post("/auth/save-fcm-token", {
+        "fcmToken": token,
+      });
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        await _storage.saveLastFcmToken(token);
+        print("FCM Token synced successfully.");
+      } else {
+        print(
+          "Failed to sync FCM Token: ${response.statusCode} ${response.body}",
+        );
+      }
+    } catch (e) {
+      print("Error syncing FCM Token: $e");
     }
   }
 }
