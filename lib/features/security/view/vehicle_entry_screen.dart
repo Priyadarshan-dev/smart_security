@@ -90,6 +90,39 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
     }
   }
 
+  String _formatDateTime(dynamic value) {
+    if (value == null || value.toString().isEmpty) return 'N/A';
+    try {
+      final dateTime = DateTime.parse(value.toString());
+      return DateFormat('dd.MM.yy h.mm a').format(dateTime);
+    } catch (e) {
+      // Handle time-only format like 15:57:32.576
+      try {
+        if (value.toString().contains(':')) {
+          final parts = value.toString().split(':');
+          if (parts.length >= 2) {
+            final now = DateTime.now();
+            final hour = int.parse(parts[0]);
+            final minute = int.parse(parts[1]);
+            final secondPart = parts.length > 2 ? parts[2].split('.') : ['0'];
+            final second = int.parse(secondPart[0]);
+
+            final dateTime = DateTime(
+              now.year,
+              now.month,
+              now.day,
+              hour,
+              minute,
+              second,
+            );
+            return DateFormat('dd.MM.yy h.mm a').format(dateTime);
+          }
+        }
+      } catch (_) {}
+      return value.toString();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(securityProvider);
@@ -2238,9 +2271,9 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                   ),
                                   child: Text(
                                     checkInTime != null
-                                        ? DateFormat(
-                                          'dd.MM.yy h.mm a',
-                                        ).format(checkInTime)
+                                        ? _formatDateTime(
+                                          vehicle['checkInTime'],
+                                        )
                                         : 'N/A',
                                     style: TextStyle(
                                       fontSize: 10,
@@ -2265,9 +2298,9 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                   ),
                                   child: Text(
                                     checkOutTime != null
-                                        ? DateFormat(
-                                          'dd.MM.yy h.mm a',
-                                        ).format(checkOutTime)
+                                        ? _formatDateTime(
+                                          vehicle['checkOutTime'],
+                                        )
                                         : 'Pending',
                                     style: TextStyle(
                                       fontSize: 10,

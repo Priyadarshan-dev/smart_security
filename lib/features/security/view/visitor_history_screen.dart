@@ -337,7 +337,7 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
                     ),
                     const SizedBox(height: 12),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -356,6 +356,25 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
                             ),
                           ),
                         ),
+                        if (item['tenant']['companyName'] != null) ...[
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              item['tenant']['companyName'],
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ],
@@ -368,6 +387,39 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text(e.toString())),
     );
+  }
+
+  String _formatDateTime(dynamic value) {
+    if (value == null || value.toString().isEmpty) return 'N/A';
+    try {
+      final dateTime = DateTime.parse(value.toString());
+      return DateFormat('dd.MM.yy h.mm a').format(dateTime);
+    } catch (e) {
+      // Handle time-only format like 15:57:32.576
+      try {
+        if (value.toString().contains(':')) {
+          final parts = value.toString().split(':');
+          if (parts.length >= 2) {
+            final now = DateTime.now();
+            final hour = int.parse(parts[0]);
+            final minute = int.parse(parts[1]);
+            final secondPart = parts.length > 2 ? parts[2].split('.') : ['0'];
+            final second = int.parse(secondPart[0]);
+
+            final dateTime = DateTime(
+              now.year,
+              now.month,
+              now.day,
+              hour,
+              minute,
+              second,
+            );
+            return DateFormat('dd.MM.yy h.mm a').format(dateTime);
+          }
+        }
+      } catch (_) {}
+      return value.toString();
+    }
   }
 
   Widget _buildHistoryTab(AsyncValue<List<dynamic>> visitors) {
@@ -548,7 +600,7 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
                                   children: [
                                     if (item['checkInTime'] != null)
                                       Text(
-                                        "In: ${DateFormat('dd.MM.yy h.mm a').format(DateTime.parse(item['checkInTime']))}",
+                                        "In: ${_formatDateTime(item['checkInTime'])}",
                                         style: TextStyle(
                                           fontSize: 11,
                                           color: Colors.green.shade700,
@@ -557,7 +609,7 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
                                       ),
                                     if (item['checkOutTime'] != null)
                                       Text(
-                                        "Out: ${DateFormat('dd.MM.yy h.mm a').format(DateTime.parse(item['checkOutTime']))}",
+                                        "Out: ${_formatDateTime(item['checkOutTime'])}",
                                         style: TextStyle(
                                           fontSize: 11,
                                           color: Colors.red.shade700,
