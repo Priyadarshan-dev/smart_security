@@ -397,7 +397,7 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                         );
                                         DefaultTabController.of(
                                           context,
-                                        )?.animateTo(1);
+                                        ).animateTo(1);
                                       } else {
                                         SnackbarUtils.showError(
                                           context,
