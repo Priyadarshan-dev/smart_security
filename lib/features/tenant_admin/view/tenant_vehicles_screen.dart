@@ -20,10 +20,7 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
     final formKey = GlobalKey<FormState>();
     final numberController = TextEditingController();
     final driverController = TextEditingController();
-    StorageService storageService = StorageService();
-    Future<String> cname = storageService.getCompanyName().then(
-      (value) => value ?? '',
-    );
+
 
     String selectedVehicleType = "CAR";
     final List<String> vehicleTypes = ["CAR", "BIKE", "TRUCK", "OTHER"];
