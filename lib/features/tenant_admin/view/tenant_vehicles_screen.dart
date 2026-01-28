@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:ceedeeyes/core/storage/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gal/gal.dart';
@@ -19,6 +20,10 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
     final formKey = GlobalKey<FormState>();
     final numberController = TextEditingController();
     final driverController = TextEditingController();
+    StorageService storageService = StorageService();
+    Future<String> cname = storageService.getCompanyName().then(
+      (value) => value ?? '',
+    );
 
     String selectedVehicleType = "CAR";
     final List<String> vehicleTypes = ["CAR", "BIKE", "TRUCK", "OTHER"];
@@ -32,7 +37,7 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
       "Other",
     ];
 
-    const primaryColor = Color(0xFF1E3A8A);
+    // const primaryColor = Color(0xFF1E3A8A);
 
     showDialog(
       context: context,
@@ -411,10 +416,14 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                 if (context.mounted) {
                                   Navigator.pop(context);
                                   if (success) {
+                                    print(
+                                      "Vechile Added Successfully :$success",
+                                    );
                                     SnackbarUtils.showSuccess(
                                       context,
                                       "Vehicle added successfully",
                                     );
+                                    // print("Vehicle added successfully$");
                                   } else {
                                     SnackbarUtils.showError(
                                       context,
@@ -467,7 +476,7 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
     ];
     if (!purposes.contains(selectedPurpose)) selectedPurpose = "Other";
 
-  //  const primaryColor = Color(0xFF1E3A8A);
+    //  const primaryColor = Color(0xFF1E3A8A);
 
     showDialog(
       context: context,
@@ -1104,6 +1113,15 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
                                         color: Colors.grey.shade600,
                                       ),
                                     ),
+                                    const SizedBox(height: 8),
+                                    // Company Name
+                                    Text(
+                                      "Company: ${vehicle['company'] ?? 'N/A'}",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -1185,6 +1203,7 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
                                       () => _showQRDialog(
                                         context,
                                         vehicle['vehicleNumber'],
+                                        vehicle['company'],
                                       ),
                                   icon: Image.asset(
                                     'assets/icons/qr_code_icon.png',
@@ -1263,7 +1282,13 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
     );
   }
 
-  void _showQRDialog(BuildContext context, String vehicleNumber) {
+  void _showQRDialog(
+    BuildContext context,
+    String vehicleNumber,
+    String? companyName,
+  ) {
+    final storageService = StorageService();
+
     showDialog(
       context: context,
       builder:
@@ -1272,25 +1297,58 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.zero,
             ),
+
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Center(
                   child: SizedBox(
                     width: 250,
-                    height: 250,
+                    // Increased height to accommodate text
+                    height: 280,
                     child: Screenshot(
                       controller: _screenshotController,
                       child: Container(
                         color: Colors.white,
                         padding: const EdgeInsets.all(16),
-                        child: Center(
-                          child: QrImageView(
-                            data: vehicleNumber,
-                            version: QrVersions.auto,
-                            size: 200.0,
-                            backgroundColor: Colors.white,
-                          ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (companyName != null && companyName.isNotEmpty)
+                              Text(
+                                "Company Name: $companyName",
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              )
+                            else
+                              FutureBuilder<String?>(
+                                future: storageService.getCompanyName(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Text("Loading...");
+                                  }
+                                  return Text(
+                                    "Company Name: ${snapshot.data ?? ""}",
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  );
+                                },
+                              ),
+                            const SizedBox(height: 10),
+                            QrImageView(
+                              data: vehicleNumber,
+                              version: QrVersions.auto,
+                              size: 180.0,
+                              backgroundColor: Colors.white,
+                            ),
+                          ],
                         ),
                       ),
                     ),

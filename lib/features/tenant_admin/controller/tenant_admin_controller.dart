@@ -214,9 +214,12 @@ class TenantAdminController extends StateNotifier<TenantAdminState> {
       print(response.body);
       print(response.statusCode);
       if (response.statusCode == 200) {
-        state = state.copyWith(
-          vehicles: AsyncValue.data(jsonDecode(response.body)),
-        );
+        final decoded = jsonDecode(response.body);
+        print("Vehicles Response Body: ${response.body}");
+        if (decoded is List && decoded.isNotEmpty) {
+          print("First Vehicle: ${decoded[0]}");
+        }
+        state = state.copyWith(vehicles: AsyncValue.data(decoded));
       } else {
         state = state.copyWith(
           vehicles: AsyncValue.error(

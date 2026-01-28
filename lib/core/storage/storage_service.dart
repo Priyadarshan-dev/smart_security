@@ -30,4 +30,12 @@ class StorageService {
   Future<String?> getLastFcmToken() async {
     return await _storage.read(key: 'last_fcm_token');
   }
+
+  Future<void> saveCompanyName(String companyName) async {
+    await _storage.write(key: 'company_name', value: companyName);
+  }
+
+  Future<String?> getCompanyName() async {
+    return await _storage.read(key: 'company_name');
+  }
 }
