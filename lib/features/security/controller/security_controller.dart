@@ -87,9 +87,11 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
       );
       if (response.statusCode == 200) {
         await fetchTodayVisitors();
+        print("Success while Check-In -- Print Statement");
         return true;
       }
-    } catch (_) {
+    } catch (error) {
+      print("Error while Check-In $error -- Print Statement");
     } finally {
       state = state.copyWith(isOperationLoading: false);
     }
@@ -170,9 +172,11 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
       print("Vehicle Check-in Body: ${response.body}");
       if (response.statusCode == 200) {
         await fetchVehicles();
+        print("Success while Vehicle Check-In -- Print Statement");
         return true;
       }
-    } catch (_) {
+    } catch (error) {
+      print("Error while Vehicle Check-In $error -- Print Statement");
     } finally {
       state = state.copyWith(isOperationLoading: false);
     }
@@ -182,7 +186,7 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
   Future<void> fetchTenants() async {
     try {
       // Reverting to /common/tenants because /super-admin/tenants gives 403 Forbidden for Security users
-      final response = await _api.get("/security/tenants");
+      final response = await _api.get("/security/tenants/all");
       print("Fetch /common/tenants Status: ${response.statusCode}");
 
       if (response.statusCode == 200) {
@@ -202,7 +206,7 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
   Future<void> fetchVehicles() async {
     state = state.copyWith(vehicles: const AsyncValue.loading());
     try {
-      final response = await _api.get("/security/vehicles");
+      final response = await _api.get("/security/vehicles/all");
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
         final List<dynamic> list = decoded is List ? decoded : [];
@@ -251,12 +255,18 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
       final startDate = start.toIso8601String().split('T')[0];
       final endDate = end.toIso8601String().split('T')[0];
       final response = await _api.get(
-        "/security/reports/visitors?startDate=$startDate&endDate=$endDate",
+        "/security/visitors/history?startDate=$startDate&endDate=$endDate&page=0&size=10",
       );
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        print("Visitor Reports Data: $data");
-        state = state.copyWith(visitorReports: AsyncValue.data(data));
+        final decoded = jsonDecode(response.body);
+        print("Visitor Reports Data: $decoded");
+        List<dynamic> list = [];
+        if (decoded is Map<String, dynamic> && decoded.containsKey('content')) {
+          list = decoded['content'];
+        } else if (decoded is List) {
+          list = decoded;
+        }
+        state = state.copyWith(visitorReports: AsyncValue.data(list));
       } else {
         state = state.copyWith(
           visitorReports: AsyncValue.error(
@@ -278,13 +288,18 @@ class SecurityMobileController extends StateNotifier<SecurityState> {
       final startDate = start.toIso8601String().split('T')[0];
       final endDate = end.toIso8601String().split('T')[0];
       final response = await _api.get(
-        "/security/reports/vehicles?startDate=$startDate&endDate=$endDate",
+        "/security/vehicles/history?startDate=$startDate&endDate=$endDate&page=0&size=10",
       );
       if (response.statusCode == 200) {
-        print("Vehicle Reports Data Loaded: ${jsonDecode(response.body)}");
-        state = state.copyWith(
-          vehicleReports: AsyncValue.data(jsonDecode(response.body)),
-        );
+        final decoded = jsonDecode(response.body);
+        print("Vehicle Reports Data Loaded: $decoded");
+        List<dynamic> list = [];
+        if (decoded is Map<String, dynamic> && decoded.containsKey('content')) {
+          list = decoded['content'];
+        } else if (decoded is List) {
+          list = decoded;
+        }
+        state = state.copyWith(vehicleReports: AsyncValue.data(list));
       } else {
         state = state.copyWith(
           vehicleReports: AsyncValue.error(

@@ -755,8 +755,10 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                         context,
                         "Approval Request Sent",
                       );
+                      print("Approval Request Sent -- Print Statement");
                       Navigator.pop(context);
                     } else {
+                      print("Failed to send request -- Print Statement");
                       SnackbarUtils.showError(
                         context,
                         "Failed to send request",

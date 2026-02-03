@@ -2,10 +2,13 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../storage/storage_service.dart';
 
-// 192.168.1.2
+// 192.168.1.56
 class ApiClient {
-  final String baseUrl =
-      "http://192.168.1.20:8080/api/v1"; // Updated to match user configuration
+  // final String baseUrl =
+  //     "http://10.174.194.36:8080/api/v1";13.201.46.231
+  //// Updated to match user configuration
+  final String baseUrl1 =
+      "http://192.168.1.23:8080/api/v1"; // Updated to match user configuration
   final StorageService _storage = StorageService();
 
   Future<Map<String, String>> _getHeaders() async {
@@ -20,10 +23,10 @@ class ApiClient {
     final headers = await _getHeaders();
     print("Headers: $headers");
     print("Body: $body");
-    print("URL: $baseUrl$path");
+    print("URL: $baseUrl1$path");
     return await http
         .post(
-          Uri.parse("$baseUrl$path"),
+          Uri.parse("$baseUrl1$path"),
           headers: headers,
           body: jsonEncode(body),
         )
@@ -33,9 +36,9 @@ class ApiClient {
   Future<http.Response> get(String path) async {
     final headers = await _getHeaders();
     print("Headers: $headers");
-    print("URL: $baseUrl$path");
+    print("URL: $baseUrl1$path");
     return await http
-        .get(Uri.parse("$baseUrl$path"), headers: headers)
+        .get(Uri.parse("$baseUrl1$path"), headers: headers)
         .timeout(const Duration(seconds: 10));
   }
 
@@ -43,7 +46,7 @@ class ApiClient {
     final headers = await _getHeaders();
     return await http
         .patch(
-          Uri.parse("$baseUrl$path"),
+          Uri.parse("$baseUrl1$path"),
           headers: headers,
           body: jsonEncode(body),
         )
@@ -54,7 +57,7 @@ class ApiClient {
     final headers = await _getHeaders();
     return await http
         .put(
-          Uri.parse("$baseUrl$path"),
+          Uri.parse("$baseUrl1$path"),
           headers: headers,
           body: jsonEncode(body),
         )
@@ -64,7 +67,7 @@ class ApiClient {
   Future<http.Response> delete(String path) async {
     final headers = await _getHeaders();
     return await http
-        .delete(Uri.parse("$baseUrl$path"), headers: headers)
+        .delete(Uri.parse("$baseUrl1$path"), headers: headers)
         .timeout(const Duration(seconds: 10));
   }
 }
