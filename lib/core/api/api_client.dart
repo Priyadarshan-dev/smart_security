@@ -2,13 +2,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../storage/storage_service.dart';
 
-// 192.168.1.56
 class ApiClient {
-  // final String baseUrl =
-  //     "http://10.174.194.36:8080/api/v1";13.201.46.231
-  //// Updated to match user configuration
   final String baseUrl1 =
-      "http://192.168.1.23:8080/api/v1"; // Updated to match user configuration
+      "http://13.205.93.213:8080/api/v1"; // Updated to match user configuration
   final StorageService _storage = StorageService();
 
   Future<Map<String, String>> _getHeaders() async {

@@ -460,8 +460,9 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
 
     String selectedVehicleType = vehicle['vehicleType'] ?? "CAR";
     final List<String> vehicleTypes = ["CAR", "BIKE", "TRUCK", "OTHER"];
-    if (!vehicleTypes.contains(selectedVehicleType))
+    if (!vehicleTypes.contains(selectedVehicleType)) {
       selectedVehicleType = "OTHER";
+    }
 
     String selectedPurpose = vehicle['purpose'] ?? "Employee";
     final List<String> purposes = [
@@ -1430,8 +1431,9 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
       final Uint8List? image = await _screenshotController.capture();
       if (image != null) {
         await Gal.putImageBytes(image, name: "QR_$vehicleNumber");
-        if (mounted)
+        if (mounted) {
           SnackbarUtils.showSuccess(context, "QR saved successfully");
+        }
       }
     } catch (e) {
       if (mounted) SnackbarUtils.showError(context, "Save failed: $e");
