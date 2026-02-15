@@ -11,6 +11,15 @@ class StorageService {
     return await _storage.read(key: 'jwt_token');
   }
 
+  Future<void> saveRefreshToken(String token)async{
+    await _storage.write(key: 'refresh_token', value: token );
+  }
+
+  Future<String?> getRefreshToken()async{
+   return await _storage.read(key: 'refresh_token');
+  }
+
+
   Future<void> saveRole(String role) async {
     await _storage.write(key: 'role', value: role);
   }

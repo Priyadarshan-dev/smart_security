@@ -3,14 +3,17 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/app_theme.dart';
-import 'features/auth/controller/auth_controller.dart';
-import 'features/auth/controller/auth_state.dart';
-import 'features/auth/view/login_screen.dart';
-import 'features/tenant_admin/view/tenant_admin_dashboard.dart';
-import 'features/security/view/security_dashboard.dart';
+import 'features/auth/provider/auth_provider.dart';
+import 'features/auth/model/auth_state.dart';
+import 'features/auth/screens/login_screen.dart';
+import 'features/tenant_admin/screens/tenant_admin_dashboard.dart';
+import 'features/security/screens/security_dashboard.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'core/services/notification_service.dart';
+
+// Global navigator key for navigation from anywhere in the app
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,12 +31,6 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   }
 }
 
-// void main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-//   await NotificationService().initializeNotifications();
-//   runApp(const ProviderScope(child: SmartSecurityApp()));
-// }
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -69,6 +66,12 @@ class _SmartSecurityAppState extends ConsumerState<SmartSecurityApp> {
       if (previous?.status != AuthStatus.authenticated &&
           next.status == AuthStatus.authenticated) {
         NotificationService().initializeNotifications();
+        // Pop all routes when user logs in after session expiry
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (navigatorKey.currentState != null) {
+            navigatorKey.currentState!.popUntil((route) => route.isFirst);
+          }
+        });
       }
     });
     final authState = ref.watch(authProvider);
@@ -78,6 +81,7 @@ class _SmartSecurityAppState extends ConsumerState<SmartSecurityApp> {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       themeMode: ThemeMode.light,
+      navigatorKey: navigatorKey,
       home: _getHome(authState),
     );
   }
