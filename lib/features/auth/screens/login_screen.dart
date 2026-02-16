@@ -88,7 +88,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ),
                     ),
-                    validator: (value) => value!.isEmpty ? "Enter email" : null,
+                    validator:
+                        (value) =>
+                            value!.isEmpty ? "Enter Email Address" : null,
                   ),
                   const SizedBox(height: 24),
                   // Password Input
@@ -142,7 +144,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                     validator:
-                        (value) => value!.isEmpty ? "Enter password" : null,
+                        (value) => value!.isEmpty ? "Enter Password" : null,
                   ),
                   const SizedBox(height: 20),
 

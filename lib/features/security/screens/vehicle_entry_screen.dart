@@ -260,13 +260,6 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
               ),
             ),
           ),
-          if (state.isOperationLoading)
-            Positioned.fill(
-              child: Material(
-                color: Colors.black.withOpacity(0.3),
-                child: const Center(child: AppLoadingWidget()),
-              ),
-            ),
         ],
       ),
     );
@@ -454,9 +447,6 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                                   context,
                                                   "Checked In Successfully",
                                                 );
-                                                DefaultTabController.of(
-                                                  context,
-                                                ).animateTo(1);
                                               } else {
                                                 SnackbarUtils.showError(
                                                   context,
@@ -549,11 +539,7 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                 },
               );
             },
-            loading:
-                () =>
-                    state.isOperationLoading
-                        ? const SizedBox.shrink()
-                        : const AppLoadingWidget(),
+            loading: () => const AppLoadingWidget(),
             error:
                 (e, _) => AppErrorWidget(
                   message: e.toString(),
@@ -867,11 +853,7 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                 },
               );
             },
-            loading:
-                () =>
-                    state.isOperationLoading
-                        ? const SizedBox.shrink()
-                        : const AppLoadingWidget(),
+            loading: () => const AppLoadingWidget(),
             error:
                 (e, _) => AppErrorWidget(
                   message: e.toString(),
@@ -885,7 +867,6 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
   }
 
   void _showAddVehicleDialog(BuildContext context) {
-    final state = ref.read(securityProvider);
     final formKey = GlobalKey<FormState>();
     final numberController = TextEditingController();
     final driverController = TextEditingController();
@@ -897,473 +878,449 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
       context: context,
       builder:
           (context) => StatefulBuilder(
-            builder:
-                (context, setDialogState) => AlertDialog(
-                  backgroundColor: Colors.white,
-                  surfaceTintColor: Colors.transparent,
-                  title: const Text(
-                    "New Vehicle Entry",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
-                  ),
-                  content: SingleChildScrollView(
-                    child: Form(
-                      key: formKey,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TextFormField(
-                            controller: numberController,
-                            decoration: InputDecoration(
-                              labelText: "Vehicle Number",
-                              hintText: "e.g. TN01AB1234",
-                              hintStyle: TextStyle(
-                                color: Colors.grey.shade400,
-                                fontWeight: FontWeight.normal,
-                              ),
-                              labelStyle: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              floatingLabelStyle: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.always,
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 20,
-                                horizontal: 20,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
+            builder: (context, setDialogState) {
+              return Consumer(
+                builder: (context, ref, _) {
+                  final state = ref.watch(securityProvider);
+                  return AlertDialog(
+                    backgroundColor: Colors.white,
+                    surfaceTintColor: Colors.transparent,
+                    title: const Text(
+                      "New Vehicle Entry",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero,
+                    ),
+                    content: SingleChildScrollView(
+                      child: Form(
+                        key: formKey,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextFormField(
+                              controller: numberController,
+                              decoration: InputDecoration(
+                                labelText: "Vehicle Number*",
+                                hintText: "e.g. TN01AB1234",
+                                hintStyle: TextStyle(
                                   color: Colors.grey.shade400,
+                                  fontWeight: FontWeight.normal,
                                 ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Colors.grey.shade400,
+                                labelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Colors.grey.shade400,
-                                  width: 2,
+                                floatingLabelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              ),
-                            ),
-                            textCapitalization: TextCapitalization.characters,
-                            validator: (v) => v!.isEmpty ? "Required" : null,
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: driverController,
-                            decoration: InputDecoration(
-                              labelText: "Driver Name",
-                              hintText: "Driver Name",
-                              hintStyle: TextStyle(
-                                color: Colors.grey.shade400,
-                                fontWeight: FontWeight.normal,
-                              ),
-                              labelStyle: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              floatingLabelStyle: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.always,
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 20,
-                                horizontal: 20,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Colors.grey.shade400,
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.always,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 20,
+                                  horizontal: 20,
                                 ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Colors.grey.shade400,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Colors.grey.shade400,
-                                  width: 2,
-                                ),
-                              ),
-                            ),
-                            validator: (v) => v!.isEmpty ? "Required" : null,
-                          ),
-                          const SizedBox(height: 16),
-                          FormField<String>(
-                            initialValue: selectedType,
-                            validator: (v) => v == null ? "Required" : null,
-                            builder: (fieldState) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: DropdownMenu<String>(
-                                      menuStyle: const MenuStyle(
-                                        minimumSize: WidgetStatePropertyAll(
-                                          Size(80, 0),
-                                        ),
-                                      ),
-                                      expandedInsets: EdgeInsets.zero,
-                                      initialSelection: selectedType,
-                                      label: const Text(
-                                        "Type",
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      hintText: "Select Type",
-                                      inputDecorationTheme:
-                                          InputDecorationTheme(
-                                            filled: false,
-                                            contentPadding:
-                                                const EdgeInsets.symmetric(
-                                                  vertical: 16,
-                                                  horizontal: 15,
-                                                ),
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                              ),
-                                            ),
-                                            enabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                              ),
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                                width: 2,
-                                              ),
-                                            ),
-                                            floatingLabelBehavior:
-                                                FloatingLabelBehavior.always,
-                                          ),
-                                      dropdownMenuEntries:
-                                          ["CAR", "BIKE", "TRUCK", "OTHER"].map(
-                                            (t) {
-                                              return DropdownMenuEntry<String>(
-                                                value: t,
-                                                label: t,
-                                              );
-                                            },
-                                          ).toList(),
-                                      onSelected: (v) {
-                                        setDialogState(() => selectedType = v);
-                                        fieldState.didChange(v);
-                                      },
-                                    ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
                                   ),
-                                  if (fieldState.hasError)
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 12,
-                                        top: 6,
-                                      ),
-                                      child: Text(
-                                        fieldState.errorText!,
-                                        style: TextStyle(
-                                          color: Colors.red.shade700,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          FormField<String>(
-                            initialValue: selectedPurpose,
-                            validator: (v) => v == null ? "Required" : null,
-                            builder: (fieldState) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: DropdownMenu<String>(
-                                      menuStyle: const MenuStyle(
-                                        minimumSize: WidgetStatePropertyAll(
-                                          Size(80, 0),
-                                        ),
-                                      ),
-                                      expandedInsets: EdgeInsets.zero,
-                                      initialSelection: selectedPurpose,
-                                      label: const Text(
-                                        "Purpose",
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      hintText: "Select Purpose",
-                                      inputDecorationTheme:
-                                          InputDecorationTheme(
-                                            filled: false,
-                                            contentPadding:
-                                                const EdgeInsets.symmetric(
-                                                  vertical: 16,
-                                                  horizontal: 15,
-                                                ),
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                              ),
-                                            ),
-                                            enabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                              ),
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                                width: 2,
-                                              ),
-                                            ),
-                                            floatingLabelBehavior:
-                                                FloatingLabelBehavior.always,
-                                          ),
-                                      dropdownMenuEntries:
-                                          [
-                                            "Employee",
-                                            "Visitor",
-                                            "Delivery",
-                                            "Vendor",
-                                            "Other",
-                                          ].map((p) {
-                                            return DropdownMenuEntry<String>(
-                                              value: p,
-                                              label: p,
-                                            );
-                                          }).toList(),
-                                      onSelected: (v) {
-                                        setDialogState(() {
-                                          selectedPurpose = v;
-                                          _clearPurposeControllers();
-                                        });
-                                        fieldState.didChange(v);
-                                      },
-                                    ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
                                   ),
-
-                                  if (fieldState.hasError)
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 12,
-                                        top: 6,
-                                      ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 2,
+                                  ),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                              textCapitalization: TextCapitalization.characters,
+                              validator: (v) => v!.isEmpty ? "Required" : null,
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: driverController,
+                              decoration: InputDecoration(
+                                labelText: "Driver Name*",
+                                hintText: "Driver Name",
+                                hintStyle: TextStyle(
+                                  color: Colors.grey.shade400,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                                labelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                floatingLabelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.always,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 20,
+                                  horizontal: 20,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 2,
+                                  ),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                              validator: (v) => v!.isEmpty ? "Required" : null,
+                            ),
+                            const SizedBox(height: 16),
+                            DropdownButtonFormField<String>(
+                              value: selectedType,
+                              validator: (v) => v == null ? "Required" : null,
+                              decoration: InputDecoration(
+                                labelText: "Type*",
+                                labelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                floatingLabelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                hintText: "Select Type",
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.always,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                  horizontal: 15,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 2,
+                                  ),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                              items:
+                                  ["CAR", "BIKE", "TRUCK", "OTHER"].map((t) {
+                                    return DropdownMenuItem<String>(
+                                      value: t,
+                                      child: Text(t),
+                                    );
+                                  }).toList(),
+                              onChanged: (v) {
+                                setDialogState(() => selectedType = v);
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            DropdownButtonFormField<String>(
+                              value: selectedPurpose,
+                              validator: (v) => v == null ? "Required" : null,
+                              decoration: InputDecoration(
+                                labelText: "Purpose*",
+                                labelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                floatingLabelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                hintText: "Select Purpose",
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.always,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                  horizontal: 15,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 2,
+                                  ),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                              items:
+                                  [
+                                    "Employee",
+                                    "Visitor",
+                                    "Delivery",
+                                    "Vendor",
+                                    "Other",
+                                  ].map((p) {
+                                    return DropdownMenuItem<String>(
+                                      value: p,
+                                      child: Text(p),
+                                    );
+                                  }).toList(),
+                              onChanged: (v) {
+                                setDialogState(() {
+                                  selectedPurpose = v;
+                                  _clearPurposeControllers();
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            DropdownButtonFormField<int>(
+                              value: selectedTenantId,
+                              validator: (v) => v == null ? "Required" : null,
+                              decoration: InputDecoration(
+                                labelText: "Select Company*",
+                                labelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                floatingLabelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                hintText: "Select Company",
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.always,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                  horizontal: 15,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 2,
+                                  ),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                              items:
+                                  state.tenants.map((t) {
+                                    return DropdownMenuItem<int>(
+                                      value: t['id'] as int,
                                       child: Text(
-                                        fieldState.errorText!,
-                                        style: TextStyle(
-                                          color: Colors.red.shade700,
-                                          fontSize: 12,
-                                        ),
+                                        (t['company'] ??
+                                                t['companyName'] ??
+                                                'No Name')
+                                            .toString(),
                                       ),
-                                    ),
-                                ],
-                              );
-                            },
+                                    );
+                                  }).toList(),
+                              onChanged: (v) {
+                                if (v != null) {
+                                  setDialogState(() {
+                                    selectedTenantId = v;
+                                    // Removed selectedCompany assignment as it seems not used/defined in current scope to avoid lint error
+                                  });
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text(
+                          "CANCEL",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryBlue,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 14,
                           ),
-                          const SizedBox(height: 16),
-                          FormField<int>(
-                            initialValue: selectedTenantId,
-                            validator: (v) => v == null ? "Required" : null,
-                            builder: (fieldState) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: DropdownMenu<int>(
-                                      expandedInsets: EdgeInsets.zero,
-                                      initialSelection: selectedTenantId,
-                                      menuStyle: const MenuStyle(
-                                        minimumSize: WidgetStatePropertyAll(
-                                          Size(80, 0),
-                                        ),
-                                      ),
-                                      label: const Text(
-                                        "Select Company",
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      hintText: "Select Company",
-                                      inputDecorationTheme:
-                                          InputDecorationTheme(
-                                            filled: false,
-                                            contentPadding:
-                                                const EdgeInsets.symmetric(
-                                                  vertical: 16,
-                                                  horizontal: 15,
-                                                ),
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                              ),
-                                            ),
-                                            enabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                              ),
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                                width: 2,
-                                              ),
-                                            ),
-                                            floatingLabelBehavior:
-                                                FloatingLabelBehavior.always,
-                                          ),
-                                      dropdownMenuEntries:
-                                          state.tenants
-                                              .map(
-                                                (t) => DropdownMenuEntry<int>(
-                                                  value: t['id'] as int,
-                                                  label:
-                                                      (t['company'] ??
-                                                              t['companyName'] ??
-                                                              'No Name')
-                                                          .toString(),
-                                                ),
-                                              )
-                                              .toList(),
-                                      onSelected: (v) {
-                                        setDialogState(
-                                          () => selectedTenantId = v,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          elevation: 0,
+                        ),
+                        onPressed:
+                            state.isOperationLoading
+                                ? null
+                                : () async {
+                                  if (formKey.currentState!.validate()) {
+                                    final selectedTenant = state.tenants
+                                        .firstWhere(
+                                          (t) => t['id'] == selectedTenantId,
                                         );
-                                        fieldState.didChange(v);
-                                      },
-                                    ),
+                                    final success = await ref
+                                        .read(securityProvider.notifier)
+                                        .vehicleEntry({
+                                          "vehicleNumber":
+                                              numberController.text,
+                                          "driverName": driverController.text,
+                                          "vehicleType": selectedType,
+                                          "purpose": selectedPurpose,
+                                          "company":
+                                              selectedTenant['companyName'] ??
+                                              selectedTenant['company'],
+                                          "visitDetails": _getVisitDetails(
+                                            selectedPurpose,
+                                          ),
+                                          "tenantId": selectedTenantId,
+                                        });
+                                    if (context.mounted) {
+                                      Navigator.pop(context);
+                                      if (success) {
+                                        SnackbarUtils.showSuccess(
+                                          context,
+                                          "Vehicle Registered & Checked In",
+                                        );
+                                      } else {
+                                        SnackbarUtils.showError(
+                                          context,
+                                          "Registration Failed",
+                                        );
+                                      }
+                                    }
+                                  }
+                                },
+                        child:
+                            state.isOperationLoading
+                                ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
                                   ),
-                                  if (fieldState.hasError)
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 12,
-                                        top: 6,
-                                      ),
-                                      child: Text(
-                                        fieldState.errorText!,
-                                        style: TextStyle(
-                                          color: Colors.red.shade700,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text(
-                        "CANCEL",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primaryBlue,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 14,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        elevation: 0,
-                      ),
-                      onPressed: () async {
-                        if (formKey.currentState!.validate()) {
-                          final selectedTenant = state.tenants.firstWhere(
-                            (t) => t['id'] == selectedTenantId,
-                          );
-                          final success = await ref
-                              .read(securityProvider.notifier)
-                              .vehicleEntry({
-                                "vehicleNumber": numberController.text,
-                                "driverName": driverController.text,
-                                "vehicleType": selectedType,
-                                "purpose": selectedPurpose,
-                                "company":
-                                    selectedTenant['companyName'] ??
-                                    selectedTenant['company'],
-                                "visitDetails": _getVisitDetails(
-                                  selectedPurpose,
+                                )
+                                : const Text(
+                                  "REGISTER",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                                "tenantId": selectedTenantId,
-                              });
-                          if (context.mounted) {
-                            Navigator.pop(context);
-                            if (success) {
-                              SnackbarUtils.showSuccess(
-                                context,
-                                "Vehicle Registered & Checked In",
-                              );
-                            } else {
-                              SnackbarUtils.showError(
-                                context,
-                                "Registration Failed",
-                              );
-                            }
-                          }
-                        }
-                      },
-                      child: const Text(
-                        "REGISTER",
-                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  );
+                },
+              );
+            },
           ),
     );
   }
@@ -1443,470 +1400,446 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
       context: context,
       builder:
           (context) => StatefulBuilder(
-            builder:
-                (context, setDialogState) => AlertDialog(
-                  backgroundColor: Colors.white,
-                  surfaceTintColor: Colors.transparent,
-                  title: const Text(
-                    "Edit Vehicle",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
-                  ),
-                  content: SingleChildScrollView(
-                    child: Form(
-                      key: formKey,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TextFormField(
-                            controller: numberController,
-                            decoration: InputDecoration(
-                              labelText: "Vehicle Number",
-                              hintText: "e.g. TN01AB1234",
-                              hintStyle: TextStyle(
-                                color: Colors.grey.shade400,
-                                fontWeight: FontWeight.normal,
-                              ),
-                              labelStyle: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              floatingLabelStyle: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.always,
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 20,
-                                horizontal: 20,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
+            builder: (context, setDialogState) {
+              return Consumer(
+                builder: (context, ref, _) {
+                  final state = ref.watch(securityProvider);
+                  return AlertDialog(
+                    backgroundColor: Colors.white,
+                    surfaceTintColor: Colors.transparent,
+                    title: const Text(
+                      "Edit Vehicle",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero,
+                    ),
+                    content: SingleChildScrollView(
+                      child: Form(
+                        key: formKey,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextFormField(
+                              controller: numberController,
+                              decoration: InputDecoration(
+                                labelText: "Vehicle Number*",
+                                hintText: "e.g. TN01AB1234",
+                                hintStyle: TextStyle(
                                   color: Colors.grey.shade400,
+                                  fontWeight: FontWeight.normal,
                                 ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Colors.grey.shade400,
+                                labelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Colors.grey.shade400,
-                                  width: 2,
+                                floatingLabelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              ),
-                            ),
-                            textCapitalization: TextCapitalization.characters,
-                            validator: (v) => v!.isEmpty ? "Required" : null,
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: driverController,
-                            decoration: InputDecoration(
-                              labelText: "Driver Name",
-                              hintText: "Driver Name",
-                              hintStyle: TextStyle(
-                                color: Colors.grey.shade400,
-                                fontWeight: FontWeight.normal,
-                              ),
-                              labelStyle: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              floatingLabelStyle: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.always,
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 20,
-                                horizontal: 20,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Colors.grey.shade400,
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.always,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 20,
+                                  horizontal: 20,
                                 ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Colors.grey.shade400,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Colors.grey.shade400,
-                                  width: 2,
-                                ),
-                              ),
-                            ),
-                            validator: (v) => v!.isEmpty ? "Required" : null,
-                          ),
-                          const SizedBox(height: 16),
-                          FormField<String>(
-                            initialValue: selectedType,
-                            validator: (v) => v == null ? "Required" : null,
-                            builder: (fieldState) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: DropdownMenu<String>(
-                                      menuStyle: const MenuStyle(
-                                        minimumSize: WidgetStatePropertyAll(
-                                          Size(80, 0),
-                                        ),
-                                      ),
-                                      expandedInsets: EdgeInsets.zero,
-                                      initialSelection: selectedType,
-                                      label: const Text(
-                                        "Type",
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      hintText: "Select Type",
-                                      inputDecorationTheme:
-                                          InputDecorationTheme(
-                                            filled: false,
-                                            contentPadding:
-                                                const EdgeInsets.symmetric(
-                                                  vertical: 16,
-                                                  horizontal: 15,
-                                                ),
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                              ),
-                                            ),
-                                            enabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                              ),
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                                width: 2,
-                                              ),
-                                            ),
-                                            floatingLabelBehavior:
-                                                FloatingLabelBehavior.always,
-                                          ),
-                                      dropdownMenuEntries:
-                                          ["CAR", "BIKE", "TRUCK", "OTHER"].map(
-                                            (t) {
-                                              return DropdownMenuEntry<String>(
-                                                value: t,
-                                                label: t,
-                                              );
-                                            },
-                                          ).toList(),
-                                      onSelected: (v) {
-                                        setDialogState(() => selectedType = v);
-                                        fieldState.didChange(v);
-                                      },
-                                    ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
                                   ),
-                                  if (fieldState.hasError)
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 12,
-                                        top: 6,
-                                      ),
-                                      child: Text(
-                                        fieldState.errorText!,
-                                        style: TextStyle(
-                                          color: Colors.red.shade700,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          FormField<String>(
-                            initialValue: selectedPurpose,
-                            validator: (v) => v == null ? "Required" : null,
-                            builder: (fieldState) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: DropdownMenu<String>(
-                                      expandedInsets: EdgeInsets.zero,
-                                      initialSelection: selectedPurpose,
-                                      menuStyle: const MenuStyle(
-                                        minimumSize: WidgetStatePropertyAll(
-                                          Size(80, 0),
-                                        ),
-                                      ),
-                                      label: const Text(
-                                        "Purpose",
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      hintText: "Select Purpose",
-                                      inputDecorationTheme:
-                                          InputDecorationTheme(
-                                            filled: false,
-                                            contentPadding:
-                                                const EdgeInsets.symmetric(
-                                                  vertical: 16,
-                                                  horizontal: 15,
-                                                ),
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                              ),
-                                            ),
-                                            enabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                              ),
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                                width: 2,
-                                              ),
-                                            ),
-                                            floatingLabelBehavior:
-                                                FloatingLabelBehavior.always,
-                                          ),
-                                      dropdownMenuEntries:
-                                          [
-                                            "Employee",
-                                            "Visitor",
-                                            "Delivery",
-                                            "Vendor",
-                                            "Other",
-                                          ].map((p) {
-                                            return DropdownMenuEntry<String>(
-                                              value: p,
-                                              label: p,
-                                            );
-                                          }).toList(),
-                                      onSelected: (v) {
-                                        setDialogState(() {
-                                          selectedPurpose = v;
-                                          _clearPurposeControllers();
-                                        });
-                                        fieldState.didChange(v);
-                                      },
-                                    ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
                                   ),
-
-                                  if (fieldState.hasError)
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 12,
-                                        top: 6,
-                                      ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 2,
+                                  ),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                              textCapitalization: TextCapitalization.characters,
+                              validator: (v) => v!.isEmpty ? "Required" : null,
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: driverController,
+                              decoration: InputDecoration(
+                                labelText: "Driver Name*",
+                                hintText: "Driver Name",
+                                hintStyle: TextStyle(
+                                  color: Colors.grey.shade400,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                                labelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                floatingLabelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.always,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 20,
+                                  horizontal: 20,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 2,
+                                  ),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                              validator: (v) => v!.isEmpty ? "Required" : null,
+                            ),
+                            const SizedBox(height: 16),
+                            DropdownButtonFormField<String>(
+                              value: selectedType,
+                              validator: (v) => v == null ? "Required" : null,
+                              decoration: InputDecoration(
+                                labelText: "Type*",
+                                labelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                floatingLabelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                hintText: "Select Type",
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.always,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                  horizontal: 15,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 2,
+                                  ),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                              items:
+                                  ["CAR", "BIKE", "TRUCK", "OTHER"].map((t) {
+                                    return DropdownMenuItem<String>(
+                                      value: t,
+                                      child: Text(t),
+                                    );
+                                  }).toList(),
+                              onChanged: (v) {
+                                setDialogState(() => selectedType = v);
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            DropdownButtonFormField<String>(
+                              value: selectedPurpose,
+                              validator: (v) => v == null ? "Required" : null,
+                              decoration: InputDecoration(
+                                labelText: "Purpose*",
+                                labelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                floatingLabelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                hintText: "Select Purpose",
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.always,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                  horizontal: 15,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 2,
+                                  ),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                              items:
+                                  [
+                                    "Employee",
+                                    "Visitor",
+                                    "Delivery",
+                                    "Vendor",
+                                    "Other",
+                                  ].map((p) {
+                                    return DropdownMenuItem<String>(
+                                      value: p,
+                                      child: Text(p),
+                                    );
+                                  }).toList(),
+                              onChanged: (v) {
+                                setDialogState(() {
+                                  selectedPurpose = v;
+                                  _clearPurposeControllers();
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            DropdownButtonFormField<int>(
+                              value: selectedTenantId,
+                              validator: (v) => v == null ? "Required" : null,
+                              decoration: InputDecoration(
+                                labelText: "Select Company*",
+                                labelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                floatingLabelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                hintText: "Select Company",
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.always,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                  horizontal: 15,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 2,
+                                  ),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                              items:
+                                  state.tenants.map((t) {
+                                    return DropdownMenuItem<int>(
+                                      value: t['id'] as int,
                                       child: Text(
-                                        fieldState.errorText!,
-                                        style: TextStyle(
-                                          color: Colors.red.shade700,
-                                          fontSize: 12,
-                                        ),
+                                        (t['company'] ??
+                                                t['companyName'] ??
+                                                'No Name')
+                                            .toString(),
                                       ),
-                                    ),
-                                ],
-                              );
-                            },
+                                    );
+                                  }).toList(),
+                              onChanged: (v) {
+                                setDialogState(() {
+                                  selectedTenantId = v;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text(
+                          "CANCEL",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryBlue,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 14,
                           ),
-                          const SizedBox(height: 16),
-                          FormField<int>(
-                            initialValue: selectedTenantId,
-                            validator: (v) => v == null ? "Required" : null,
-                            builder: (fieldState) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: DropdownMenu<int>(
-                                      menuStyle: const MenuStyle(
-                                        minimumSize: WidgetStatePropertyAll(
-                                          Size(80, 0),
-                                        ),
-                                      ),
-                                      expandedInsets: EdgeInsets.zero,
-                                      initialSelection: selectedTenantId,
-                                      label: const Text(
-                                        "Select Company",
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      hintText: "Select Company",
-                                      inputDecorationTheme:
-                                          InputDecorationTheme(
-                                            filled: false,
-                                            contentPadding:
-                                                const EdgeInsets.symmetric(
-                                                  vertical: 16,
-                                                  horizontal: 15,
-                                                ),
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                              ),
-                                            ),
-                                            enabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                              ),
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey.shade400,
-                                                width: 2,
-                                              ),
-                                            ),
-                                            floatingLabelBehavior:
-                                                FloatingLabelBehavior.always,
-                                          ),
-                                      dropdownMenuEntries:
-                                          state.tenants
-                                              .map(
-                                                (t) => DropdownMenuEntry<int>(
-                                                  value: t['id'] as int,
-                                                  label:
-                                                      (t['company'] ??
-                                                              t['companyName'] ??
-                                                              'No Name')
-                                                          .toString(),
-                                                ),
-                                              )
-                                              .toList(),
-                                      onSelected: (v) {
-                                        setDialogState(
-                                          () => selectedTenantId = v,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          elevation: 0,
+                        ),
+                        onPressed:
+                            state.isOperationLoading
+                                ? null
+                                : () async {
+                                  if (formKey.currentState!.validate()) {
+                                    final selectedTenant = state.tenants
+                                        .firstWhere(
+                                          (t) => t['id'] == selectedTenantId,
                                         );
-                                        fieldState.didChange(v);
-                                      },
-                                    ),
+                                    final success = await ref
+                                        .read(securityProvider.notifier)
+                                        .updateVehicle(vehicle['id'], {
+                                          "vehicleNumber":
+                                              numberController.text,
+                                          "driverName": driverController.text,
+                                          "vehicleType": selectedType,
+                                          "purpose": selectedPurpose,
+                                          "company":
+                                              selectedTenant['companyName'] ??
+                                              selectedTenant['company'],
+                                          "visitDetails": _getVisitDetails(
+                                            selectedPurpose,
+                                          ),
+                                          "tenantId": selectedTenantId,
+                                        });
+                                    if (context.mounted) {
+                                      Navigator.pop(context);
+                                      if (success) {
+                                        SnackbarUtils.showSuccess(
+                                          context,
+                                          "Vehicle Updated Successfully",
+                                        );
+                                      } else {
+                                        SnackbarUtils.showError(
+                                          context,
+                                          "Update Failed",
+                                        );
+                                      }
+                                    }
+                                  }
+                                },
+                        child:
+                            state.isOperationLoading
+                                ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
                                   ),
-                                  if (fieldState.hasError)
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 12,
-                                        top: 6,
-                                      ),
-                                      child: Text(
-                                        fieldState.errorText!,
-                                        style: TextStyle(
-                                          color: Colors.red.shade700,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text(
-                        "CANCEL",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primaryBlue,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 14,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        elevation: 0,
-                      ),
-                      onPressed: () async {
-                        if (formKey.currentState!.validate()) {
-                          final selectedTenant = state.tenants.firstWhere(
-                            (t) => t['id'] == selectedTenantId,
-                          );
-                          final success = await ref
-                              .read(securityProvider.notifier)
-                              .updateVehicle(vehicle['id'], {
-                                "vehicleNumber": numberController.text,
-                                "driverName": driverController.text,
-                                "vehicleType": selectedType,
-                                "purpose": selectedPurpose,
-                                "company":
-                                    selectedTenant['companyName'] ??
-                                    selectedTenant['company'],
-                                "visitDetails": _getVisitDetails(
-                                  selectedPurpose,
+                                )
+                                : const Text(
+                                  "UPDATE",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                                "tenantId": selectedTenantId,
-                              });
-                          if (context.mounted) {
-                            Navigator.pop(context);
-                            if (success) {
-                              SnackbarUtils.showSuccess(
-                                context,
-                                "Vehicle Updated Successfully",
-                              );
-                            } else {
-                              SnackbarUtils.showError(context, "Update Failed");
-                            }
-                          }
-                        }
-                      },
-                      child: const Text(
-                        "UPDATE",
-                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  );
+                },
+              );
+            },
           ),
     );
   }
@@ -1914,95 +1847,117 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
   void _showDeleteDialog(BuildContext context, dynamic vehicle) {
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
-            ),
-            contentPadding: const EdgeInsets.all(24),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset(
-                  'assets/icons/delete_icon.png',
-                  width: 60,
-                  height: 60,
-                  color: Colors.red,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  "Delete Vehicle",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "Are you sure you want to delete ${vehicle['vehicleNumber']}?",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.zero,
+      builder: (context) {
+        return Consumer(
+          builder: (context, ref, _) {
+            final state = ref.watch(securityProvider);
+            return AlertDialog(
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.zero,
+              ),
+              contentPadding: const EdgeInsets.all(24),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'assets/icons/delete_icon.png',
+                    width: 60,
+                    height: 60,
+                    color: Colors.red,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    "Delete Vehicle",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Are you sure you want to delete ${vehicle['vehicleNumber']}?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.zero,
+                            ),
+                            side: BorderSide(color: Colors.grey.shade300),
                           ),
-                          side: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        child: const Text(
-                          "CANCEL",
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontWeight: FontWeight.bold,
+                          child: const Text(
+                            "CANCEL",
+                            style: TextStyle(
+                              color: Colors.black87,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFEF4444),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.zero,
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFEF4444),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.zero,
+                            ),
+                            elevation: 0,
                           ),
-                          elevation: 0,
-                        ),
-                        onPressed: () async {
-                          final success = await ref
-                              .read(securityProvider.notifier)
-                              .deleteVehicle(vehicle['id']);
-                          if (context.mounted) {
-                            Navigator.pop(context);
-                            if (success) {
-                              SnackbarUtils.showSuccess(
-                                context,
-                                "Vehicle Deleted",
-                              );
-                            } else {
-                              SnackbarUtils.showError(context, "Delete Failed");
-                            }
-                          }
-                        },
-                        child: const Text(
-                          "DELETE",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          onPressed:
+                              state.isOperationLoading
+                                  ? null
+                                  : () async {
+                                    final success = await ref
+                                        .read(securityProvider.notifier)
+                                        .deleteVehicle(vehicle['id']);
+                                    if (context.mounted) {
+                                      Navigator.pop(context);
+                                      if (success) {
+                                        SnackbarUtils.showSuccess(
+                                          context,
+                                          "Vehicle Deleted",
+                                        );
+                                      } else {
+                                        SnackbarUtils.showError(
+                                          context,
+                                          "Delete Failed",
+                                        );
+                                      }
+                                    }
+                                  },
+                          child:
+                              state.isOperationLoading
+                                  ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                  : const Text(
+                                    "DELETE",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            actions:
-                [], // Actions are part of content for better layout control
-          ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -2030,179 +1985,152 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        FormField<String>(
-                          initialValue: selectedPurpose,
+                        DropdownButtonFormField<String>(
+                          value: selectedPurpose,
                           validator: (v) => v == null ? "Required" : null,
-                          builder: (fieldState) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                DropdownMenu<String>(
-                                  width: double.infinity,
-                                  expandedInsets: EdgeInsets.zero,
-                                  initialSelection: selectedPurpose,
-                                  label: const Text(
-                                    "Purpose",
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  hintText: "Select Purpose",
-                                  inputDecorationTheme: InputDecorationTheme(
-                                    filled: false,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 16,
-                                      horizontal: 15,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      borderSide: BorderSide(
-                                        color: Colors.grey.shade400,
-                                      ),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      borderSide: BorderSide(
-                                        color: Colors.grey.shade400,
-                                      ),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      borderSide: BorderSide(
-                                        color: Colors.grey.shade400,
-                                        width: 2,
-                                      ),
-                                    ),
-                                    floatingLabelBehavior:
-                                        FloatingLabelBehavior.always,
-                                  ),
-                                  dropdownMenuEntries:
-                                      [
-                                        "Employee",
-                                        "Visitor",
-                                        "Delivery",
-                                        "Vendor",
-                                        "Other",
-                                      ].map((p) {
-                                        return DropdownMenuEntry<String>(
-                                          value: p,
-                                          label: p,
-                                        );
-                                      }).toList(),
-                                  onSelected: (v) {
-                                    setDialogState(() {
-                                      selectedPurpose = v;
-                                      _clearPurposeControllers();
-                                    });
-                                    fieldState.didChange(v);
-                                  },
-                                ),
-                                if (selectedPurpose != null)
-                                  _buildVisitTypeFields(
-                                    selectedPurpose,
-                                    setDialogState,
-                                  ),
-                                if (fieldState.hasError)
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 12,
-                                      top: 6,
-                                    ),
-                                    child: Text(
-                                      fieldState.errorText!,
-                                      style: TextStyle(
-                                        color: Colors.red.shade700,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            );
+                          decoration: InputDecoration(
+                            labelText: "Purpose*",
+                            labelStyle: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            floatingLabelStyle: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            hintText: "Select Purpose",
+                            floatingLabelBehavior: FloatingLabelBehavior.always,
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 16,
+                              horizontal: 15,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade400,
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade400,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade400,
+                                width: 2,
+                              ),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(
+                                color: Colors.red,
+                                width: 1,
+                              ),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(
+                                color: Colors.red,
+                                width: 2,
+                              ),
+                            ),
+                          ),
+                          items:
+                              [
+                                "Employee",
+                                "Visitor",
+                                "Delivery",
+                                "Vendor",
+                                "Other",
+                              ].map((p) {
+                                return DropdownMenuItem<String>(
+                                  value: p,
+                                  child: Text(p),
+                                );
+                              }).toList(),
+                          onChanged: (v) {
+                            setDialogState(() {
+                              selectedPurpose = v;
+                              _clearPurposeControllers();
+                            });
                           },
                         ),
+                        if (selectedPurpose != null)
+                          _buildVisitTypeFields(
+                            selectedPurpose!, // Ensure non-null for the method if needed, though surrounding check handles logic usually
+                            setDialogState,
+                          ),
                         const SizedBox(height: 16),
-                        FormField<int>(
-                          initialValue: selectedTenantId,
+                        DropdownButtonFormField<int>(
+                          value: selectedTenantId,
                           validator: (v) => v == null ? "Required" : null,
-                          builder: (fieldState) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                DropdownMenu<int>(
-                                  width: double.infinity,
-                                  expandedInsets: EdgeInsets.zero,
-                                  initialSelection: selectedTenantId,
-                                  label: const Text(
-                                    "Select Company",
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                          decoration: InputDecoration(
+                            labelText: "Select Company*",
+                            labelStyle: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            floatingLabelStyle: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            hintText: "Select Company",
+                            floatingLabelBehavior: FloatingLabelBehavior.always,
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 16,
+                              horizontal: 15,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade400,
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade400,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade400,
+                                width: 2,
+                              ),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(
+                                color: Colors.red,
+                                width: 1,
+                              ),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(
+                                color: Colors.red,
+                                width: 2,
+                              ),
+                            ),
+                          ),
+                          items:
+                              state.tenants.map((t) {
+                                return DropdownMenuItem<int>(
+                                  value: t['id'] as int,
+                                  child: Text(
+                                    (t['company'] ??
+                                            t['companyName'] ??
+                                            'No Name')
+                                        .toString(),
                                   ),
-                                  hintText: "Select Company",
-                                  inputDecorationTheme: InputDecorationTheme(
-                                    filled: false,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 16,
-                                      horizontal: 15,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      borderSide: BorderSide(
-                                        color: Colors.grey.shade400,
-                                      ),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      borderSide: BorderSide(
-                                        color: Colors.grey.shade400,
-                                      ),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      borderSide: BorderSide(
-                                        color: Colors.grey.shade400,
-                                        width: 2,
-                                      ),
-                                    ),
-                                    floatingLabelBehavior:
-                                        FloatingLabelBehavior.always,
-                                  ),
-                                  dropdownMenuEntries:
-                                      state.tenants
-                                          .map(
-                                            (t) => DropdownMenuEntry<int>(
-                                              value: t['id'] as int,
-                                              label:
-                                                  (t['company'] ??
-                                                          t['companyName'] ??
-                                                          'No Name')
-                                                      .toString(),
-                                            ),
-                                          )
-                                          .toList(),
-                                  onSelected: (v) {
-                                    setDialogState(() => selectedTenantId = v);
-                                    fieldState.didChange(v);
-                                  },
-                                ),
-                                if (fieldState.hasError)
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 12,
-                                      top: 6,
-                                    ),
-                                    child: Text(
-                                      fieldState.errorText!,
-                                      style: TextStyle(
-                                        color: Colors.red.shade700,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            );
+                                );
+                              }).toList(),
+                          onChanged: (v) {
+                            setDialogState(() => selectedTenantId = v);
                           },
                         ),
                       ],

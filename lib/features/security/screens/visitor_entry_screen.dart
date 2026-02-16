@@ -132,13 +132,6 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
             ),
           ),
         ),
-        if (state.isOperationLoading)
-          Positioned.fill(
-            child: Material(
-              color: Colors.black.withOpacity(0.3),
-              child: const Center(child: CircularProgressIndicator()),
-            ),
-          ),
       ],
     );
   }
@@ -193,133 +186,152 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
             ),
           );
         }
-        return RefreshIndicator(
-          onRefresh:
-              () => ref.read(securityProvider.notifier).fetchTodayVisitors(),
-          child: ListView.builder(
-            physics: const AlwaysScrollableScrollPhysics(),
-            itemCount: visibleVisitors.length,
+        return ListView.builder(
+          physics: const AlwaysScrollableScrollPhysics(),
+          itemCount: visibleVisitors.length,
 
-            itemBuilder: (context, index) {
-              final item = visibleVisitors[index];
-              final imageProvider = _safeImage(item['imageUrl']);
-              final bool isAllowed =
-                  item['status'] == 'ALLOWED' || item['status'] == 'APPROVED';
-              final bool isPending = item['status'] == 'PENDING';
+          itemBuilder: (context, index) {
+            final item = visibleVisitors[index];
+            final imageProvider = _safeImage(item['imageUrl']);
+            final bool isAllowed =
+                item['status'] == 'ALLOWED' || item['status'] == 'APPROVED';
+            final bool isPending = item['status'] == 'PENDING';
 
-              return Card(
-                elevation: 2,
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                color: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 30,
-                            backgroundColor: Colors.grey.shade200,
-                            backgroundImage: imageProvider,
-                            child:
-                                imageProvider == null
-                                    ? const Icon(Icons.person, size: 30)
-                                    : null,
-                          ),
+            return Card(
+              elevation: 2,
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundColor: Colors.grey.shade200,
+                          backgroundImage: imageProvider,
+                          child:
+                              imageProvider == null
+                                  ? const Icon(Icons.person, size: 30)
+                                  : null,
+                        ),
 
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  item['visitorName'] ?? 'Unknown',
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item['visitorName'] ?? 'Unknown',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
                                 ),
+                              ),
+                              Text(
+                                "+91 ${item['mobileNumber'] ?? ''}",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (isAllowed)
+                          ElevatedButton(
+                            onPressed:
+                                state.isOperationLoading
+                                    ? null
+                                    : () => ref
+                                        .read(securityProvider.notifier)
+                                        .checkInVisitor(item['id']),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.successColor,
+                              foregroundColor: Colors.white,
+                              side: BorderSide.none,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Icon(Icons.check_circle_outline, size: 18),
+                                SizedBox(width: 4),
+                                Text("Check-In"),
+                              ],
+                            ),
+                          )
+                        else if (isPending)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.orange.withOpacity(0.1),
+                              border: Border.all(color: Colors.orange.shade200),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.access_time,
+                                  size: 18,
+                                  color: Colors.orange.shade800,
+                                ),
+                                const SizedBox(width: 4),
                                 Text(
-                                  "+91 ${item['mobileNumber'] ?? ''}",
+                                  "Pending",
                                   style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey.shade600,
+                                    color: Colors.orange.shade800,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          if (isAllowed)
-                            ElevatedButton(
-                              onPressed:
-                                  state.isOperationLoading
-                                      ? null
-                                      : () => ref
-                                          .read(securityProvider.notifier)
-                                          .checkInVisitor(item['id']),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppTheme.successColor,
-                                foregroundColor: Colors.white,
-                                side: BorderSide.none,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                elevation: 0,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: const [
-                                  Icon(Icons.check_circle_outline, size: 18),
-                                  SizedBox(width: 4),
-                                  Text("Check-In"),
-                                ],
-                              ),
-                            )
-                          else if (isPending)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.orange.withOpacity(0.1),
-                                border: Border.all(
-                                  color: Colors.orange.shade200,
-                                ),
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.access_time,
-                                    size: 18,
-                                    color: Colors.orange.shade800,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    "Pending",
-                                    style: TextStyle(
-                                      color: Colors.orange.shade800,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            (item['visitType'] ??
+                                    item['purpose'] ??
+                                    'Visitor') +
+                                (item['comments'] != null &&
+                                        item['comments'].toString().isNotEmpty
+                                    ? " / ${item['comments']}"
+                                    : ""),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
                             ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
+                          ),
+                        ),
+                        if (item['tenant']['companyName'] != null) ...[
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 16,
@@ -330,53 +342,24 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
-                              (item['visitType'] ??
-                                      item['purpose'] ??
-                                      'Visitor') +
-                                  (item['comments'] != null &&
-                                          item['comments'].toString().isNotEmpty
-                                      ? " / ${item['comments']}"
-                                      : ""),
+                              item['tenant']['companyName'],
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
                           ),
-                          if (item['tenant']['companyName'] != null) ...[
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                item['tenant']['companyName'],
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ],
                         ],
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         );
       },
-      loading:
-          () =>
-              state.isOperationLoading
-                  ? const SizedBox.shrink()
-                  : const Center(child: CircularProgressIndicator()),
+      loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text(e.toString())),
     );
   }
@@ -440,7 +423,7 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
             TextFormField(
               controller: _mobileController,
               decoration: InputDecoration(
-                labelText: "Mobile Number",
+                labelText: "Mobile Number*",
                 hintText: "Mobile Number",
                 hintStyle: TextStyle(
                   color: Colors.grey.shade400,
@@ -471,6 +454,14 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide(color: Colors.grey.shade400, width: 2),
                 ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Colors.red, width: 1),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Colors.red, width: 2),
+                ),
               ),
               keyboardType: TextInputType.phone,
               inputFormatters: [
@@ -488,7 +479,7 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
             TextFormField(
               controller: _nameController,
               decoration: InputDecoration(
-                labelText: "Visitor Name",
+                labelText: "Visitor Name*",
                 hintText: "Visitor Name",
                 hintStyle: TextStyle(
                   color: Colors.grey.shade400,
@@ -519,6 +510,14 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide(color: Colors.grey.shade400, width: 2),
                 ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Colors.red, width: 1),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Colors.red, width: 2),
+                ),
               ),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
@@ -530,79 +529,52 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
               },
             ),
             const SizedBox(height: 16),
-            FormField<String>(
-              initialValue: _selectedPurpose,
+            DropdownButtonFormField<String>(
+              value: _selectedPurpose,
               validator: (v) => v == null ? "Required" : null,
-              builder: (fieldState) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: double.infinity,
-                      child: DropdownMenu<String>(
-                        expandedInsets: EdgeInsets.zero,
-                        menuStyle: const MenuStyle(
-                          minimumSize: WidgetStatePropertyAll(Size(80, 0)),
-                        ),
-
-                        initialSelection: _selectedPurpose,
-                        label: const Text(
-                          "Visit Type",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        hintText: "Select Type",
-                        inputDecorationTheme: InputDecorationTheme(
-                          filled: false,
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 16,
-                            horizontal: 15,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: const BorderSide(color: Colors.grey),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(color: Colors.grey.shade400),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(
-                              color: Colors.grey.shade400,
-                              width: 2,
-                            ),
-                          ),
-                          floatingLabelBehavior: FloatingLabelBehavior.always,
-                        ),
-                        dropdownMenuEntries:
-                            _purposes.map((p) {
-                              return DropdownMenuEntry<String>(
-                                value: p,
-                                label: p,
-                              );
-                            }).toList(),
-                        onSelected: (v) {
-                          setState(() => _selectedPurpose = v);
-                          fieldState.didChange(v);
-                        },
-                      ),
-                    ),
-                    if (fieldState.hasError)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12, top: 6),
-                        child: Text(
-                          fieldState.errorText!,
-                          style: TextStyle(
-                            color: Colors.red.shade700,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                  ],
-                );
+              decoration: InputDecoration(
+                labelText: "Visit Type*",
+                labelStyle: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+                floatingLabelStyle: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+                hintText: "Select Type",
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 15,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Colors.grey),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey.shade400),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey.shade400, width: 2),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Colors.red, width: 1),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Colors.red, width: 2),
+                ),
+              ),
+              items:
+                  _purposes.map((p) {
+                    return DropdownMenuItem<String>(value: p, child: Text(p));
+                  }).toList(),
+              onChanged: (v) {
+                setState(() => _selectedPurpose = v);
               },
             ),
             const SizedBox(height: 16),
@@ -644,98 +616,72 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
             if (_selectedPurpose == "Visitor") _buildVisitTypeFields(),
             if (_selectedPurpose == "Interview") _buildVisitTypeFields(),
             const SizedBox(height: 16),
-            FormField<int>(
-              initialValue: _selectedTenantId,
+            DropdownButtonFormField<int>(
+              value: _selectedTenantId,
               validator: (v) => v == null ? "Required" : null,
-              builder: (fieldState) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: double.infinity,
-                      child: DropdownMenu<int>(
-                        expandedInsets: EdgeInsets.zero,
-                        menuStyle: const MenuStyle(
-                          minimumSize: WidgetStatePropertyAll(Size(80, 0)),
-                        ),
-                        initialSelection: _selectedTenantId,
-                        label: const Text(
-                          "Select Company",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        hintText: "Select Company",
-                        inputDecorationTheme: InputDecorationTheme(
-                          filled: false,
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 16,
-                            horizontal: 15,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: const BorderSide(color: Colors.grey),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(color: Colors.grey.shade400),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(
-                              color: Colors.grey.shade400,
-                              width: 2,
-                            ),
-                          ),
-                          floatingLabelBehavior: FloatingLabelBehavior.always,
-                        ),
-                        dropdownMenuEntries:
-                            state.tenants.map((t) {
-                              return DropdownMenuEntry<int>(
-                                value: t['id'] as int,
-                                label:
-                                    (t['company'] ??
-                                            t['companyName'] ??
-                                            'No Name')
-                                        .toString(),
-                              );
-                            }).toList(),
-                        onSelected: (v) {
-                          if (v != null) {
-                            final tenant = state.tenants.firstWhere(
-                              (t) => t['id'] == v,
-                            );
-                            setState(() {
-                              _selectedTenantId = v;
-                              _selectedCompany =
-                                  tenant['company'] ?? tenant['companyName'];
-                              _selectedAdminIds.clear();
-                            });
-                            fieldState.didChange(v);
-                          }
-                        },
+              decoration: InputDecoration(
+                labelText: "Select Company*",
+                labelStyle: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+                floatingLabelStyle: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+                hintText: "Select Company",
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 15,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Colors.grey),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey.shade400),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey.shade400, width: 2),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Colors.red, width: 1),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Colors.red, width: 2),
+                ),
+              ),
+              items:
+                  state.tenants.map((t) {
+                    return DropdownMenuItem<int>(
+                      value: t['id'] as int,
+                      child: Text(
+                        (t['company'] ?? t['companyName'] ?? 'No Name')
+                            .toString(),
                       ),
-                    ),
-                    if (fieldState.hasError)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12, top: 6),
-                        child: Text(
-                          fieldState.errorText!,
-                          style: TextStyle(
-                            color: Colors.red.shade700,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                  ],
-                );
+                    );
+                  }).toList(),
+              onChanged: (v) {
+                if (v != null) {
+                  final tenant = state.tenants.firstWhere((t) => t['id'] == v);
+                  setState(() {
+                    _selectedTenantId = v;
+                    _selectedCompany =
+                        tenant['company'] ?? tenant['companyName'];
+                    _selectedAdminIds.clear();
+                  });
+                }
               },
             ),
             const SizedBox(height: 16),
             if (admins.isNotEmpty) ...[
               const Text(
-                "Select Admins",
+                "Select Admins*",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 8),

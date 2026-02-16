@@ -228,11 +228,6 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
                   ),
             ),
           ),
-          if (state.isOperationLoading)
-            Container(
-              color: Colors.black.withOpacity(0.3),
-              child: const Center(child: AppLoadingWidget()),
-            ),
         ],
       ),
     );
