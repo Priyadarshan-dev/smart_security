@@ -1,4 +1,4 @@
-import 'dart:convert';
+import '../../../core/utils/image_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:ceedeeyes/core/theme/app_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +6,7 @@ import 'package:logger/logger.dart';
 import '../provider/security_provider.dart';
 import '../../../core/utils/snackbar_utils.dart';
 import 'package:intl/intl.dart';
+import '../../shared/widgets/custom_calendar_dialog.dart';
 
 class VisitorHistoryScreen extends ConsumerStatefulWidget {
   const VisitorHistoryScreen({super.key});
@@ -50,11 +51,14 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
   }
 
   Future<void> _selectDate(BuildContext context, bool isStart) async {
-    final DateTime? picked = await showDatePicker(
+    final DateTime? picked = await showDialog<DateTime>(
       context: context,
-      initialDate: isStart ? _startDate : _endDate,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2101),
+      builder:
+          (context) => CustomCalendarDialog(
+            initialDate: isStart ? _startDate : _endDate,
+            firstDate: DateTime(2020),
+            lastDate: DateTime(2101),
+          ),
     );
     if (picked != null) {
       if (isStart && picked.isAfter(_endDate)) {
@@ -292,12 +296,12 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
                         CircleAvatar(
                           radius: 30,
                           backgroundColor: Colors.grey.shade200,
-                          backgroundImage:
-                              item['imageUrl'] != null
-                                  ? MemoryImage(base64Decode(item['imageUrl']))
-                                  : null,
+                          backgroundImage: ImageUtils.getImageProvider(
+                            item['imageUrl'],
+                          ),
                           child:
-                              item['imageUrl'] == null
+                              ImageUtils.getImageProvider(item['imageUrl']) ==
+                                      null
                                   ? const Icon(Icons.person, size: 30)
                                   : null,
                         ),
@@ -529,14 +533,14 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
                                 CircleAvatar(
                                   radius: 30,
                                   backgroundColor: Colors.grey.shade200,
-                                  backgroundImage:
-                                      item['imageUrl'] != null
-                                          ? MemoryImage(
-                                            base64Decode(item['imageUrl']),
-                                          )
-                                          : null,
+                                  backgroundImage: ImageUtils.getImageProvider(
+                                    item['imageUrl'],
+                                  ),
                                   child:
-                                      item['imageUrl'] == null
+                                      ImageUtils.getImageProvider(
+                                                item['imageUrl'],
+                                              ) ==
+                                              null
                                           ? const Icon(Icons.person, size: 30)
                                           : null,
                                 ),

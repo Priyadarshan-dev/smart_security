@@ -1,4 +1,4 @@
-import 'dart:convert';
+import '../../../core/utils/image_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../provider/tenant_admin_provider.dart';
@@ -337,6 +337,9 @@ class _TenantHomeView extends ConsumerWidget {
                     )
                   else
                     ...state.todayVisitors.value!.map((visitor) {
+                      final imageProvider = ImageUtils.getImageProvider(
+                        visitor['imageUrl'],
+                      );
                       return Card(
                         margin: const EdgeInsets.only(bottom: 16),
                         elevation: 2,
@@ -351,11 +354,9 @@ class _TenantHomeView extends ConsumerWidget {
                               CircleAvatar(
                                 radius: 35,
                                 backgroundColor: Colors.grey.shade100,
-                                backgroundImage: _safeImage(
-                                  visitor['imageUrl'],
-                                ),
+                                backgroundImage: imageProvider,
                                 child:
-                                    _safeImage(visitor['imageUrl']) == null
+                                    imageProvider == null
                                         ? Icon(
                                           Icons.person_rounded,
                                           color: Colors.grey.shade400,
@@ -363,7 +364,6 @@ class _TenantHomeView extends ConsumerWidget {
                                         )
                                         : null,
                               ),
-
                               const SizedBox(width: 20),
                               Expanded(
                                 child: Column(
@@ -401,36 +401,6 @@ class _TenantHomeView extends ConsumerWidget {
                 ],
               ),
     );
-  }
-
-  ImageProvider? _safeImage(dynamic imageUrl) {
-    if (imageUrl == null) return null;
-
-    String value = imageUrl.toString();
-
-    if (value.isEmpty) return null;
-
-    try {
-      // Case 1: Normal image URL
-      if (value.startsWith('http')) {
-        return NetworkImage(value);
-      }
-
-      // Case 2: Base64 with prefix
-      if (value.contains(',')) {
-        value = value.split(',').last;
-      }
-
-      // Fix padding if missing
-      while (value.length % 4 != 0) {
-        value += '=';
-      }
-
-      return MemoryImage(base64Decode(value));
-    } catch (e) {
-      debugPrint("Invalid image format: $e");
-      return null;
-    }
   }
 
   Widget _buildInfoRow(String label, String value, {Color? color}) {

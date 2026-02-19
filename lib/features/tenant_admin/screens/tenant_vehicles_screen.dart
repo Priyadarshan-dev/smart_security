@@ -67,7 +67,7 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                           TextFormField(
                             controller: numberController,
                             decoration: InputDecoration(
-                              labelText: "Vehicle Number",
+                              labelText: "Vehicle Number*",
                               labelStyle: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
@@ -105,13 +105,13 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                               ),
                             ),
                             textCapitalization: TextCapitalization.characters,
-                            validator: (v) => v!.isEmpty ? "Required" : null,
+                            validator: (v) => v!.isEmpty ? "" : null,
                           ),
                           const SizedBox(height: 20),
                           TextFormField(
                             controller: driverController,
                             decoration: InputDecoration(
-                              labelText: "Driver Name",
+                              labelText: "Driver Name*",
                               labelStyle: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
@@ -148,12 +148,12 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                 ),
                               ),
                             ),
-                            validator: (v) => v!.isEmpty ? "Required" : null,
+                            validator: (v) => v!.isEmpty ? "" : null,
                           ),
                           const SizedBox(height: 20),
                           FormField<String>(
                             initialValue: selectedVehicleType,
-                            validator: (v) => v == null ? "Required" : null,
+                            validator: (v) => v == null ? "" : null,
                             builder: (fieldState) {
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,15 +161,16 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                   SizedBox(
                                     width: double.infinity,
                                     child: DropdownMenu<String>(
-                                      menuStyle: MenuStyle(
+                                      menuStyle: const MenuStyle(
                                         minimumSize: WidgetStatePropertyAll(
                                           Size(80, 0),
                                         ),
                                       ),
                                       expandedInsets: EdgeInsets.zero,
                                       // initialSelection: selectedVehicleType,
+                                      errorText: fieldState.errorText,
                                       label: const Text(
-                                        "Vehicle Type",
+                                        "Vehicle Type*",
                                         style: TextStyle(
                                           color: Colors.black,
                                           fontWeight: FontWeight.bold,
@@ -206,6 +207,23 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                                 width: 2,
                                               ),
                                             ),
+                                            errorBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              borderSide: const BorderSide(
+                                                color: Colors.red,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            focusedErrorBorder:
+                                                OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                  borderSide: const BorderSide(
+                                                    color: Colors.red,
+                                                    width: 2,
+                                                  ),
+                                                ),
                                             floatingLabelBehavior:
                                                 FloatingLabelBehavior.always,
                                           ),
@@ -224,20 +242,6 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                       },
                                     ),
                                   ),
-                                  if (fieldState.hasError)
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 12,
-                                        top: 6,
-                                      ),
-                                      child: Text(
-                                        fieldState.errorText!,
-                                        style: TextStyle(
-                                          color: Colors.red.shade700,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
                                 ],
                               );
                             },
@@ -245,7 +249,7 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                           const SizedBox(height: 20),
                           FormField<String>(
                             initialValue: selectedPurpose,
-                            validator: (v) => v == null ? "Required" : null,
+                            validator: (v) => v == null ? "" : null,
                             builder: (fieldState) {
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -254,14 +258,15 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                     width: double.infinity,
                                     child: DropdownMenu<String>(
                                       expandedInsets: EdgeInsets.zero,
-                                      menuStyle: MenuStyle(
+                                      menuStyle: const MenuStyle(
                                         minimumSize: WidgetStatePropertyAll(
                                           Size(80, 0),
                                         ),
                                       ),
                                       // initialSelection: selectedPurpose,
+                                      errorText: fieldState.errorText,
                                       label: const Text(
-                                        "Purpose",
+                                        "Purpose*",
                                         style: TextStyle(
                                           color: Colors.black,
                                           fontWeight: FontWeight.bold,
@@ -298,6 +303,23 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                                 width: 2,
                                               ),
                                             ),
+                                            errorBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              borderSide: const BorderSide(
+                                                color: Colors.red,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            focusedErrorBorder:
+                                                OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                  borderSide: const BorderSide(
+                                                    color: Colors.red,
+                                                    width: 2,
+                                                  ),
+                                                ),
                                             floatingLabelBehavior:
                                                 FloatingLabelBehavior.always,
                                           ),
@@ -316,21 +338,6 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                       },
                                     ),
                                   ),
-
-                                  if (fieldState.hasError)
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 12,
-                                        top: 6,
-                                      ),
-                                      child: Text(
-                                        fieldState.errorText!,
-                                        style: TextStyle(
-                                          color: Colors.red.shade700,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
                                 ],
                               );
                             },
@@ -542,7 +549,7 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                               ),
                             ),
                             textCapitalization: TextCapitalization.characters,
-                            validator: (v) => v!.isEmpty ? "Required" : null,
+                            validator: (v) => v!.isEmpty ? "" : null,
                           ),
                           const SizedBox(height: 20),
                           TextFormField(
@@ -585,12 +592,12 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                 ),
                               ),
                             ),
-                            validator: (v) => v!.isEmpty ? "Required" : null,
+                            validator: (v) => v!.isEmpty ? "" : null,
                           ),
                           const SizedBox(height: 20),
                           FormField<String>(
                             initialValue: selectedVehicleType,
-                            validator: (v) => v == null ? "Required" : null,
+                            validator: (v) => v == null ? "" : null,
                             builder: (fieldState) {
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -605,6 +612,7 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                         ),
                                       ),
                                       initialSelection: selectedVehicleType,
+                                      errorText: fieldState.errorText,
                                       label: const Text(
                                         "Vehicle Type",
                                         style: TextStyle(
@@ -612,6 +620,7 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
+                                      hintText: "Select Vehicle Type",
                                       inputDecorationTheme:
                                           InputDecorationTheme(
                                             filled: false,
@@ -642,6 +651,23 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                                 width: 2,
                                               ),
                                             ),
+                                            errorBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              borderSide: const BorderSide(
+                                                color: Colors.red,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            focusedErrorBorder:
+                                                OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                  borderSide: const BorderSide(
+                                                    color: Colors.red,
+                                                    width: 2,
+                                                  ),
+                                                ),
                                             floatingLabelBehavior:
                                                 FloatingLabelBehavior.always,
                                           ),
@@ -660,20 +686,6 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                       },
                                     ),
                                   ),
-                                  if (fieldState.hasError)
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 12,
-                                        top: 6,
-                                      ),
-                                      child: Text(
-                                        fieldState.errorText!,
-                                        style: TextStyle(
-                                          color: Colors.red.shade700,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
                                 ],
                               );
                             },
@@ -681,7 +693,7 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                           const SizedBox(height: 20),
                           FormField<String>(
                             initialValue: selectedPurpose,
-                            validator: (v) => v == null ? "Required" : null,
+                            validator: (v) => v == null ? "" : null,
                             builder: (fieldState) {
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -696,6 +708,7 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                           Size(80, 0),
                                         ),
                                       ),
+                                      errorText: fieldState.errorText,
                                       label: const Text(
                                         "Purpose",
                                         style: TextStyle(
@@ -734,6 +747,23 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                                 width: 2,
                                               ),
                                             ),
+                                            errorBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              borderSide: const BorderSide(
+                                                color: Colors.red,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            focusedErrorBorder:
+                                                OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                  borderSide: const BorderSide(
+                                                    color: Colors.red,
+                                                    width: 2,
+                                                  ),
+                                                ),
                                             floatingLabelBehavior:
                                                 FloatingLabelBehavior.always,
                                           ),
@@ -750,23 +780,6 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                       },
                                     ),
                                   ),
-
-                                  const SizedBox(height: 20),
-
-                                  if (fieldState.hasError)
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 12,
-                                        top: 6,
-                                      ),
-                                      child: Text(
-                                        fieldState.errorText!,
-                                        style: TextStyle(
-                                          color: Colors.red.shade700,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
                                 ],
                               );
                             },

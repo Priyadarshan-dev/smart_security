@@ -1,5 +1,4 @@
-import 'dart:convert';
-
+import '../../../core/utils/image_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../model/tenant_admin_state.dart';
@@ -84,11 +83,14 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
                                 CircleAvatar(
                                   radius: 35,
                                   backgroundColor: Colors.grey.shade200,
-                                  backgroundImage: _safeImage(
+                                  backgroundImage: ImageUtils.getImageProvider(
                                     visitor['imageUrl'],
                                   ),
                                   child:
-                                      _safeImage(visitor['imageUrl']) == null
+                                      ImageUtils.getImageProvider(
+                                                visitor['imageUrl'],
+                                              ) ==
+                                              null
                                           ? const Icon(Icons.person, size: 30)
                                           : null,
                                 ),
@@ -231,35 +233,6 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
         ],
       ),
     );
-  }
-
-  ImageProvider? _safeImage(dynamic imageUrl) {
-    if (imageUrl == null) return null;
-
-    String value = imageUrl.toString();
-    if (value.isEmpty) return null;
-
-    try {
-      // Case 1: Normal network image
-      if (value.startsWith('http')) {
-        return NetworkImage(value);
-      }
-
-      // Case 2: Base64 with prefix
-      if (value.contains(',')) {
-        value = value.split(',').last;
-      }
-
-      // Fix missing padding
-      while (value.length % 4 != 0) {
-        value += '=';
-      }
-
-      return MemoryImage(base64Decode(value));
-    } catch (e) {
-      debugPrint("Invalid image format: $e");
-      return null;
-    }
   }
 
   void _showDeleteDialog(

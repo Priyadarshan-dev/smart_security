@@ -1,3 +1,4 @@
+import '../../../core/utils/image_utils.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:ceedeeyes/core/theme/app_theme.dart';
@@ -17,6 +18,7 @@ class VisitorEntryScreen extends ConsumerStatefulWidget {
 }
 
 class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
+  final GlobalKey<FormState> _walkInFormKey = GlobalKey<FormState>();
   final _mobileController = TextEditingController();
   final _nameController = TextEditingController();
   final _visitorController = TextEditingController();
@@ -27,6 +29,7 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
   String? _image64;
   String? _addressProofImage64;
   final ImagePicker _picker = ImagePicker();
+  bool _addressProofError = false;
 
   final List<String> _purposes = [
     "Visitor",
@@ -136,35 +139,6 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
     );
   }
 
-  ImageProvider? _safeImage(dynamic imageUrl) {
-    if (imageUrl == null) return null;
-
-    String value = imageUrl.toString();
-    if (value.isEmpty) return null;
-
-    try {
-      // Case 1: Normal network image
-      if (value.startsWith('http')) {
-        return NetworkImage(value);
-      }
-
-      // Case 2: Base64 with prefix
-      if (value.contains(',')) {
-        value = value.split(',').last;
-      }
-
-      // Fix missing padding
-      while (value.length % 4 != 0) {
-        value += '=';
-      }
-
-      return MemoryImage(base64Decode(value));
-    } catch (e) {
-      debugPrint("Invalid image format: $e");
-      return null;
-    }
-  }
-
   Widget _buildScheduledTab(SecurityState state) {
     return state.todayVisitors.when(
       data: (list) {
@@ -192,7 +166,7 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
 
           itemBuilder: (context, index) {
             final item = visibleVisitors[index];
-            final imageProvider = _safeImage(item['imageUrl']);
+            final imageProvider = ImageUtils.getImageProvider(item['imageUrl']);
             final bool isAllowed =
                 item['status'] == 'ALLOWED' || item['status'] == 'APPROVED';
             final bool isPending = item['status'] == 'PENDING';
@@ -364,23 +338,25 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
     );
   }
 
-  Widget _buildWalkInTab(SecurityState state) {
-    final formKey = GlobalKey<FormState>();
-
-    final selectedTenant = state.tenants.firstWhere(
+  Widget _buildWalkInTab(SecurityState securityState) {
+    final selectedTenant = securityState.tenants.firstWhere(
       (t) => t['id'] == _selectedTenantId,
-      orElse: () => null,
+      orElse: () => {},
     );
+
     final admins =
-        selectedTenant != null ? selectedTenant['admins'] as List<dynamic> : [];
+        selectedTenant.isNotEmpty
+            ? selectedTenant['admins'] as List<dynamic>? ?? []
+            : [];
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Form(
-        key: formKey,
+        key: _walkInFormKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            /// 📸 PHOTO
             Center(
               child: GestureDetector(
                 onTap: _pickImage,
@@ -419,9 +395,17 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                 ),
               ),
             ),
+
             const SizedBox(height: 24),
+
+            /// 📱 MOBILE
             TextFormField(
               controller: _mobileController,
+              keyboardType: TextInputType.phone,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(10),
+              ],
               decoration: InputDecoration(
                 labelText: "Mobile Number*",
                 hintText: "Mobile Number",
@@ -463,19 +447,16 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                   borderSide: const BorderSide(color: Colors.red, width: 2),
                 ),
               ),
-              keyboardType: TextInputType.phone,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                LengthLimitingTextInputFormatter(10),
-              ],
               validator: (v) {
-                if (v == null || v.isEmpty) return "Required";
+                if (v == null || v.isEmpty) return "";
                 if (v.length != 10) return "Must be 10 digits";
-                if (!RegExp(r'^[0-9]+$').hasMatch(v)) return "Numbers only";
                 return null;
               },
             ),
+
             const SizedBox(height: 16),
+
+            /// 👤 NAME
             TextFormField(
               controller: _nameController,
               decoration: InputDecoration(
@@ -519,65 +500,76 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                   borderSide: const BorderSide(color: Colors.red, width: 2),
                 ),
               ),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
-              ],
               validator: (v) {
-                if (v == null || v.isEmpty) return "Required";
+                if (v == null || v.isEmpty) return "";
                 if (v.length < 3) return "Too short";
                 return null;
               },
             ),
+
             const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: _selectedPurpose,
-              validator: (v) => v == null ? "Required" : null,
-              decoration: InputDecoration(
-                labelText: "Visit Type*",
-                labelStyle: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-                floatingLabelStyle: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-                hintText: "Select Type",
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-                contentPadding: const EdgeInsets.symmetric(
-                  vertical: 16,
-                  horizontal: 15,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Colors.grey),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: Colors.grey.shade400),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: Colors.grey.shade400, width: 2),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Colors.red, width: 1),
-                ),
-                focusedErrorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Colors.red, width: 2),
-                ),
-              ),
-              items:
-                  _purposes.map((p) {
-                    return DropdownMenuItem<String>(value: p, child: Text(p));
-                  }).toList(),
-              onChanged: (v) {
-                setState(() => _selectedPurpose = v);
+
+            /// 🏷 VISIT TYPE
+            FormField<String>(
+              validator: (v) => v == null ? "" : null,
+              builder: (field) {
+                return DropdownMenu<String>(
+                  label: const Text(
+                    "Visit Type*",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  hintText: "Select Visit Type",
+                  expandedInsets: EdgeInsets.zero,
+                  errorText: field.errorText,
+                  inputDecorationTheme: InputDecorationTheme(
+                    filled: false,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 15,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: Colors.grey.shade400,
+                        width: 2,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Colors.red, width: 1),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Colors.red, width: 2),
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                  ),
+                  dropdownMenuEntries:
+                      _purposes
+                          .map((p) => DropdownMenuEntry(value: p, label: p))
+                          .toList(),
+                  onSelected: (v) {
+                    field.didChange(v);
+                    setState(() => _selectedPurpose = v);
+                  },
+                );
               },
             ),
+
             const SizedBox(height: 16),
+
+            /// 💬 COMMENTS
             TextFormField(
               controller: _visitorController,
               decoration: InputDecoration(
@@ -613,116 +605,133 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
             ),
 
             const SizedBox(height: 16),
-            if (_selectedPurpose == "Visitor") _buildVisitTypeFields(),
-            if (_selectedPurpose == "Interview") _buildVisitTypeFields(),
+
+            if (_selectedPurpose == "Visitor" ||
+                _selectedPurpose == "Interview")
+              _buildVisitTypeFields(),
+
             const SizedBox(height: 16),
-            DropdownButtonFormField<int>(
-              value: _selectedTenantId,
-              validator: (v) => v == null ? "Required" : null,
-              decoration: InputDecoration(
-                labelText: "Select Company*",
-                labelStyle: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-                floatingLabelStyle: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-                hintText: "Select Company",
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-                contentPadding: const EdgeInsets.symmetric(
-                  vertical: 16,
-                  horizontal: 15,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Colors.grey),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: Colors.grey.shade400),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: Colors.grey.shade400, width: 2),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Colors.red, width: 1),
-                ),
-                focusedErrorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Colors.red, width: 2),
-                ),
-              ),
-              items:
-                  state.tenants.map((t) {
-                    return DropdownMenuItem<int>(
-                      value: t['id'] as int,
-                      child: Text(
-                        (t['company'] ?? t['companyName'] ?? 'No Name')
-                            .toString(),
+
+            /// 🏢 COMPANY
+            FormField<int>(
+              validator: (v) => v == null ? "" : null,
+              builder: (field) {
+                return SizedBox(
+                  child: DropdownMenu<int>(
+                    label: const Text(
+                      "Select Company*",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
                       ),
-                    );
-                  }).toList(),
-              onChanged: (v) {
-                if (v != null) {
-                  final tenant = state.tenants.firstWhere((t) => t['id'] == v);
-                  setState(() {
-                    _selectedTenantId = v;
-                    _selectedCompany =
-                        tenant['company'] ?? tenant['companyName'];
-                    _selectedAdminIds.clear();
-                  });
-                }
+                    ),
+                    hintText: "Select Company",
+                    expandedInsets: EdgeInsets.zero,
+                    errorText: field.errorText,
+                    inputDecorationTheme: InputDecorationTheme(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: Colors.grey),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: Colors.grey.shade400),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(
+                          color: Colors.grey.shade400,
+                          width: 2,
+                        ),
+                      ),
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(
+                          color: Colors.red,
+                          width: 1,
+                        ),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(
+                          color: Colors.red,
+                          width: 2,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 15,
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                    ),
+                    dropdownMenuEntries:
+                        securityState.tenants.map<DropdownMenuEntry<int>>((t) {
+                          return DropdownMenuEntry(
+                            value: t['id'] as int,
+                            label:
+                                (t['company'] ?? t['companyName'] ?? 'No Name')
+                                    .toString(),
+                          );
+                        }).toList(),
+                    onSelected: (v) {
+                      field.didChange(v);
+
+                      if (v != null) {
+                        final tenant = securityState.tenants.firstWhere(
+                          (t) => t['id'] == v,
+                        );
+
+                        setState(() {
+                          _selectedTenantId = v;
+                          _selectedCompany =
+                              tenant['company'] ?? tenant['companyName'];
+                          _selectedAdminIds.clear();
+                        });
+                      }
+                    },
+                  ),
+                );
               },
             ),
+
             const SizedBox(height: 16),
+
+            /// 👮 ADMINS
             if (admins.isNotEmpty) ...[
               const Text(
                 "Select Admins*",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               ...admins.map((admin) {
-                final adminId = admin['id'] as int;
-                final isSelected = _selectedAdminIds.contains(adminId);
+                final id = admin['id'] as int;
                 return CheckboxListTile(
-                  title: Text(
-                    admin['fullName'] ?? admin['username'] ?? 'Admin',
-                  ),
+                  title: Text(admin['fullName'] ?? 'Admin'),
                   subtitle: Text(admin['email'] ?? ''),
-                  value: isSelected,
+                  value: _selectedAdminIds.contains(id),
                   onChanged: (val) {
                     setState(() {
-                      if (val == true) {
-                        _selectedAdminIds.add(adminId);
-                      } else {
-                        _selectedAdminIds.remove(adminId);
-                      }
+                      val == true
+                          ? _selectedAdminIds.add(id)
+                          : _selectedAdminIds.remove(id);
                     });
                   },
                   controlAffinity: ListTileControlAffinity.leading,
                 );
-              }).toList(),
+              }),
               if (_selectedAdminIds.isEmpty)
                 const Padding(
-                  padding: EdgeInsets.only(left: 16.0),
+                  padding: EdgeInsets.only(left: 16),
                   child: Text(
-                    "Please select at least one admin",
+                    "Select at least one admin",
                     style: TextStyle(color: Colors.red, fontSize: 12),
                   ),
                 ),
-            ] else if (_selectedTenantId != null)
-              const Padding(
-                padding: EdgeInsets.only(bottom: 16),
-                child: Text(
-                  "No admins found for this company",
-                  style: TextStyle(color: Colors.red, fontSize: 12),
-                ),
-              ),
+            ],
+
             const SizedBox(height: 32),
+
+            /// 🚀 SUBMIT BUTTON
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryBlue,
@@ -733,65 +742,71 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                 ),
               ),
               onPressed:
-                  state.isOperationLoading
+                  securityState.isOperationLoading
                       ? null
                       : () async {
-                        if (formKey.currentState!.validate() &&
-                            _selectedAdminIds.isNotEmpty) {
-                          if (_selectedPurpose == "Visitor" &&
-                              _addressProofImage64 == null) {
-                            SnackbarUtils.showError(
-                              context,
-                              "Address proof is required for Visitor type",
-                            );
-                            return;
-                          }
-                          final success = await ref
-                              .read(securityProvider.notifier)
-                              .addWalkIn({
-                                "visitorName": _nameController.text,
-                                "mobileNumber": _mobileController.text,
-                                "visitType": _selectedPurpose,
-                                "company": _selectedCompany,
-                                "tenantId": _selectedTenantId,
-                                "assignedAdminIds": _selectedAdminIds,
-                                "imageUrl": _image64,
-                                "attachment": _addressProofImage64,
-                                "comments": _visitorController.text,
-                              });
-                          if (context.mounted) {
-                            if (success) {
-                              SnackbarUtils.showSuccess(
-                                context,
-                                "Approval Request Sent",
-                              );
-                              print("Approval Request Sent -- Print Statement");
-                              Navigator.pop(context);
-                            } else {
-                              print("----------------------------------");
-                              print(success.toString());
-                              print(
-                                "Failed to send request -- Print Statement",
-                              );
-                              print("----------------------------------");
-                              SnackbarUtils.showError(
-                                context,
-                                "Failed to send request",
-                              );
-                            }
-                          }
+                        print("BUTTON CLICKED");
+
+                        if (!_walkInFormKey.currentState!.validate()) {
+                          print("FORM INVALID");
+                          return;
+                        }
+
+                        if (_selectedAdminIds.isEmpty) {
+                          print("NO ADMINS SELECTED");
+                          return;
+                        }
+
+                        if ((_selectedPurpose == "Visitor" ||
+                                _selectedPurpose == "Interview") &&
+                            (_addressProofImage64 == null ||
+                                _addressProofImage64!.isEmpty)) {
+                          setState(() {
+                            _addressProofError = true;
+                          });
+                          SnackbarUtils.showError(
+                            context,
+                            "Address proof is required",
+                          );
+                          return;
+                        }
+
+                        print("FORM VALID → sending request");
+
+                        final success = await ref
+                            .read(securityProvider.notifier)
+                            .addWalkIn({
+                              "visitorName": _nameController.text,
+                              "mobileNumber": _mobileController.text,
+                              "visitType": _selectedPurpose,
+                              "company": _selectedCompany,
+                              "tenantId": _selectedTenantId,
+                              "assignedAdminIds": _selectedAdminIds,
+                              "imageUrl": _image64,
+                              "attachment": _addressProofImage64,
+                              "comments": _visitorController.text,
+                            });
+
+                        if (!mounted) return;
+
+                        if (success) {
+                          print("SUCCESS");
+                          SnackbarUtils.showSuccess(
+                            context,
+                            "Approval Request Sent",
+                          );
+                          Navigator.pop(context);
+                        } else {
+                          print("FAILED");
+                          SnackbarUtils.showError(
+                            context,
+                            "Failed to send request",
+                          );
                         }
                       },
               child:
-                  state.isOperationLoading
-                      ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      )
+                  securityState.isOperationLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
                       : const Text("REQUEST APPROVAL"),
             ),
           ],
@@ -799,6 +814,480 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
       ),
     );
   }
+
+  // Widget _buildWalkInTab(SecurityState state) {
+  //   final formKey = GlobalKey<FormState>();
+
+  //   final selectedTenant = state.tenants.firstWhere(
+  //     (t) => t['id'] == _selectedTenantId,
+  //     orElse: () => null,
+  //   );
+  //   final admins =
+  //       selectedTenant != null ? selectedTenant['admins'] as List<dynamic> : [];
+
+  //   return SingleChildScrollView(
+  //     padding: const EdgeInsets.all(16),
+  //     child: Form(
+  //       key: formKey,
+  //       child: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.stretch,
+  //         children: [
+  //           Center(
+  //             child: GestureDetector(
+  //               onTap: _pickImage,
+  //               child: Container(
+  //                 width: 100,
+  //                 height: 100,
+  //                 decoration: BoxDecoration(
+  //                   color: Colors.grey.shade200,
+  //                   shape: BoxShape.circle,
+  //                   border: Border.all(color: AppTheme.primaryBlue, width: 2.5),
+  //                 ),
+  //                 child:
+  //                     _image64 != null
+  //                         ? ClipOval(
+  //                           child: Image.memory(
+  //                             base64Decode(_image64!),
+  //                             fit: BoxFit.cover,
+  //                           ),
+  //                         )
+  //                         : Icon(
+  //                           Icons.camera_alt,
+  //                           size: 40,
+  //                           color: Theme.of(context).primaryColor,
+  //                         ),
+  //               ),
+  //             ),
+  //           ),
+  //           const SizedBox(height: 8),
+  //           const Center(
+  //             child: Text(
+  //               "Capture Visitor Photo",
+  //               style: TextStyle(
+  //                 fontSize: 12,
+  //                 color: Colors.grey,
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //             ),
+  //           ),
+  //           const SizedBox(height: 24),
+  //           TextFormField(
+  //             controller: _mobileController,
+  //             decoration: InputDecoration(
+  //               labelText: "Mobile Number*",
+  //               hintText: "Mobile Number",
+  //               hintStyle: TextStyle(
+  //                 color: Colors.grey.shade400,
+  //                 fontWeight: FontWeight.normal,
+  //               ),
+  //               labelStyle: const TextStyle(
+  //                 color: Colors.black,
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //               floatingLabelStyle: const TextStyle(
+  //                 color: Colors.black,
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //               floatingLabelBehavior: FloatingLabelBehavior.always,
+  //               contentPadding: const EdgeInsets.symmetric(
+  //                 vertical: 20,
+  //                 horizontal: 20,
+  //               ),
+  //               border: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(16),
+  //                 borderSide: BorderSide(color: Colors.grey.shade400),
+  //               ),
+  //               enabledBorder: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(16),
+  //                 borderSide: BorderSide(color: Colors.grey.shade400),
+  //               ),
+  //               focusedBorder: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(16),
+  //                 borderSide: BorderSide(color: Colors.grey.shade400, width: 2),
+  //               ),
+  //               errorBorder: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(16),
+  //                 borderSide: const BorderSide(color: Colors.red, width: 1),
+  //               ),
+  //               focusedErrorBorder: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(16),
+  //                 borderSide: const BorderSide(color: Colors.red, width: 2),
+  //               ),
+  //             ),
+  //             keyboardType: TextInputType.phone,
+  //             inputFormatters: [
+  //               FilteringTextInputFormatter.digitsOnly,
+  //               LengthLimitingTextInputFormatter(10),
+  //             ],
+  //             validator: (v) {
+  //               if (v == null || v.isEmpty) return "";
+  //               if (v.length != 10) return "Must be 10 digits";
+  //               if (!RegExp(r'^[0-9]+$').hasMatch(v)) return "Numbers only";
+  //               return null;
+  //             },
+  //           ),
+  //           const SizedBox(height: 16),
+  //           TextFormField(
+  //             controller: _nameController,
+  //             decoration: InputDecoration(
+  //               labelText: "Visitor Name*",
+  //               hintText: "Visitor Name",
+  //               hintStyle: TextStyle(
+  //                 color: Colors.grey.shade400,
+  //                 fontWeight: FontWeight.normal,
+  //               ),
+  //               labelStyle: const TextStyle(
+  //                 color: Colors.black,
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //               floatingLabelStyle: const TextStyle(
+  //                 color: Colors.black,
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //               floatingLabelBehavior: FloatingLabelBehavior.always,
+  //               contentPadding: const EdgeInsets.symmetric(
+  //                 vertical: 20,
+  //                 horizontal: 20,
+  //               ),
+  //               border: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(16),
+  //                 borderSide: BorderSide(color: Colors.grey.shade400),
+  //               ),
+  //               enabledBorder: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(16),
+  //                 borderSide: BorderSide(color: Colors.grey.shade400),
+  //               ),
+  //               focusedBorder: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(16),
+  //                 borderSide: BorderSide(color: Colors.grey.shade400, width: 2),
+  //               ),
+  //               errorBorder: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(16),
+  //                 borderSide: const BorderSide(color: Colors.red, width: 1),
+  //               ),
+  //               focusedErrorBorder: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(16),
+  //                 borderSide: const BorderSide(color: Colors.red, width: 2),
+  //               ),
+  //             ),
+  //             inputFormatters: [
+  //               FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
+  //             ],
+  //             validator: (v) {
+  //               if (v == null || v.isEmpty) return "";
+  //               if (v.length < 3) return "Too short";
+  //               return null;
+  //             },
+  //           ),
+  //           const SizedBox(height: 16),
+  //           FormField<String>(
+  //             validator: (v) => v == null ? "" : null,
+  //             builder: (FormFieldState<String> state) {
+  //               return DropdownMenu<String>(
+  //                 initialSelection: _selectedPurpose,
+  //                 label: const Text(
+  //                   "Visit Type*",
+  //                   style: TextStyle(
+  //                     color: Colors.black,
+  //                     fontWeight: FontWeight.bold,
+  //                   ),
+  //                 ),
+  //                 hintText: "Select Visit Type",
+  //                 expandedInsets: EdgeInsets.zero,
+  //                 errorText: state.errorText,
+  //                 inputDecorationTheme: InputDecorationTheme(
+  //                   filled: false,
+  //                   contentPadding: const EdgeInsets.symmetric(
+  //                     vertical: 16,
+  //                     horizontal: 15,
+  //                   ),
+  //                   border: OutlineInputBorder(
+  //                     borderRadius: BorderRadius.circular(16),
+  //                     borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+  //                   ),
+  //                   enabledBorder: OutlineInputBorder(
+  //                     borderRadius: BorderRadius.circular(16),
+  //                     borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+  //                   ),
+  //                   focusedBorder: OutlineInputBorder(
+  //                     borderRadius: BorderRadius.circular(16),
+  //                     borderSide: BorderSide(
+  //                       color: Colors.grey.shade400,
+  //                       width: 2,
+  //                     ),
+  //                   ),
+  //                   errorBorder: OutlineInputBorder(
+  //                     borderRadius: BorderRadius.circular(16),
+  //                     borderSide: const BorderSide(color: Colors.red, width: 1),
+  //                   ),
+  //                   focusedErrorBorder: OutlineInputBorder(
+  //                     borderRadius: BorderRadius.circular(16),
+  //                     borderSide: const BorderSide(color: Colors.red, width: 2),
+  //                   ),
+  //                   floatingLabelBehavior: FloatingLabelBehavior.always,
+  //                 ),
+  //                 dropdownMenuEntries:
+  //                     _purposes.map((p) {
+  //                       return DropdownMenuEntry<String>(value: p, label: p);
+  //                     }).toList(),
+  //                 onSelected: (v) {
+  //                   state.didChange(v);
+  //                   setState(() => _selectedPurpose = v);
+  //                 },
+  //               );
+  //             },
+  //           ),
+
+  //           const SizedBox(height: 16),
+  //           TextFormField(
+  //             controller: _visitorController,
+  //             decoration: InputDecoration(
+  //               labelText: "Comments",
+  //               labelStyle: const TextStyle(
+  //                 color: Colors.black,
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //               floatingLabelStyle: const TextStyle(
+  //                 color: Colors.black,
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //               hintText: "add comments",
+  //               hintStyle: TextStyle(color: Colors.grey.shade400),
+  //               floatingLabelBehavior: FloatingLabelBehavior.always,
+  //               contentPadding: const EdgeInsets.symmetric(
+  //                 vertical: 16,
+  //                 horizontal: 15,
+  //               ),
+  //               border: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(12),
+  //                 borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+  //               ),
+  //               enabledBorder: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(12),
+  //                 borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+  //               ),
+  //               focusedBorder: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(12),
+  //                 borderSide: BorderSide(color: Colors.grey.shade400, width: 2),
+  //               ),
+  //             ),
+  //           ),
+
+  //           const SizedBox(height: 16),
+  //           if (_selectedPurpose == "Visitor") _buildVisitTypeFields(),
+  //           if (_selectedPurpose == "Interview") _buildVisitTypeFields(),
+
+  //           FormField<int>(
+  //             validator: (v) => v == null ? "" : null,
+  //             builder: (FormFieldState<int> state) {
+  //               return DropdownMenu<int>(
+  //                 initialSelection: _selectedTenantId,
+
+  //                 label: const Text(
+  //                   "Select Company*",
+  //                   style: TextStyle(
+  //                     color: Colors.black,
+  //                     fontWeight: FontWeight.bold,
+  //                   ),
+  //                 ),
+  //                 hintText: "Select Company",
+  //                 expandedInsets: EdgeInsets.zero,
+  //                 errorText: state.errorText,
+  //                 inputDecorationTheme: InputDecorationTheme(
+  //                   border: OutlineInputBorder(
+  //                     borderRadius: BorderRadius.circular(16),
+  //                     borderSide: const BorderSide(color: Colors.grey),
+  //                   ),
+  //                   enabledBorder: OutlineInputBorder(
+  //                     borderRadius: BorderRadius.circular(16),
+  //                     borderSide: BorderSide(color: Colors.grey.shade400),
+  //                   ),
+  //                   focusedBorder: OutlineInputBorder(
+  //                     borderRadius: BorderRadius.circular(16),
+  //                     borderSide: BorderSide(
+  //                       color: Colors.grey.shade400,
+  //                       width: 2,
+  //                     ),
+  //                   ),
+  //                   errorBorder: OutlineInputBorder(
+  //                     borderRadius: BorderRadius.circular(16),
+  //                     borderSide: const BorderSide(color: Colors.red, width: 1),
+  //                   ),
+  //                   focusedErrorBorder: OutlineInputBorder(
+  //                     borderRadius: BorderRadius.circular(16),
+  //                     borderSide: const BorderSide(color: Colors.red, width: 2),
+  //                   ),
+  //                   contentPadding: const EdgeInsets.symmetric(
+  //                     vertical: 16,
+  //                     horizontal: 15,
+  //                   ),
+  //                   floatingLabelBehavior: FloatingLabelBehavior.always,
+  //                 ),
+  //                 dropdownMenuEntries:
+  //                     state
+  //                             .context
+  //                             .mounted // simple check to safely access state if needed, though we use `state` from builder
+  //                         // We need to access the `tenants` list. It is available in the parent scope.
+  //                         // The closure captures `securitystate` or `state` variable from build method.
+  //                         ? (ref.read(securityProvider).tenants)
+  //                             .map<DropdownMenuEntry<int>>((t) {
+  //                               // Re-read or use existing 'state' var
+  //                               return DropdownMenuEntry<int>(
+  //                                 value: t['id'] as int,
+  //                                 label:
+  //                                     (t['company'] ??
+  //                                             t['companyName'] ??
+  //                                             'No Name')
+  //                                         .toString(),
+  //                               );
+  //                             })
+  //                             .toList()
+  //                         : [],
+  //                 onSelected: (v) {
+  //                   state.didChange(v);
+  //                   if (v != null) {
+  //                     final tenant = ref
+  //                         .read(securityProvider)
+  //                         .tenants
+  //                         .firstWhere((t) => t['id'] == v);
+  //                     setState(() {
+  //                       _selectedTenantId = v;
+  //                       _selectedCompany =
+  //                           tenant['company'] ?? tenant['companyName'];
+  //                       _selectedAdminIds.clear();
+  //                     });
+  //                   }
+  //                 },
+  //               );
+  //             },
+  //           ),
+
+  //           const SizedBox(height: 16),
+  //           if (admins.isNotEmpty) ...[
+  //             const Text(
+  //               "Select Admins*",
+  //               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+  //             ),
+  //             const SizedBox(height: 8),
+  //             ...admins.map((admin) {
+  //               final adminId = admin['id'] as int;
+  //               final isSelected = _selectedAdminIds.contains(adminId);
+  //               return CheckboxListTile(
+  //                 title: Text(
+  //                   admin['fullName'] ?? admin['username'] ?? 'Admin',
+  //                 ),
+  //                 subtitle: Text(admin['email'] ?? ''),
+  //                 value: isSelected,
+  //                 onChanged: (val) {
+  //                   setState(() {
+  //                     if (val == true) {
+  //                       _selectedAdminIds.add(adminId);
+  //                     } else {
+  //                       _selectedAdminIds.remove(adminId);
+  //                     }
+  //                   });
+  //                 },
+  //                 controlAffinity: ListTileControlAffinity.leading,
+  //               );
+  //             }).toList(),
+  //             if (_selectedAdminIds.isEmpty)
+  //               const Padding(
+  //                 padding: EdgeInsets.only(left: 16.0),
+  //                 child: Text(
+  //                   "Please select at least one admin",
+  //                   style: TextStyle(color: Colors.red, fontSize: 12),
+  //                 ),
+  //               ),
+  //           ] else if (_selectedTenantId != null)
+  //             const Padding(
+  //               padding: EdgeInsets.only(bottom: 16),
+  //               child: Text(
+  //                 "No admins found for this company",
+  //                 style: TextStyle(color: Colors.red, fontSize: 12),
+  //               ),
+  //             ),
+  //           const SizedBox(height: 32),
+  //           ElevatedButton(
+  //             style: ElevatedButton.styleFrom(
+  //               backgroundColor: AppTheme.primaryBlue,
+  //               foregroundColor: Colors.white,
+  //               padding: const EdgeInsets.all(16),
+  //               shape: RoundedRectangleBorder(
+  //                 borderRadius: BorderRadius.circular(16),
+  //               ),
+  //             ),
+  //             onPressed:
+  //                 state.isOperationLoading
+  //                     ? null
+  //                     : () async {
+  //                       print("BUTTON CLICKED");
+  //                       if (formKey.currentState!.validate() &&
+  //                           _selectedAdminIds.isNotEmpty) {
+  //                         if (_selectedPurpose == "Visitor" &&
+  //                             _addressProofImage64 == null) {
+  //                           SnackbarUtils.showError(
+  //                             context,
+  //                             "Address proof is required for Visitor type",
+  //                           );
+  //                           print("BUTTON CLICKED inside if");
+  //                           return;
+  //                         }
+
+  //                         final success = await ref
+  //                             .read(securityProvider.notifier)
+  //                             .addWalkIn({
+  //                               "visitorName": _nameController.text,
+  //                               "mobileNumber": _mobileController.text,
+  //                               "visitType": _selectedPurpose,
+  //                               "company": _selectedCompany,
+  //                               "tenantId": _selectedTenantId,
+  //                               "assignedAdminIds": _selectedAdminIds,
+  //                               "imageUrl": _image64,
+  //                               "attachment": _addressProofImage64,
+  //                               "comments": _visitorController.text,
+  //                             });
+  //                         print("BUTTON CLICKED last");
+  //                         if (context.mounted) {
+  //                           if (success) {
+  //                             SnackbarUtils.showSuccess(
+  //                               context,
+  //                               "Approval Request Sent",
+  //                             );
+  //                             print("Approval Request Sent -- Print Statement");
+  //                             Navigator.pop(context);
+  //                           } else {
+  //                             print("----------------------------------");
+  //                             print(success.toString());
+  //                             print(
+  //                               "Failed to send request -- Print Statement",
+  //                             );
+  //                             print("----------------------------------");
+  //                             SnackbarUtils.showError(
+  //                               context,
+  //                               "Failed to send request",
+  //                             );
+  //                           }
+  //                         }
+  //                       }
+  //                       print("BUTTON CLICKED outside else");
+  //                     },
+  //             child:
+  //                 state.isOperationLoading
+  //                     ? const SizedBox(
+  //                       height: 20,
+  //                       width: 20,
+  //                       child: CircularProgressIndicator(
+  //                         color: Colors.white,
+  //                         strokeWidth: 2,
+  //                       ),
+  //                     )
+  //                     : const Text("REQUEST APPROVAL"),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Future<void> _pickImage() async {
     try {
@@ -827,6 +1316,7 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
       return AddressProofWidget(
         image64: _addressProofImage64,
         onCapture: _pickAddressProofImage,
+        hasError: _addressProofError,
         onRemove: () {
           setState(() {
             _addressProofImage64 = null;
@@ -838,6 +1328,7 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
       return AddressProofWidget(
         image64: _addressProofImage64,
         onCapture: _pickAddressProofImage,
+        hasError: _addressProofError,
         onRemove: () {
           setState(() {
             _addressProofImage64 = null;
@@ -860,6 +1351,7 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
         final base64String = base64Encode(bytes);
         setState(() {
           _addressProofImage64 = base64String;
+          _addressProofError = false;
         });
       }
     } catch (e) {

@@ -4,6 +4,7 @@ import 'package:ceedeeyes/core/theme/app_theme.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../provider/security_provider.dart';
 import '../model/security_state.dart';
+import '../../shared/widgets/custom_calendar_dialog.dart';
 import '../../../core/utils/snackbar_utils.dart';
 import '../../../core/widgets/app_loading_widget.dart';
 import '../../../core/widgets/app_error_widget.dart';
@@ -82,26 +83,14 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
   }
 
   Future<void> _selectHistoryDate(BuildContext context, bool isStart) async {
-    final DateTime? picked = await showDatePicker(
+    final DateTime? picked = await showDialog<DateTime>(
       context: context,
-      initialDate: isStart ? _historyStartDate : _historyEndDate,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2101),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppTheme.primaryBlue,
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
-            ),
-            dialogTheme: const DialogThemeData(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-            ),
+      builder:
+          (context) => CustomCalendarDialog(
+            initialDate: isStart ? _historyStartDate : _historyEndDate,
+            firstDate: DateTime(2020),
+            lastDate: DateTime(2101),
           ),
-          child: child!,
-        );
-      },
     );
     if (picked != null) {
       if (isStart && picked.isAfter(_historyEndDate)) {
@@ -956,7 +945,7 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                 ),
                               ),
                               textCapitalization: TextCapitalization.characters,
-                              validator: (v) => v!.isEmpty ? "Required" : null,
+                              validator: (v) => v!.isEmpty ? "" : null,
                             ),
                             const SizedBox(height: 16),
                             TextFormField(
@@ -1016,223 +1005,256 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                   ),
                                 ),
                               ),
-                              validator: (v) => v!.isEmpty ? "Required" : null,
+                              validator: (v) => v!.isEmpty ? "" : null,
                             ),
                             const SizedBox(height: 16),
-                            DropdownButtonFormField<String>(
-                              value: selectedType,
-                              validator: (v) => v == null ? "Required" : null,
-                              decoration: InputDecoration(
-                                labelText: "Type*",
-                                labelStyle: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                floatingLabelStyle: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                hintText: "Select Type",
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 16,
-                                  horizontal: 15,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey.shade400,
+                            FormField<String>(
+                              initialValue: selectedType,
+                              validator: (v) => v == null ? "" : null,
+                              builder: (FormFieldState<String> state) {
+                                return DropdownMenu<String>(
+                                  initialSelection: selectedType,
+                                  controller: TextEditingController(
+                                    text: selectedType,
                                   ),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey.shade400,
+                                  label: const Text(
+                                    "Type*",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey.shade400,
-                                    width: 2,
-                                  ),
-                                ),
-                                errorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: const BorderSide(
-                                    color: Colors.red,
-                                    width: 1,
-                                  ),
-                                ),
-                                focusedErrorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: const BorderSide(
-                                    color: Colors.red,
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                              items:
-                                  ["CAR", "BIKE", "TRUCK", "OTHER"].map((t) {
-                                    return DropdownMenuItem<String>(
-                                      value: t,
-                                      child: Text(t),
-                                    );
-                                  }).toList(),
-                              onChanged: (v) {
-                                setDialogState(() => selectedType = v);
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            DropdownButtonFormField<String>(
-                              value: selectedPurpose,
-                              validator: (v) => v == null ? "Required" : null,
-                              decoration: InputDecoration(
-                                labelText: "Purpose*",
-                                labelStyle: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                floatingLabelStyle: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                hintText: "Select Purpose",
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 16,
-                                  horizontal: 15,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey.shade400,
-                                  ),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey.shade400,
-                                  ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey.shade400,
-                                    width: 2,
-                                  ),
-                                ),
-                                errorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: const BorderSide(
-                                    color: Colors.red,
-                                    width: 1,
-                                  ),
-                                ),
-                                focusedErrorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: const BorderSide(
-                                    color: Colors.red,
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                              items:
-                                  [
-                                    "Employee",
-                                    "Visitor",
-                                    "Delivery",
-                                    "Vendor",
-                                    "Other",
-                                  ].map((p) {
-                                    return DropdownMenuItem<String>(
-                                      value: p,
-                                      child: Text(p),
-                                    );
-                                  }).toList(),
-                              onChanged: (v) {
-                                setDialogState(() {
-                                  selectedPurpose = v;
-                                  _clearPurposeControllers();
-                                });
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            DropdownButtonFormField<int>(
-                              value: selectedTenantId,
-                              validator: (v) => v == null ? "Required" : null,
-                              decoration: InputDecoration(
-                                labelText: "Select Company*",
-                                labelStyle: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                floatingLabelStyle: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                hintText: "Select Company",
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 16,
-                                  horizontal: 15,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey.shade400,
-                                  ),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey.shade400,
-                                  ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey.shade400,
-                                    width: 2,
-                                  ),
-                                ),
-                                errorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: const BorderSide(
-                                    color: Colors.red,
-                                    width: 1,
-                                  ),
-                                ),
-                                focusedErrorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: const BorderSide(
-                                    color: Colors.red,
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                              items:
-                                  state.tenants.map((t) {
-                                    return DropdownMenuItem<int>(
-                                      value: t['id'] as int,
-                                      child: Text(
-                                        (t['company'] ??
-                                                t['companyName'] ??
-                                                'No Name')
-                                            .toString(),
+                                  hintText: "Select Type",
+                                  expandedInsets: EdgeInsets.zero,
+                                  errorText: state.errorText,
+                                  inputDecorationTheme: InputDecorationTheme(
+                                    filled: false,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                      horizontal: 15,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFCBD5E1),
                                       ),
-                                    );
-                                  }).toList(),
-                              onChanged: (v) {
-                                if (v != null) {
-                                  setDialogState(() {
-                                    selectedTenantId = v;
-                                    // Removed selectedCompany assignment as it seems not used/defined in current scope to avoid lint error
-                                  });
-                                }
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFCBD5E1),
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey.shade400,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    errorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Colors.red,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    focusedErrorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Colors.red,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    floatingLabelBehavior:
+                                        FloatingLabelBehavior.always,
+                                  ),
+                                  dropdownMenuEntries:
+                                      ["CAR", "BIKE", "TRUCK", "OTHER"].map((
+                                        t,
+                                      ) {
+                                        return DropdownMenuEntry<String>(
+                                          value: t,
+                                          label: t,
+                                        );
+                                      }).toList(),
+                                  onSelected: (v) {
+                                    state.didChange(v);
+                                    setDialogState(() => selectedType = v);
+                                  },
+                                );
+                              },
+                            ),
+
+                            const SizedBox(height: 16),
+                            FormField<String>(
+                              initialValue: selectedPurpose,
+                              validator: (v) => v == null ? "" : null,
+                              builder: (FormFieldState<String> state) {
+                                return DropdownMenu<String>(
+                                  initialSelection: selectedPurpose,
+                                  controller: TextEditingController(
+                                    text: selectedPurpose,
+                                  ),
+                                  label: const Text(
+                                    "Purpose*",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  hintText: "Select Purpose",
+                                  expandedInsets: EdgeInsets.zero,
+                                  errorText: state.errorText,
+                                  inputDecorationTheme: InputDecorationTheme(
+                                    filled: false,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                      horizontal: 15,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFCBD5E1),
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFCBD5E1),
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey.shade400,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    errorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Colors.red,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    focusedErrorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Colors.red,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    floatingLabelBehavior:
+                                        FloatingLabelBehavior.always,
+                                  ),
+                                  dropdownMenuEntries:
+                                      [
+                                        "Employee",
+                                        "Visitor",
+                                        "Delivery",
+                                        "Vendor",
+                                        "Other",
+                                      ].map((p) {
+                                        return DropdownMenuEntry<String>(
+                                          value: p,
+                                          label: p,
+                                        );
+                                      }).toList(),
+                                  onSelected: (v) {
+                                    state.didChange(v);
+                                    setDialogState(() {
+                                      selectedPurpose = v;
+                                      _clearPurposeControllers();
+                                    });
+                                  },
+                                );
+                              },
+                            ),
+
+                            const SizedBox(height: 16),
+                            FormField<int>(
+                              initialValue: selectedTenantId,
+                              validator: (v) => v == null ? "" : null,
+                              builder: (FormFieldState<int> state) {
+                                return DropdownMenu<int>(
+                                  initialSelection: selectedTenantId,
+                                  label: const Text(
+                                    "Select Company*",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  hintText: "Select Company",
+                                  expandedInsets: EdgeInsets.zero,
+                                  errorText: state.errorText,
+                                  inputDecorationTheme: InputDecorationTheme(
+                                    filled: false,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                      horizontal: 15,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFCBD5E1),
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFCBD5E1),
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey.shade400,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    errorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Colors.red,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    focusedErrorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Colors.red,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    floatingLabelBehavior:
+                                        FloatingLabelBehavior.always,
+                                  ),
+                                  dropdownMenuEntries:
+                                      ref
+                                          .read(securityProvider)
+                                          .tenants
+                                          .map<DropdownMenuEntry<int>>((t) {
+                                            return DropdownMenuEntry<int>(
+                                              value: t['id'] as int,
+                                              label:
+                                                  (t['company'] ??
+                                                          t['companyName'] ??
+                                                          'No Name')
+                                                      .toString(),
+                                            );
+                                          })
+                                          .toList(),
+                                  onSelected: (v) {
+                                    state.didChange(v);
+                                    if (v != null) {
+                                      setDialogState(() {
+                                        selectedTenantId = v;
+                                      });
+                                    }
+                                  },
+                                );
                               },
                             ),
                           ],
@@ -1478,7 +1500,7 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                 ),
                               ),
                               textCapitalization: TextCapitalization.characters,
-                              validator: (v) => v!.isEmpty ? "Required" : null,
+                              validator: (v) => v!.isEmpty ? "" : null,
                             ),
                             const SizedBox(height: 16),
                             TextFormField(
@@ -1538,220 +1560,266 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                   ),
                                 ),
                               ),
-                              validator: (v) => v!.isEmpty ? "Required" : null,
+                              validator: (v) => v!.isEmpty ? "" : null,
                             ),
                             const SizedBox(height: 16),
-                            DropdownButtonFormField<String>(
-                              value: selectedType,
-                              validator: (v) => v == null ? "Required" : null,
-                              decoration: InputDecoration(
-                                labelText: "Type*",
-                                labelStyle: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                floatingLabelStyle: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                hintText: "Select Type",
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 16,
-                                  horizontal: 15,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey.shade400,
+                            FormField<String>(
+                              initialValue: selectedType,
+                              validator:
+                                  (v) =>
+                                      v == null ? "Please select a type" : null,
+                              builder: (FormFieldState<String> state) {
+                                return DropdownMenu<String>(
+                                  initialSelection: selectedType,
+                                  controller: TextEditingController(
+                                    text: selectedType,
                                   ),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey.shade400,
+                                  label: const Text(
+                                    "Type*",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey.shade400,
-                                    width: 2,
-                                  ),
-                                ),
-                                errorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: const BorderSide(
-                                    color: Colors.red,
-                                    width: 1,
-                                  ),
-                                ),
-                                focusedErrorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: const BorderSide(
-                                    color: Colors.red,
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                              items:
-                                  ["CAR", "BIKE", "TRUCK", "OTHER"].map((t) {
-                                    return DropdownMenuItem<String>(
-                                      value: t,
-                                      child: Text(t),
-                                    );
-                                  }).toList(),
-                              onChanged: (v) {
-                                setDialogState(() => selectedType = v);
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            DropdownButtonFormField<String>(
-                              value: selectedPurpose,
-                              validator: (v) => v == null ? "Required" : null,
-                              decoration: InputDecoration(
-                                labelText: "Purpose*",
-                                labelStyle: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                floatingLabelStyle: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                hintText: "Select Purpose",
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 16,
-                                  horizontal: 15,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey.shade400,
-                                  ),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey.shade400,
-                                  ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey.shade400,
-                                    width: 2,
-                                  ),
-                                ),
-                                errorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: const BorderSide(
-                                    color: Colors.red,
-                                    width: 1,
-                                  ),
-                                ),
-                                focusedErrorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: const BorderSide(
-                                    color: Colors.red,
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                              items:
-                                  [
-                                    "Employee",
-                                    "Visitor",
-                                    "Delivery",
-                                    "Vendor",
-                                    "Other",
-                                  ].map((p) {
-                                    return DropdownMenuItem<String>(
-                                      value: p,
-                                      child: Text(p),
-                                    );
-                                  }).toList(),
-                              onChanged: (v) {
-                                setDialogState(() {
-                                  selectedPurpose = v;
-                                  _clearPurposeControllers();
-                                });
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            DropdownButtonFormField<int>(
-                              value: selectedTenantId,
-                              validator: (v) => v == null ? "Required" : null,
-                              decoration: InputDecoration(
-                                labelText: "Select Company*",
-                                labelStyle: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                floatingLabelStyle: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                hintText: "Select Company",
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 16,
-                                  horizontal: 15,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey.shade400,
-                                  ),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey.shade400,
-                                  ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey.shade400,
-                                    width: 2,
-                                  ),
-                                ),
-                                errorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: const BorderSide(
-                                    color: Colors.red,
-                                    width: 1,
-                                  ),
-                                ),
-                                focusedErrorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: const BorderSide(
-                                    color: Colors.red,
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                              items:
-                                  state.tenants.map((t) {
-                                    return DropdownMenuItem<int>(
-                                      value: t['id'] as int,
-                                      child: Text(
-                                        (t['company'] ??
-                                                t['companyName'] ??
-                                                'No Name')
-                                            .toString(),
+                                  hintText: "Select Type",
+                                  expandedInsets: EdgeInsets.zero,
+                                  errorText: state.errorText,
+                                  inputDecorationTheme: InputDecorationTheme(
+                                    filled: false,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                      horizontal: 15,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFCBD5E1),
                                       ),
-                                    );
-                                  }).toList(),
-                              onChanged: (v) {
-                                setDialogState(() {
-                                  selectedTenantId = v;
-                                });
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFCBD5E1),
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey.shade400,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    errorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Colors.red,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    focusedErrorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Colors.red,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    floatingLabelBehavior:
+                                        FloatingLabelBehavior.always,
+                                  ),
+                                  dropdownMenuEntries:
+                                      ["CAR", "BIKE", "TRUCK", "OTHER"].map((
+                                        t,
+                                      ) {
+                                        return DropdownMenuEntry<String>(
+                                          value: t,
+                                          label: t,
+                                        );
+                                      }).toList(),
+                                  onSelected: (v) {
+                                    state.didChange(v);
+                                    setDialogState(() => selectedType = v);
+                                  },
+                                );
+                              },
+                            ),
+
+                            const SizedBox(height: 16),
+                            FormField<String>(
+                              initialValue: selectedPurpose,
+                              validator:
+                                  (v) =>
+                                      v == null
+                                          ? "Please select a purpose"
+                                          : null,
+                              builder: (FormFieldState<String> state) {
+                                return DropdownMenu<String>(
+                                  initialSelection: selectedPurpose,
+                                  controller: TextEditingController(
+                                    text: selectedPurpose,
+                                  ),
+                                  label: const Text(
+                                    "Purpose*",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  hintText: "Select Purpose",
+                                  expandedInsets: EdgeInsets.zero,
+                                  errorText: state.errorText,
+                                  inputDecorationTheme: InputDecorationTheme(
+                                    filled: false,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                      horizontal: 15,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFCBD5E1),
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFCBD5E1),
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey.shade400,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    errorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Colors.red,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    focusedErrorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Colors.red,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    floatingLabelBehavior:
+                                        FloatingLabelBehavior.always,
+                                  ),
+                                  dropdownMenuEntries:
+                                      [
+                                        "Employee",
+                                        "Visitor",
+                                        "Delivery",
+                                        "Vendor",
+                                        "Other",
+                                      ].map((p) {
+                                        return DropdownMenuEntry<String>(
+                                          value: p,
+                                          label: p,
+                                        );
+                                      }).toList(),
+                                  onSelected: (v) {
+                                    state.didChange(v);
+                                    setDialogState(() {
+                                      selectedPurpose = v;
+                                      _clearPurposeControllers();
+                                    });
+                                  },
+                                );
+                              },
+                            ),
+
+                            const SizedBox(height: 16),
+                            FormField<int>(
+                              initialValue: selectedTenantId,
+                              validator:
+                                  (v) =>
+                                      v == null
+                                          ? "Please select a company"
+                                          : null,
+                              builder: (FormFieldState<int> state) {
+                                return DropdownMenu<int>(
+                                  initialSelection: selectedTenantId,
+                                  label: const Text(
+                                    "Select Company*",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  hintText: "Select Company",
+                                  expandedInsets: EdgeInsets.zero,
+                                  errorText: state.errorText,
+                                  inputDecorationTheme: InputDecorationTheme(
+                                    filled: false,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                      horizontal: 15,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFCBD5E1),
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFCBD5E1),
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey.shade400,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    errorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Colors.red,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    focusedErrorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: const BorderSide(
+                                        color: Colors.red,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    floatingLabelBehavior:
+                                        FloatingLabelBehavior.always,
+                                  ),
+                                  dropdownMenuEntries:
+                                      ref
+                                          .read(securityProvider)
+                                          .tenants
+                                          .map<DropdownMenuEntry<int>>((t) {
+                                            return DropdownMenuEntry<int>(
+                                              value: t['id'] as int,
+                                              label:
+                                                  (t['company'] ??
+                                                          t['companyName'] ??
+                                                          'No Name')
+                                                      .toString(),
+                                            );
+                                          })
+                                          .toList(),
+                                  onSelected: (v) {
+                                    state.didChange(v);
+                                    if (v != null) {
+                                      setDialogState(() {
+                                        selectedTenantId = v;
+                                      });
+                                    }
+                                  },
+                                );
                               },
                             ),
                           ],
@@ -1945,6 +2013,7 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                   : const Text(
                                     "DELETE",
                                     style: TextStyle(
+                                      color: Colors.black,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -1985,77 +2054,90 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        DropdownButtonFormField<String>(
-                          value: selectedPurpose,
-                          validator: (v) => v == null ? "Required" : null,
-                          decoration: InputDecoration(
-                            labelText: "Purpose*",
-                            labelStyle: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            floatingLabelStyle: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            hintText: "Select Purpose",
-                            floatingLabelBehavior: FloatingLabelBehavior.always,
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 16,
-                              horizontal: 15,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: BorderSide(
-                                color: Colors.grey.shade400,
+                        FormField<String>(
+                          initialValue: selectedPurpose,
+                          validator:
+                              (v) =>
+                                  v == null ? "Please select a purpose" : null,
+                          builder: (FormFieldState<String> state) {
+                            return DropdownMenu<String>(
+                              initialSelection: selectedPurpose,
+                              controller: TextEditingController(
+                                text: selectedPurpose,
                               ),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: BorderSide(
-                                color: Colors.grey.shade400,
+                              label: const Text(
+                                "Purpose*",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: BorderSide(
-                                color: Colors.grey.shade400,
-                                width: 2,
+                              hintText: "Select Purpose",
+                              expandedInsets: EdgeInsets.zero,
+                              errorText: state.errorText,
+                              inputDecorationTheme: InputDecorationTheme(
+                                filled: false,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                  horizontal: 15,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFCBD5E1),
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFCBD5E1),
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 2,
+                                  ),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 2,
+                                  ),
+                                ),
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.always,
                               ),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: const BorderSide(
-                                color: Colors.red,
-                                width: 1,
-                              ),
-                            ),
-                            focusedErrorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: const BorderSide(
-                                color: Colors.red,
-                                width: 2,
-                              ),
-                            ),
-                          ),
-                          items:
-                              [
-                                "Employee",
-                                "Visitor",
-                                "Delivery",
-                                "Vendor",
-                                "Other",
-                              ].map((p) {
-                                return DropdownMenuItem<String>(
-                                  value: p,
-                                  child: Text(p),
-                                );
-                              }).toList(),
-                          onChanged: (v) {
-                            setDialogState(() {
-                              selectedPurpose = v;
-                              _clearPurposeControllers();
-                            });
+                              dropdownMenuEntries:
+                                  [
+                                    "Employee",
+                                    "Visitor",
+                                    "Delivery",
+                                    "Vendor",
+                                    "Other",
+                                  ].map((p) {
+                                    return DropdownMenuEntry<String>(
+                                      value: p,
+                                      label: p,
+                                    );
+                                  }).toList(),
+                              onSelected: (v) {
+                                state.didChange(v);
+                                setDialogState(() {
+                                  selectedPurpose = v;
+                                  _clearPurposeControllers();
+                                });
+                              },
+                            );
                           },
                         ),
                         if (selectedPurpose != null)
@@ -2064,73 +2146,88 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                             setDialogState,
                           ),
                         const SizedBox(height: 16),
-                        DropdownButtonFormField<int>(
-                          value: selectedTenantId,
-                          validator: (v) => v == null ? "Required" : null,
-                          decoration: InputDecoration(
-                            labelText: "Select Company*",
-                            labelStyle: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            floatingLabelStyle: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            hintText: "Select Company",
-                            floatingLabelBehavior: FloatingLabelBehavior.always,
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 16,
-                              horizontal: 15,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: BorderSide(
-                                color: Colors.grey.shade400,
+                        FormField<int>(
+                          initialValue: selectedTenantId,
+                          validator:
+                              (v) =>
+                                  v == null ? "Please select a company" : null,
+                          builder: (FormFieldState<int> fieldState) {
+                            return DropdownMenu<int>(
+                              initialSelection: selectedTenantId,
+                              label: const Text(
+                                "Select Company*",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: BorderSide(
-                                color: Colors.grey.shade400,
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: BorderSide(
-                                color: Colors.grey.shade400,
-                                width: 2,
-                              ),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: const BorderSide(
-                                color: Colors.red,
-                                width: 1,
-                              ),
-                            ),
-                            focusedErrorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: const BorderSide(
-                                color: Colors.red,
-                                width: 2,
-                              ),
-                            ),
-                          ),
-                          items:
-                              state.tenants.map((t) {
-                                return DropdownMenuItem<int>(
-                                  value: t['id'] as int,
-                                  child: Text(
-                                    (t['company'] ??
-                                            t['companyName'] ??
-                                            'No Name')
-                                        .toString(),
+                              hintText: "Select Company",
+                              expandedInsets: EdgeInsets.zero,
+                              errorText: fieldState.errorText,
+                              inputDecorationTheme: InputDecorationTheme(
+                                filled: false,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                  horizontal: 15,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFCBD5E1),
                                   ),
-                                );
-                              }).toList(),
-                          onChanged: (v) {
-                            setDialogState(() => selectedTenantId = v);
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFCBD5E1),
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 2,
+                                  ),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 2,
+                                  ),
+                                ),
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.always,
+                              ),
+                              dropdownMenuEntries:
+                                  state.tenants.map<DropdownMenuEntry<int>>((
+                                    t,
+                                  ) {
+                                    return DropdownMenuEntry<int>(
+                                      value: t['id'] as int,
+                                      label:
+                                          (t['company'] ??
+                                                  t['companyName'] ??
+                                                  'No Name')
+                                              .toString(),
+                                    );
+                                  }).toList(),
+                              onSelected: (v) {
+                                fieldState.didChange(v);
+                                if (v != null) {
+                                  setDialogState(() {
+                                    selectedTenantId = v;
+                                  });
+                                }
+                              },
+                            );
                           },
                         ),
                       ],

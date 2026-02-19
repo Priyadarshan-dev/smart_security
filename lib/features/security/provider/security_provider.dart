@@ -41,16 +41,33 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
   }
 
   Future<bool> checkInVisitor(int visitorId) async {
+    print("🔵 checkInVisitor() called with visitorId: $visitorId");
+
     state = state.copyWith(isOperationLoading: true);
+
     try {
+      print("🟡 Sending check-in request...");
+
       final response = await _service.checkInVisitor(visitorId);
+
+      print("🟡 STATUS CODE: ${response.statusCode}");
+      print("🟡 RAW RESPONSE BODY: ${response.body}");
+
       if (response.statusCode == 200) {
+        print("🟢 Check-in success response received");
+
         final visitors = state.todayVisitors.value;
+        print("🟡 Current visitors list: $visitors");
+
         if (visitors != null) {
+          final responseData = jsonDecode(response.body);
+          print("🟢 DECODED RESPONSE: $responseData");
+
           final updatedVisitors =
               visitors.map((v) {
                 if (v['id'] == visitorId) {
-                  final responseData = jsonDecode(response.body);
+                  print("🟢 Updating visitor: ${v['id']}");
+
                   return {
                     ...v,
                     'status': responseData['status'] ?? 'CHECKED_IN',
@@ -59,18 +76,30 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
                 }
                 return v;
               }).toList();
+
+          print("🟢 Updated visitors list: $updatedVisitors");
+
           state = state.copyWith(
             todayVisitors: AsyncValue.data(updatedVisitors),
           );
+        } else {
+          print("🔴 todayVisitors list is NULL");
         }
-        print("Success while Check-In -- Print Statement");
+
+        print("✅ Visitor check-in completed");
         return true;
+      } else {
+        print("🔴 Check-in failed with status: ${response.statusCode}");
       }
-    } catch (error) {
-      print("Error while Check-In $error -- Print Statement");
+    } catch (error, stack) {
+      print("🔴 ERROR during check-in: $error");
+      print("🔴 STACK TRACE: $stack");
     } finally {
+      print("🟡 Resetting loading state");
       state = state.copyWith(isOperationLoading: false);
     }
+
+    print("❌ checkInVisitor() returning false");
     return false;
   }
 
@@ -230,6 +259,7 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
     try {
       final response = await _service.getTenants();
       print("Fetch /common/tenants Status: ${response.statusCode}");
+      print("Fetch /common/tenants Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -310,22 +340,6 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
     }
   }
 
-  // Future<bool> staffCheckIn(int id) async {
-  //   state = state.copyWith(isOperationLoading: true);
-  //   try {
-  //     final response = await _service.staffCheckIn(id);
-  //     if (response.statusCode == 200) {
-  //       await fetchStaffs();
-  //       return true;
-  //     }
-  //   } catch (error) {
-  //     print("Error while Staff Check-In $error");
-  //   } finally {
-  //     state = state.copyWith(isOperationLoading: false);
-  //   }
-  //   return false;
-  // }
-
   Future<bool> staffCheckIn(int id) async {
     state = state.copyWith(isOperationLoading: true);
 
@@ -359,21 +373,6 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
     return false;
   }
 
-  // Future<bool> staffCheckOut(int id) async {
-  //   state = state.copyWith(isOperationLoading: true);
-  //   try {
-  //     final response = await _service.staffCheckOut(id);
-  //     if (response.statusCode == 200) {
-  //       await fetchStaffs();
-  //       return true;
-  //     }
-  //   } catch (error) {
-  //     print("Error while Staff Check-Out $error");
-  //   } finally {
-  //     state = state.copyWith(isOperationLoading: false);
-  //   }
-  //   return false;
-  // }
   Future<bool> staffCheckOut(int id) async {
     state = state.copyWith(isOperationLoading: true);
 

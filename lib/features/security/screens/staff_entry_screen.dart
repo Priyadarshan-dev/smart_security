@@ -13,6 +13,7 @@ import '../../../core/widgets/app_loading_widget.dart';
 import '../model/security_state.dart';
 import '../model/staff_model.dart';
 import '../provider/security_provider.dart';
+import '../../shared/widgets/custom_calendar_dialog.dart';
 
 class StaffEntryScreen extends ConsumerStatefulWidget {
   const StaffEntryScreen({super.key});
@@ -81,26 +82,14 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
   }
 
   Future<void> _selectHistoryDate(BuildContext context, bool isStart) async {
-    final DateTime? picked = await showDatePicker(
+    final DateTime? picked = await showDialog<DateTime>(
       context: context,
-      initialDate: isStart ? _historyStartDate : _historyEndDate,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2101),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppTheme.primaryBlue,
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
-            ),
-            dialogTheme: const DialogThemeData(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-            ),
+      builder:
+          (context) => CustomCalendarDialog(
+            initialDate: isStart ? _historyStartDate : _historyEndDate,
+            firstDate: DateTime(2020),
+            lastDate: DateTime(2101),
           ),
-          child: child!,
-        );
-      },
     );
     if (picked != null) {
       if (isStart && picked.isAfter(_historyEndDate)) {

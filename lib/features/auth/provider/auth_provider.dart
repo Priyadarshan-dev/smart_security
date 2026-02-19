@@ -18,7 +18,16 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthService _authService;
 
-  AuthNotifier(this._authService) : super(AuthState.initial());
+  AuthNotifier(this._authService) : super(AuthState.initial()) {
+    _listenToSessionExpiry();
+  }
+
+  void _listenToSessionExpiry() {
+    ApiClient.sessionExpiryStream.listen((_) {
+      print("Session expiry event received. Logging out.");
+      logout();
+    });
+  }
 
   Future<void> login(String email, String password) async {
     state = state.copyWith(status: AuthStatus.loading);

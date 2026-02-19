@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../storage/storage_service.dart';
 
 class ApiClient {
-  final String baseUrl1 = "http://13.205.93.213:8080/api/v1";
+  //  13.205.93.213  192.168.1.39
+  final String baseUrl1 = "http://192.168.1.42:8080/api/v1";
 
   final StorageService _storage = StorageService();
 
@@ -15,13 +17,19 @@ class ApiClient {
     };
   }
 
+  static final _sessionExpiryController = StreamController<void>.broadcast();
+  static Stream<void> get sessionExpiryStream =>
+      _sessionExpiryController.stream;
+
+  Future<bool>? _refreshFuture;
+
   Future<http.Response> _requestWithRetry(
     Future<http.Response> Function() request,
   ) async {
     http.Response response = await request();
 
     if (response.statusCode == 401) {
-      final refreshed = await _refreshToken();
+      final refreshed = await _getRefreshFuture();
 
       if (refreshed) {
         response = await request();
@@ -33,20 +41,39 @@ class ApiClient {
     return response;
   }
 
+  Future<bool> _getRefreshFuture() async {
+    if (_refreshFuture != null) {
+      return await _refreshFuture ?? false;
+    }
+
+    _refreshFuture = _refreshToken();
+    try {
+      return await _refreshFuture ?? false;
+    } finally {
+      _refreshFuture = null;
+    }
+  }
+
   Future<bool> _refreshToken() async {
     final refreshToken = await _storage.getRefreshToken();
 
-    if (refreshToken == null) return false;
+    if (refreshToken == null) {
+      _sessionExpiryController.add(null);
+      return false;
+    }
 
     try {
+      print("starts Refreshing token endpoint.");
       final response = await http.post(
         Uri.parse("$baseUrl1/auth/refresh-token"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"refreshToken": refreshToken}),
       );
+      print("mid Refreshing token endpoint.");
       print(response.body);
 
       if (response.statusCode == 200) {
+        print("mid 200 OK Refreshing token endpoint.");
         final data = jsonDecode(response.body);
 
         final newAccessToken = data["accessToken"];
@@ -57,10 +84,14 @@ class ApiClient {
 
         return true;
       } else {
-        throw Exception("Session expired. Please logout and login again.");
+        print(" end else Exception Refreshing token endpoint.");
+        _sessionExpiryController.add(null);
+        return false;
       }
     } catch (e) {
-      throw Exception("Session expired. Please logout and login again.");
+      print(" end catch Exception Refreshing token endpoint.");
+      _sessionExpiryController.add(null);
+      return false;
     }
   }
 

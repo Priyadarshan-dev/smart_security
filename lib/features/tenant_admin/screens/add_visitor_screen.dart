@@ -6,9 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import '../../shared/widgets/custom_calendar_dialog.dart';
 import '../provider/tenant_admin_provider.dart';
 import '../../../core/utils/snackbar_utils.dart';
-
 
 class AddVisitorScreen extends ConsumerStatefulWidget {
   const AddVisitorScreen({super.key});
@@ -26,6 +26,7 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
   DateTime _visitDate = DateTime.now();
   String? _addressProofImage64;
   final ImagePicker _picker = ImagePicker();
+  bool _addressProofError = false;
 
   final List<String> _visitTypes = [
     "Interview",
@@ -38,7 +39,6 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(tenantAdminProvider);
-    const primaryColor = Color(0xFF1E3A8A);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F9FF),
@@ -61,7 +61,7 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  labelText: "Visitor Name",
+                  labelText: "Visitor Name*",
                   labelStyle: const TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -92,12 +92,20 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
                       width: 2,
                     ),
                   ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: Colors.red, width: 1),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: Colors.red, width: 2),
+                  ),
                 ),
                 inputFormatters: [
                   FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
                 ],
                 validator: (v) {
-                  if (v == null || v.isEmpty) return "Required";
+                  if (v == null || v.isEmpty) return "";
                   if (RegExp(r'[0-9]').hasMatch(v))
                     return "Numbers not allowed";
                   return null;
@@ -108,7 +116,7 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
               TextFormField(
                 controller: _mobileController,
                 decoration: InputDecoration(
-                  labelText: "Mobile Number",
+                  labelText: "Mobile Number*",
                   labelStyle: const TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -139,6 +147,14 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
                       width: 2,
                     ),
                   ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: Colors.red, width: 1),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: Colors.red, width: 2),
+                  ),
                 ),
                 keyboardType: TextInputType.number,
                 inputFormatters: [
@@ -146,7 +162,7 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
                   LengthLimitingTextInputFormatter(10),
                 ],
                 validator: (v) {
-                  if (v == null || v.isEmpty) return "Required";
+                  if (v == null || v.isEmpty) return "";
                   if (v.length != 10) return "Must be 10 digits";
                   return null;
                 },
@@ -154,7 +170,7 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
               const SizedBox(height: 24),
               FormField<String>(
                 initialValue: _selectedVisitType,
-                validator: (v) => v == null ? "Required" : null,
+                validator: (v) => v == null ? "" : null,
                 builder: (fieldState) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,17 +182,15 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
                           menuStyle: const MenuStyle(
                             minimumSize: WidgetStatePropertyAll(Size(80, 0)),
                           ),
-
+                          errorText: fieldState.errorText,
                           label: const Text(
-                            "Visit Type",
+                            "Visit Type*",
                             style: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-
                           hintText: "Select Visit Type",
-
                           inputDecorationTheme: InputDecorationTheme(
                             filled: false,
                             contentPadding: const EdgeInsets.symmetric(
@@ -198,13 +212,26 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
                               borderSide: BorderSide(
-                                color: Colors.grey,
+                                color: Colors.grey.shade400,
+                                width: 2,
+                              ),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(
+                                color: Colors.red,
+                                width: 1,
+                              ),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(
+                                color: Colors.red,
                                 width: 2,
                               ),
                             ),
                             floatingLabelBehavior: FloatingLabelBehavior.always,
                           ),
-
                           dropdownMenuEntries:
                               _visitTypes
                                   .map(
@@ -214,7 +241,6 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
                                     ),
                                   )
                                   .toList(),
-
                           onSelected: (v) {
                             setState(() => _selectedVisitType = v);
                             fieldState.didChange(v);
@@ -260,20 +286,22 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
                               width: 2,
                             ),
                           ),
-                        ),
-                      ),
-
-                      if (fieldState.hasError)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 12, top: 6),
-                          child: Text(
-                            fieldState.errorText!,
-                            style: TextStyle(
-                              color: Colors.red.shade700,
-                              fontSize: 12,
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: const BorderSide(
+                              color: Colors.red,
+                              width: 1,
+                            ),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: const BorderSide(
+                              color: Colors.red,
+                              width: 2,
                             ),
                           ),
                         ),
+                      ),
 
                       if (_selectedVisitType == "Visitor") ...[
                         const SizedBox(height: 20),
@@ -293,42 +321,27 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
               TextFormField(
                 readOnly: true,
                 onTap: () async {
-                  final now = DateTime.now();
-                  final today = DateTime(now.year, now.month, now.day);
-                  final picked = await showDatePicker(
+                  // final now = DateTime.now();
+                  // final today = DateTime(now.year, now.month, now.day);
+
+                  final DateTime? picked = await showDialog<DateTime>(
                     context: context,
-                    helpText: "",
-                    initialDate:
-                        _visitDate.isBefore(today) ? today : _visitDate,
-                    firstDate: today,
-                    lastDate: today.add(const Duration(days: 365)),
-                    builder: (context, child) {
-                      return Theme(
-                        data: Theme.of(context).copyWith(
-                          colorScheme: const ColorScheme.light(
-                            primary: primaryColor,
-                            onPrimary: Colors.white,
-                            onSurface: Colors.black,
-                          ),
-                          datePickerTheme: const DatePickerThemeData(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.zero,
-                            ),
-                          ),
-                          textButtonTheme: TextButtonThemeData(
-                            style: TextButton.styleFrom(
-                              foregroundColor: primaryColor,
-                            ),
-                          ),
+                    builder:
+                        (context) => CustomCalendarDialog(
+                          initialDate: _visitDate,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime(2101),
                         ),
-                        child: child!,
-                      );
-                    },
                   );
-                  if (picked != null) setState(() => _visitDate = picked);
+
+                  if (picked != null) {
+                    setState(() {
+                      _visitDate = picked;
+                    });
+                  }
                 },
                 decoration: InputDecoration(
-                  labelText: "Visit Date",
+                  labelText: "Visit Date*",
                   labelStyle: const TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -362,6 +375,14 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
                       width: 2,
                     ),
                   ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: Colors.red, width: 1),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: Colors.red, width: 2),
+                  ),
                 ),
                 controller: TextEditingController(
                   text: DateFormat('yyyy-MM-dd').format(_visitDate),
@@ -386,6 +407,21 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
                       state.isOperationLoading
                           ? null
                           : () async {
+                            if ((_selectedVisitType == "Visitor" ||
+                                    _selectedVisitType == "Interview") &&
+                                (_addressProofImage64 == null ||
+                                    _addressProofImage64!.isEmpty)) {
+                              setState(() {
+                                _addressProofError = true;
+                              });
+                              SnackbarUtils.showError(
+                                context,
+                                "Address proof is required",
+                              );
+                              _buildVisitTypeFields();
+                              return;
+                            }
+
                             if (_formKey.currentState!.validate()) {
                               final success = await ref
                                   .read(tenantAdminProvider.notifier)
@@ -449,6 +485,7 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
       return AddressProofWidget(
         image64: _addressProofImage64,
         onCapture: _pickAddressProofImage,
+        hasError: _addressProofError,
         onRemove: () {
           setState(() {
             _addressProofImage64 = null;
@@ -456,10 +493,11 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
         },
       );
     }
-    if(_selectedVisitType == "Interview"){
+    if (_selectedVisitType == "Interview") {
       return AddressProofWidget(
         image64: _addressProofImage64,
         onCapture: _pickAddressProofImage,
+        hasError: _addressProofError,
         onRemove: () {
           setState(() {
             _addressProofImage64 = null;
@@ -482,6 +520,7 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
         final base64String = base64Encode(bytes);
         setState(() {
           _addressProofImage64 = base64String;
+          _addressProofError = false;
         });
       }
     } catch (e) {

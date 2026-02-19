@@ -180,6 +180,7 @@ class TenantAdminNotifier extends StateNotifier<TenantAdminState> {
       final response = await _service.scheduleVisitor(data);
       if (response.statusCode == 200) {
         await fetchDashboardData();
+        print("Status Code : ${response.statusCode}");
         return true;
       }
     } catch (e) {
@@ -308,19 +309,57 @@ class TenantAdminNotifier extends StateNotifier<TenantAdminState> {
   }
 
   Future<bool> addVehicle(Map<String, dynamic> data) async {
+    print("🔵 addVehicle() called");
+    print("🟡 Payload: $data");
+
     state = state.copyWith(isOperationLoading: true);
+
     try {
+      print("🟡 Sending add vehicle request...");
+
       final response = await _service.addVehicle(data);
+
+      print("🟡 STATUS CODE: ${response.statusCode}");
+      print("🟡 RAW RESPONSE BODY: ${response.body}");
+
       if (response.statusCode == 200 || response.statusCode == 201) {
+        print("🟢 Vehicle added successfully");
+
+        print("🟡 Refreshing tenant vehicles...");
         await fetchTenantVehicles();
+
+        print("✅ Vehicle list refreshed");
+
         return true;
+      } else {
+        print("🔴 Vehicle add failed with status: ${response.statusCode}");
       }
-    } catch (_) {
+    } catch (error, stack) {
+      print("🔴 ERROR while adding vehicle: $error");
+      print("🔴 STACK TRACE: $stack");
     } finally {
+      print("🟡 Resetting loading state");
       state = state.copyWith(isOperationLoading: false);
     }
+
+    print("❌ addVehicle() returning false");
     return false;
   }
+
+  // Future<bool> addVehicle(Map<String, dynamic> data) async {
+  //   state = state.copyWith(isOperationLoading: true);
+  //   try {
+  //     final response = await _service.addVehicle(data);
+  //     if (response.statusCode == 200 || response.statusCode == 201) {
+  //       await fetchTenantVehicles();
+  //       return true;
+  //     }
+  //   } catch (_) {
+  //   } finally {
+  //     state = state.copyWith(isOperationLoading: false);
+  //   }
+  //   return false;
+  // }
 
   Future<bool> updateVehicle(int id, Map<String, dynamic> data) async {
     state = state.copyWith(isOperationLoading: true);

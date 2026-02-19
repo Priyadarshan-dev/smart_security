@@ -6,9 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import '../../shared/widgets/custom_calendar_dialog.dart';
 import '../provider/tenant_admin_provider.dart';
 import '../../../core/utils/snackbar_utils.dart';
-
 
 class EditVisitorScreen extends ConsumerStatefulWidget {
   final dynamic visitor;
@@ -51,7 +51,7 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
       text: widget.visitor['comments'],
     );
     _selectedVisitType = widget.visitor['visitType'];
-    
+
     print(widget.visitor['attachment'] ?? '');
     print('----------------------------------');
     _addressProofImage64 = widget.visitor['attachment'] ?? '';
@@ -66,7 +66,6 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(tenantAdminProvider);
-    const primaryColor = Color(0xFF1E3A8A);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -89,7 +88,7 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  labelText: "Visitor Name",
+                  labelText: "Visitor Name*",
                   labelStyle: const TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -125,7 +124,7 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
                   FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
                 ],
                 validator: (v) {
-                  if (v == null || v.isEmpty) return "Required";
+                  if (v == null || v.isEmpty) return "";
                   if (RegExp(r'[0-9]').hasMatch(v))
                     return "Numbers not allowed";
                   return null;
@@ -136,7 +135,7 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
               TextFormField(
                 controller: _mobileController,
                 decoration: InputDecoration(
-                  labelText: "Mobile Number",
+                  labelText: "Mobile Number*",
                   labelStyle: const TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -174,7 +173,7 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
                   LengthLimitingTextInputFormatter(10),
                 ],
                 validator: (v) {
-                  if (v == null || v.isEmpty) return "Required";
+                  if (v == null || v.isEmpty) return "";
                   if (v.length != 10) return "Must be 10 digits";
                   return null;
                 },
@@ -183,7 +182,7 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
               // Visit Type Dropdown
               FormField<String>(
                 initialValue: _selectedVisitType,
-                validator: (v) => v == null ? "Required" : null,
+                validator: (v) => v == null ? "" : null,
                 builder: (fieldState) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,8 +195,9 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
                             minimumSize: WidgetStatePropertyAll(Size(80, 0)),
                           ),
                           initialSelection: _selectedVisitType,
+                          errorText: fieldState.errorText,
                           label: const Text(
-                            "Visit Type",
+                            "Visit Type*",
                             style: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
@@ -208,24 +208,38 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
                             filled: false,
                             contentPadding: const EdgeInsets.symmetric(
                               vertical: 16,
-                              horizontal: 20,
+                              horizontal: 15,
                             ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
                               borderSide: const BorderSide(
-                                color: Color(0xFFF1F5F9),
+                                color: Color(0xFFCBD5E1),
                               ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
                               borderSide: const BorderSide(
-                                color: Color(0xFFF1F5F9),
+                                color: Color(0xFFCBD5E1),
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
                               borderSide: BorderSide(
                                 color: Colors.grey.shade400,
+                                width: 2,
+                              ),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(
+                                color: Colors.red,
+                                width: 1,
+                              ),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(
+                                color: Colors.red,
                                 width: 2,
                               ),
                             ),
@@ -283,20 +297,22 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
                               width: 2,
                             ),
                           ),
-                        ),
-                      ),
-
-                      if (fieldState.hasError)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 12, top: 6),
-                          child: Text(
-                            fieldState.errorText!,
-                            style: TextStyle(
-                              color: Colors.red.shade700,
-                              fontSize: 12,
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: const BorderSide(
+                              color: Colors.red,
+                              width: 1,
+                            ),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: const BorderSide(
+                              color: Colors.red,
+                              width: 2,
                             ),
                           ),
                         ),
+                      ),
                       const SizedBox(height: 20),
                       if (_selectedVisitType == "Visitor") ...[
                         _buildVisitTypeFields(),
@@ -310,36 +326,27 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
               TextFormField(
                 readOnly: true,
                 onTap: () async {
-                  final now = DateTime.now();
-                  final today = DateTime(now.year, now.month, now.day);
-                  final picked = await showDatePicker(
+                  //  final now = DateTime.now();
+                  //  final today = DateTime(now.year, now.month, now.day);
+
+                  final DateTime? picked = await showDialog<DateTime>(
                     context: context,
-                    initialDate:
-                        _visitDate.isBefore(today) ? today : _visitDate,
-                    firstDate: today,
-                    lastDate: today.add(const Duration(days: 365)),
-                    builder: (context, child) {
-                      return Theme(
-                        data: Theme.of(context).copyWith(
-                          colorScheme: const ColorScheme.light(
-                            primary: primaryColor,
-                            onPrimary: Colors.white,
-                            onSurface: Colors.black,
-                          ),
-                          textButtonTheme: TextButtonThemeData(
-                            style: TextButton.styleFrom(
-                              foregroundColor: primaryColor,
-                            ),
-                          ),
+                    builder:
+                        (context) => CustomCalendarDialog(
+                          initialDate: _visitDate,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime(2101),
                         ),
-                        child: child!,
-                      );
-                    },
                   );
-                  if (picked != null) setState(() => _visitDate = picked);
+
+                  if (picked != null) {
+                    setState(() {
+                      _visitDate = picked;
+                    });
+                  }
                 },
                 decoration: InputDecoration(
-                  labelText: "Visit Date",
+                  labelText: "Visit Date*",
                   labelStyle: const TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,

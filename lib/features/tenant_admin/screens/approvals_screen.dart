@@ -1,4 +1,4 @@
-import 'dart:convert';
+import '../../../core/utils/image_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -63,6 +63,10 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
                 itemCount: list.length,
                 itemBuilder: (context, index) {
                   final item = list[index];
+                  final imageProvider = ImageUtils.getImageProvider(
+                    item['imageUrl'],
+                  );
+
                   return Card(
                     margin: const EdgeInsets.only(bottom: 20),
                     elevation: 2,
@@ -81,18 +85,9 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
                               CircleAvatar(
                                 radius: 35,
                                 backgroundColor: Colors.grey.shade100,
-                                backgroundImage:
-                                    (item['imageUrl'] != null &&
-                                            item['imageUrl']
-                                                .toString()
-                                                .isNotEmpty)
-                                        ? MemoryImage(
-                                          base64Decode(item['imageUrl']),
-                                        )
-                                        : null,
+                                backgroundImage: imageProvider,
                                 child:
-                                    (item['imageUrl'] == null ||
-                                            item['imageUrl'].toString().isEmpty)
+                                    imageProvider == null
                                         ? Icon(
                                           Icons.person_rounded,
                                           size: 40,
