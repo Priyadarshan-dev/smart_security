@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logger/logger.dart';
+
 import '../../../core/api/api_client.dart';
 import '../model/tenant_admin_state.dart';
 import '../service/tenant_admin_service.dart';
@@ -16,7 +16,6 @@ final tenantAdminProvider =
 
 class TenantAdminNotifier extends StateNotifier<TenantAdminState> {
   final TenantAdminService _service;
-  final _logger = Logger();
 
   TenantAdminNotifier(this._service) : super(TenantAdminState.initial());
 
@@ -105,17 +104,10 @@ class TenantAdminNotifier extends StateNotifier<TenantAdminState> {
   ) async {
     state = state.copyWith(isOperationLoading: true);
     try {
-      _logger.i(
-        'Approving/rejecting visitorId: $visitorId with status: $status and remarks: $remarks',
-      );
-
       final response = await _service.approveOrReject(visitorId, {
         "status": status,
         "remarks": remarks,
       });
-
-      _logger.i('Response status code: ${response.statusCode}');
-      _logger.d('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         // Update pendingApprovals locally
@@ -161,13 +153,9 @@ class TenantAdminNotifier extends StateNotifier<TenantAdminState> {
           state = state.copyWith(allVisitors: AsyncValue.data(updatedAll));
         }
 
-        _logger.i('Operation successful');
         return true;
-      } else {
-        _logger.w('Operation failed with status code: ${response.statusCode}');
-      }
+      } else {}
     } catch (e) {
-      _logger.e('Exception while approving/rejecting visitor');
     } finally {
       state = state.copyWith(isOperationLoading: false);
     }
@@ -180,11 +168,10 @@ class TenantAdminNotifier extends StateNotifier<TenantAdminState> {
       final response = await _service.scheduleVisitor(data);
       if (response.statusCode == 200) {
         await fetchDashboardData();
-        print("Status Code : ${response.statusCode}");
+
         return true;
       }
     } catch (e) {
-      print(e);
     } finally {
       state = state.copyWith(isOperationLoading: false);
     }
@@ -194,22 +181,19 @@ class TenantAdminNotifier extends StateNotifier<TenantAdminState> {
   Future<bool> updateVisitor(int visitorId, Map<String, dynamic> data) async {
     state = state.copyWith(isOperationLoading: true);
     try {
-      print(data);
       final response = await _service.updateVisitor(visitorId, data);
-      print(response.body);
-      print(response.statusCode);
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-
         final today = state.todayVisitors.value;
         if (today != null) {
           final updatedToday =
               today.map((v) {
-                if (v['id'] == visitorId)
+                if (v['id'] == visitorId) {
                   return <String, dynamic>{
                     ...v as Map<String, dynamic>,
                     ...responseData as Map<String, dynamic>,
                   };
+                }
                 return v;
               }).toList();
           state = state.copyWith(todayVisitors: AsyncValue.data(updatedToday));
@@ -219,11 +203,12 @@ class TenantAdminNotifier extends StateNotifier<TenantAdminState> {
         if (all != null) {
           final updatedAll =
               all.map((v) {
-                if (v['id'] == visitorId)
+                if (v['id'] == visitorId) {
                   return <String, dynamic>{
                     ...v as Map<String, dynamic>,
                     ...responseData as Map<String, dynamic>,
                   };
+                }
                 return v;
               }).toList();
           state = state.copyWith(allVisitors: AsyncValue.data(updatedAll));
@@ -239,20 +224,12 @@ class TenantAdminNotifier extends StateNotifier<TenantAdminState> {
   }
 
   Future<bool> deleteVisitor(int visitorId) async {
-    _logger.i("Delete Visitor Called");
-    _logger.i("Visitor ID: $visitorId");
-
     state = state.copyWith(isOperationLoading: true);
 
     try {
       final response = await _service.deleteVisitor(visitorId);
 
-      _logger.i("Delete API Status Code: ${response.statusCode}");
-      _logger.i("Delete API Response Body: ${response.body}");
-
       if (response.statusCode == 200) {
-        _logger.i("Visitor deleted successfully");
-
         final today = state.todayVisitors.value;
         if (today != null) {
           final updatedToday =
@@ -276,11 +253,8 @@ class TenantAdminNotifier extends StateNotifier<TenantAdminState> {
         }
 
         return true;
-      } else {
-        _logger.e("Delete failed with status ${response.statusCode}");
-      }
-    } catch (e, stackTrace) {
-      _logger.e("Delete Exception Occurred", error: e, stackTrace: stackTrace);
+      } else {}
+    } catch (e) {
     } finally {
       state = state.copyWith(isOperationLoading: false);
     }
@@ -309,40 +283,21 @@ class TenantAdminNotifier extends StateNotifier<TenantAdminState> {
   }
 
   Future<bool> addVehicle(Map<String, dynamic> data) async {
-    print("🔵 addVehicle() called");
-    print("🟡 Payload: $data");
-
     state = state.copyWith(isOperationLoading: true);
 
     try {
-      print("🟡 Sending add vehicle request...");
-
       final response = await _service.addVehicle(data);
 
-      print("🟡 STATUS CODE: ${response.statusCode}");
-      print("🟡 RAW RESPONSE BODY: ${response.body}");
-
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print("🟢 Vehicle added successfully");
-
-        print("🟡 Refreshing tenant vehicles...");
         await fetchTenantVehicles();
 
-        print("✅ Vehicle list refreshed");
-
         return true;
-      } else {
-        print("🔴 Vehicle add failed with status: ${response.statusCode}");
-      }
-    } catch (error, stack) {
-      print("🔴 ERROR while adding vehicle: $error");
-      print("🔴 STACK TRACE: $stack");
+      } else {}
+    } catch (error) {
     } finally {
-      print("🟡 Resetting loading state");
       state = state.copyWith(isOperationLoading: false);
     }
 
-    print("❌ addVehicle() returning false");
     return false;
   }
 

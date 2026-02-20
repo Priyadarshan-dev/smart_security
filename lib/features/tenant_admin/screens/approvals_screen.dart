@@ -1,7 +1,7 @@
 import '../../../core/utils/image_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logger/logger.dart';
+
 import '../provider/tenant_admin_provider.dart';
 import '../../../core/widgets/app_loading_widget.dart';
 import '../../../core/widgets/app_error_widget.dart';
@@ -21,7 +21,11 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Approvals"),
+        title: const Text(
+          "Approvals",
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         centerTitle: true,
         backgroundColor: const Color(0xFF60A5FA),
         foregroundColor: Colors.white,
@@ -52,6 +56,8 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
                       const SizedBox(height: 16),
                       const Text(
                         "No pending approvals",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                     ],
@@ -103,6 +109,8 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
                                   children: [
                                     Text(
                                       "Name: ${item['visitorName']}",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontSize: 14,
                                         color: Colors.grey.shade600,
@@ -112,6 +120,8 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
                                     // Mobile
                                     Text(
                                       "Mobile: ${item['mobileNumber']}",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontSize: 14,
                                         color: Colors.grey.shade600,
@@ -121,6 +131,8 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
                                     // Purpose / Visit Type
                                     Text(
                                       "Purpose: ${item['visitType'] ?? 'Guest'}${item['comments'] != null && item['comments'].toString().isNotEmpty ? " / ${item['comments']}" : ""}",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontSize: 14,
                                         color: Colors.grey.shade600,
@@ -150,8 +162,7 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
                                                   "APPROVED",
                                                   "",
                                                 );
-                                            final Logger logger = Logger();
-                                            logger.d("Visitor approved");
+
                                             if (context.mounted && success) {
                                               SnackbarUtils.showSuccess(
                                                 context,
@@ -200,6 +211,8 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
                                     alignment: Alignment.center,
                                     child: const Text(
                                       "Accept",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
@@ -247,6 +260,8 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
                                     alignment: Alignment.center,
                                     child: const Text(
                                       "Reject",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
@@ -291,6 +306,8 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
             surfaceTintColor: Colors.white,
             title: const Text(
               "Rejection Reason",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
@@ -347,6 +364,8 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
                       ),
                       child: const Text(
                         "CANCEL",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Colors.black87,
                           fontWeight: FontWeight.bold,
@@ -394,6 +413,8 @@ class _ApprovalsScreenState extends ConsumerState<ApprovalsScreen> {
                               },
                       child: const Text(
                         "REJECT",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),

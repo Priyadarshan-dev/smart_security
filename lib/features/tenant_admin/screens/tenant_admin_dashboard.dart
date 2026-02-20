@@ -138,7 +138,11 @@ class _TenantAdminDashboardState extends ConsumerState<TenantAdminDashboard> {
                         ),
                     backgroundColor: const Color(0xFF60A5FA),
                     foregroundColor: Colors.white,
-                    label: const Text("Schedule"),
+                    label: const Text(
+                      "Schedule",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     icon: const Icon(Icons.add),
                   )
                   : null,
@@ -163,8 +167,16 @@ class _TenantHomeView extends ConsumerWidget {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text("Logout"),
-            content: const Text("Are you sure you want to logout?"),
+            title: const Text(
+              "Logout",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            content: const Text(
+              "Are you sure you want to logout?",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.zero,
             ),
@@ -183,6 +195,8 @@ class _TenantHomeView extends ConsumerWidget {
                       ),
                       child: const Text(
                         "CANCEL",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Colors.black87,
                           fontWeight: FontWeight.bold,
@@ -208,6 +222,8 @@ class _TenantHomeView extends ConsumerWidget {
                       },
                       child: const Text(
                         "LOGOUT",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -237,7 +253,11 @@ class _TenantHomeView extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Tenant Home"),
+        title: const Text(
+          "Tenant Home",
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         centerTitle: true,
         backgroundColor: const Color(0xFF60A5FA),
         foregroundColor: Colors.white,
@@ -309,6 +329,8 @@ class _TenantHomeView extends ConsumerWidget {
                   const SizedBox(height: 32),
                   Text(
                     "Recent Activity",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -329,6 +351,8 @@ class _TenantHomeView extends ConsumerWidget {
                             const SizedBox(height: 16),
                             const Text(
                               "No activity today",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(color: Colors.grey),
                             ),
                           ],
@@ -411,6 +435,8 @@ class _TenantHomeView extends ConsumerWidget {
           width: 60,
           child: Text(
             "$label: ",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               fontSize: 13,
               color: Colors.grey,
@@ -421,6 +447,8 @@ class _TenantHomeView extends ConsumerWidget {
         Expanded(
           child: Text(
             value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,
@@ -468,15 +496,24 @@ class _TenantHomeView extends ConsumerWidget {
           const SizedBox(height: 16),
           Text(
             value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
               color: color,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 4),
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
           Text(
             subtitle,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: Theme.of(
               context,
             ).textTheme.bodySmall?.copyWith(color: Colors.grey),

@@ -1,7 +1,5 @@
 import 'dart:convert';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../../core/api/api_client.dart';
 import '../../../core/storage/storage_service.dart';
 import '../model/auth_state.dart';
@@ -24,7 +22,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   void _listenToSessionExpiry() {
     ApiClient.sessionExpiryStream.listen((_) {
-      print("Session expiry event received. Logging out.");
       logout();
     });
   }
@@ -36,15 +33,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print("Login Response: $data");
+
         await _authService.saveSession(
           data['accessToken'],
           data['role'],
           data['refreshToken'],
         );
-        print("Balaaaa : $data");
-        print(" LOGIN New Access Token: ${data['accessToken']} ");
-        print(" LOGIN New Refresh Token: ${data['refreshToken']} ");
 
         // await _authService.refreshToken();
 
@@ -66,7 +60,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
         state = state.copyWith(status: AuthStatus.error, error: errorMessage);
       }
     } catch (e) {
-      print("Login Error: $e");
       String message = "Server unreachable. Please check your connection.";
       if (e.toString().contains("TimeoutException")) {
         message = "Connection timeout. Server might be slow or down.";
@@ -97,29 +90,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final token = await _authService.getFcmToken();
 
       if (token == null) {
-        print("FCM Token is null, skipping sync.");
         return;
       }
 
       final lastSyncedToken = await _authService.getLastSyncedFcmToken();
       if (token == lastSyncedToken) {
-        print("FCM Token is already synced.");
         return;
       }
 
-      print("Syncing FCM Token: $token");
       final response = await _authService.syncFcmToken(token);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         await _authService.saveLastFcmToken(token);
-        print("FCM Token synced successfully.");
-      } else {
-        print(
-          "Failed to sync FCM Token: ${response.statusCode} ${response.body}",
-        );
-      }
-    } catch (e) {
-      print("Error syncing FCM Token: $e");
-    }
+      } else {}
+    } catch (e) {}
   }
 }

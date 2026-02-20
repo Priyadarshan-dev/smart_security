@@ -4,7 +4,7 @@ import 'package:ceedeeyes/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:logger/logger.dart';
+
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../core/utils/snackbar_utils.dart';
@@ -40,7 +40,6 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
   );
   DateTime _historyEndDate = DateTime.now();
   final vehicleHistoryScrollController = ScrollController();
-  final logger = Logger();
 
   @override
   void initState() {
@@ -77,7 +76,6 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
             _historyEndDate,
             isLoadMore: true,
           );
-      logger.d("Loading more staff history...");
     }
   }
 
@@ -173,6 +171,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
               ),
               title: Text(
                 "Staff Management",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -245,13 +245,13 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
               ),
             ),
           ),
-          if (state.isOperationLoading)
-            Positioned.fill(
-              child: Material(
-                color: Colors.black.withOpacity(0.3),
-                child: const Center(child: AppLoadingWidget()),
-              ),
-            ),
+          // if (state.isOperationLoading)
+          //   Positioned.fill(
+          //     child: Material(
+          //       color: Colors.black.withOpacity(0.3),
+          //       child: const Center(child: AppLoadingWidget()),
+          //     ),
+          //   ),
         ],
       ),
     );
@@ -364,6 +364,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
             child: Center(
               child: Text(
                 "No staffs found",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(color: Colors.grey),
                 textAlign: TextAlign.center,
               ),
@@ -396,6 +398,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
                           child: Center(
                             child: Text(
                               staff.staffName.substring(0, 1),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
@@ -413,6 +417,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
                                 children: [
                                   Text(
                                     "Staff Name : ",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -421,6 +427,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
                                   ),
                                   Text(
                                     staff.staffName,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -433,6 +441,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
                                 children: [
                                   Text(
                                     "Emp Id : ",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: 15,
                                       color: Colors.grey.shade800,
@@ -440,6 +450,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
                                   ),
                                   Text(
                                     staff.employeeId,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: 13,
                                       color: Colors.grey.shade600,
@@ -491,6 +503,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
                               SizedBox(width: 4),
                               Text(
                                 "Check In",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13,
@@ -616,7 +630,13 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
           child: Builder(
             builder: (context) {
               if (checkedIn.isEmpty) {
-                return const Center(child: Text("No matching staffs inside"));
+                return const Center(
+                  child: Text(
+                    "No matching staffs inside",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                );
               }
 
               return ListView.builder(
@@ -646,6 +666,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
                                 child: Center(
                                   child: Text(
                                     staff.staffName.substring(0, 1),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -663,6 +685,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
                                       children: [
                                         Text(
                                           "Staff Name : ",
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.bold,
@@ -671,6 +695,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
                                         ),
                                         Text(
                                           staff.staffName,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.bold,
@@ -684,6 +710,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
                                       children: [
                                         Text(
                                           "Emp Id : ",
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                             fontSize: 15,
                                             color: Colors.grey.shade800,
@@ -691,6 +719,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
                                         ),
                                         Text(
                                           staff.employeeId,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                             fontSize: 13,
                                             color: Colors.grey.shade600,
@@ -743,6 +773,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
                                     SizedBox(width: 4),
                                     Text(
                                       "Check Out",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 13,
@@ -774,7 +806,13 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
           child: state.staffReports.when(
             data: (history) {
               if (history.isEmpty) {
-                return const Center(child: Text("No history found"));
+                return const Center(
+                  child: Text(
+                    "No history found",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                );
               }
               // Sort by check-in time descending (latest first)
               final sortedHistory = List.from(history);
@@ -859,6 +897,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
                                 children: [
                                   Text(
                                     staff['name'] ?? 'N/A',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -868,6 +908,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
                                   const SizedBox(height: 2),
                                   Text(
                                     "Emp Id: ${staff['employeeCode'] ?? 'N/A'}",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: 13,
                                       color: Colors.grey.shade600,
@@ -892,6 +934,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
                                     checkInTime != null
                                         ? _formatDateTime(staff['checkInTime'])
                                         : 'N/A',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: 10,
                                       color: Colors.green.shade700,
@@ -916,6 +960,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
                                     checkOutTime != null
                                         ? _formatDateTime(staff['checkOutTime'])
                                         : 'Pending',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: 10,
                                       color:
@@ -986,6 +1032,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
                 ),
                 const Text(
                   "Scan Staff QR",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
                 const SizedBox(height: 16),
@@ -1036,6 +1084,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
                 const SizedBox(height: 16),
                 const Text(
                   "Align QR code within the frame",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 16),
@@ -1071,6 +1121,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
                 children: [
                   Text(
                     "FROM",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
@@ -1106,6 +1158,8 @@ class _StaffEntryScreenState extends ConsumerState<StaffEntryScreen> {
                 children: [
                   Text(
                     "TO",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,

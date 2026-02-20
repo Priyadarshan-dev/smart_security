@@ -21,7 +21,6 @@ class _SecurityDashboardState extends ConsumerState<SecurityDashboard> {
     super.initState();
     //  NotificationService().initializeNotifications();
     Future.microtask(() {
-      print("SecurityDashboard: Initializing data...");
       ref.read(securityProvider.notifier).fetchTodayVisitors();
       ref.read(securityProvider.notifier).fetchTenants();
       ref.read(authProvider.notifier).syncFcmToken();
@@ -40,6 +39,8 @@ class _SecurityDashboardState extends ConsumerState<SecurityDashboard> {
         centerTitle: true,
         title: Text(
           "Security Dashboard",
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -74,6 +75,8 @@ class _SecurityDashboardState extends ConsumerState<SecurityDashboard> {
                 leadingIcon: const Icon(Icons.logout, color: Colors.red),
                 child: const Text(
                   "Logout",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: Colors.red),
                 ),
               ),
@@ -117,6 +120,8 @@ class _SecurityDashboardState extends ConsumerState<SecurityDashboard> {
                           (e, _) => Center(
                             child: Text(
                               "Error",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(color: Colors.red),
                             ),
                           ),
@@ -227,6 +232,8 @@ class _SecurityDashboardState extends ConsumerState<SecurityDashboard> {
                       children: [
                         Text(
                           value,
+                          // maxLines: 1,
+                          // overflow: TextOverflow.ellipsis,
                           style: Theme.of(
                             context,
                           ).textTheme.headlineSmall?.copyWith(
@@ -238,6 +245,8 @@ class _SecurityDashboardState extends ConsumerState<SecurityDashboard> {
                         const SizedBox(height: 2),
                         Text(
                           "Reported",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: Theme.of(context).textTheme.labelSmall
                               ?.copyWith(color: Colors.grey, fontSize: 10),
                         ),
@@ -258,8 +267,8 @@ class _SecurityDashboardState extends ConsumerState<SecurityDashboard> {
                         color: color,
                         height: 1.1,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                      // maxLines: 1,
+                      // overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(width: 4),
@@ -283,8 +292,16 @@ class _SecurityDashboardState extends ConsumerState<SecurityDashboard> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text("Logout"),
-            content: const Text("Are you sure you want to logout?"),
+            title: const Text(
+              "Logout",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            content: const Text(
+              "Are you sure you want to logout?",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.zero,
             ),
@@ -303,6 +320,8 @@ class _SecurityDashboardState extends ConsumerState<SecurityDashboard> {
                       ),
                       child: const Text(
                         "CANCEL",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Colors.black87,
                           fontWeight: FontWeight.bold,
@@ -328,6 +347,8 @@ class _SecurityDashboardState extends ConsumerState<SecurityDashboard> {
                       },
                       child: const Text(
                         "LOGOUT",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),

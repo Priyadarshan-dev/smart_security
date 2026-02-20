@@ -18,17 +18,12 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  print("Handling a background message: ${message.messageId}");
-  // Check if user is logged in even in background
+
   final storage = StorageService();
   final token = await storage.getToken();
+
   if (token != null) {
-    // You can trigger a notification here if needed,
-    // but usually FCM shows notifications automatically in background unless data-only.
-    print("User is logged in (Background), processing notification...");
-  } else {
-    print("User is logged out (Background), skipping notification.");
-  }
+  } else {}
 }
 
 void main() async {
@@ -57,6 +52,7 @@ class _SmartSecurityAppState extends ConsumerState<SmartSecurityApp> {
       await ref.read(authProvider.notifier).checkAuth();
       // Request notification permissions after the app has started and initial auth check is done
       await NotificationService().requestFullPermissions();
+      await NotificationService().initializeNotifications();
     });
   }
 
@@ -65,15 +61,12 @@ class _SmartSecurityAppState extends ConsumerState<SmartSecurityApp> {
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (previous?.status != AuthStatus.authenticated &&
           next.status == AuthStatus.authenticated) {
-        NotificationService().initializeNotifications();
-        // Pop all routes when user logs in after session expiry
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (navigatorKey.currentState != null) {
-            navigatorKey.currentState!.popUntil((route) => route.isFirst);
-          }
+          navigatorKey.currentState?.popUntil((route) => route.isFirst);
         });
       }
     });
+
     final authState = ref.watch(authProvider);
 
     return MaterialApp(

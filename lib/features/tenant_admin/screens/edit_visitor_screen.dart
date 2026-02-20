@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:ceedeeyes/features/shared/widgets/address_proof_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -39,8 +38,7 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
   @override
   void initState() {
     super.initState();
-    print(widget.visitor);
-    print('kkkkk');
+
     _nameController = TextEditingController(
       text: widget.visitor['visitorName'],
     );
@@ -52,9 +50,7 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
     );
     _selectedVisitType = widget.visitor['visitType'];
 
-    print(widget.visitor['attachment'] ?? '');
-    print('----------------------------------');
-    _addressProofImage64 = widget.visitor['attachment'] ?? '';
+    _addressProofImage64 = widget.visitor['attachment'];
 
     try {
       _visitDate = DateFormat('yyyy-MM-dd').parse(widget.visitor['visitDate']);
@@ -70,7 +66,11 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Edit Visitor"),
+        title: const Text(
+          "Edit Visitor",
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         centerTitle: true,
         backgroundColor: const Color(0xFF60A5FA),
         foregroundColor: Colors.white,
@@ -198,6 +198,8 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
                           errorText: fieldState.errorText,
                           label: const Text(
                             "Visit Type*",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
@@ -314,7 +316,8 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      if (_selectedVisitType == "Visitor") ...[
+                      if (_selectedVisitType == "Visitor" ||
+                          _selectedVisitType == "Interview") ...[
                         _buildVisitTypeFields(),
                       ],
                     ],
@@ -421,6 +424,7 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
                                     context,
                                     "Visitor updated successfully",
                                   );
+
                                   Navigator.pop(context);
                                 } else {
                                   SnackbarUtils.showError(
@@ -443,6 +447,8 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
                           )
                           : const Text(
                             "UPDATE VISITOR",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -459,7 +465,7 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
   }
 
   Widget _buildVisitTypeFields() {
-    if (_selectedVisitType == "Visitor") {
+    if (_selectedVisitType == "Visitor" || _selectedVisitType == "Interview") {
       return AddressProofWidget(
         image64: _addressProofImage64,
         onCapture: _pickAddressProofImage,
@@ -491,7 +497,6 @@ class _EditVisitorScreenState extends ConsumerState<EditVisitorScreen> {
       debugPrint("Error picking image: $e");
       if (mounted) {
         SnackbarUtils.showError(context, "Error capturing image");
-        print("Error While Capturing Image ${e.toString()}");
       }
     }
   }

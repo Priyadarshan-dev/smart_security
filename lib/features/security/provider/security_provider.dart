@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logger/logger.dart';
 
 import '../../../core/api/api_client.dart';
 import '../model/security_state.dart';
@@ -18,7 +17,6 @@ final securityProvider = StateNotifierProvider<SecurityNotifier, SecurityState>(
 
 class SecurityNotifier extends StateNotifier<SecurityState> {
   final SecurityService _service;
-  final Logger _logger = Logger();
 
   SecurityNotifier(this._service) : super(SecurityState.initial());
 
@@ -41,33 +39,20 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
   }
 
   Future<bool> checkInVisitor(int visitorId) async {
-    print("🔵 checkInVisitor() called with visitorId: $visitorId");
-
     state = state.copyWith(isOperationLoading: true);
 
     try {
-      print("🟡 Sending check-in request...");
-
       final response = await _service.checkInVisitor(visitorId);
 
-      print("🟡 STATUS CODE: ${response.statusCode}");
-      print("🟡 RAW RESPONSE BODY: ${response.body}");
-
       if (response.statusCode == 200) {
-        print("🟢 Check-in success response received");
-
         final visitors = state.todayVisitors.value;
-        print("🟡 Current visitors list: $visitors");
 
         if (visitors != null) {
           final responseData = jsonDecode(response.body);
-          print("🟢 DECODED RESPONSE: $responseData");
 
           final updatedVisitors =
               visitors.map((v) {
                 if (v['id'] == visitorId) {
-                  print("🟢 Updating visitor: ${v['id']}");
-
                   return {
                     ...v,
                     'status': responseData['status'] ?? 'CHECKED_IN',
@@ -77,29 +62,18 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
                 return v;
               }).toList();
 
-          print("🟢 Updated visitors list: $updatedVisitors");
-
           state = state.copyWith(
             todayVisitors: AsyncValue.data(updatedVisitors),
           );
-        } else {
-          print("🔴 todayVisitors list is NULL");
-        }
+        } else {}
 
-        print("✅ Visitor check-in completed");
         return true;
-      } else {
-        print("🔴 Check-in failed with status: ${response.statusCode}");
-      }
-    } catch (error, stack) {
-      print("🔴 ERROR during check-in: $error");
-      print("🔴 STACK TRACE: $stack");
+      } else {}
+    } catch (error) {
     } finally {
-      print("🟡 Resetting loading state");
       state = state.copyWith(isOperationLoading: false);
     }
 
-    print("❌ checkInVisitor() returning false");
     return false;
   }
 
@@ -153,21 +127,10 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
             "[BASE64_ATTACHMENT_${data["attachment"].length}_chars]";
       }
 
-      _logger.d("🚀 Sending Walk-in POST request");
-      _logger.d("📦 Request Body: ${jsonEncode(safeLogData)}");
-
       final response = await _service.addWalkIn(data);
 
-      _logger.d("📨 Response Status: ${response.statusCode}");
-      _logger.d("📨 Response Body: ${response.body}");
-
       return response.statusCode == 200;
-    } catch (e, stackTrace) {
-      _logger.e(
-        "🔥 Error while adding walk-in",
-        error: e,
-        stackTrace: stackTrace,
-      );
+    } catch (e) {
       return false;
     } finally {
       state = state.copyWith(isOperationLoading: false);
@@ -178,8 +141,7 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
     state = state.copyWith(isOperationLoading: true);
     try {
       final response = await _service.vehicleEntry(data);
-      print("Vehicle Entry Status: ${response.statusCode}");
-      print("Vehicle Entry Body: ${response.body}");
+
       if (response.statusCode == 200) {
         await fetchVehicles();
         return true;
@@ -225,8 +187,7 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
     state = state.copyWith(isOperationLoading: true);
     try {
       final response = await _service.vehicleCheckIn(id);
-      print("Vehicle Check-in Status: ${response.statusCode}");
-      print("Vehicle Check-in Body: ${response.body}");
+
       if (response.statusCode == 200) {
         final currentVehicles = state.vehicles.value;
         if (currentVehicles != null) {
@@ -244,11 +205,10 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
               }).toList();
           state = state.copyWith(vehicles: AsyncValue.data(updatedVehicles));
         }
-        print("Success while Vehicle Check-In -- Print Statement");
+
         return true;
       }
     } catch (error) {
-      print("Error while Vehicle Check-In $error -- Print Statement");
     } finally {
       state = state.copyWith(isOperationLoading: false);
     }
@@ -258,21 +218,13 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
   Future<void> fetchTenants() async {
     try {
       final response = await _service.getTenants();
-      print("Fetch /common/tenants Status: ${response.statusCode}");
-      print("Fetch /common/tenants Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print("Tenants Data Loaded: ${data.length} items");
+
         state = state.copyWith(tenants: data);
-      } else {
-        print(
-          "Fetch Tenants Failed: Status ${response.statusCode}, Body: ${response.body}",
-        );
-      }
-    } catch (e) {
-      print("Fetch Tenants Error: $e");
-    }
+      } else {}
+    } catch (e) {}
   }
 
   Future<void> fetchVehicles() async {
@@ -293,15 +245,10 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
 
   // ------------------------------------staffs Section------------------------
   Future<void> fetchStaffs() async {
-    _logger.i("Fetching staffs started");
-
     state = state.copyWith(isStaffLoading: true, staffError: null);
 
     try {
       final response = await _service.getStaffs();
-
-      _logger.d("Status Code: ${response.statusCode}");
-      _logger.v("Raw Response: ${response.body}");
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
@@ -309,29 +256,19 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
 
         final staffList = list.map((e) => StaffModel.fromJson(e)).toList();
 
-        _logger.i("Fetched ${staffList.length} staffs successfully");
-
         state = state.copyWith(
           staffs: staffList,
           isStaffLoading: false,
           status: SecurityStatus.success,
         );
       } else {
-        _logger.e("Failed to fetch staffs. Status: ${response.statusCode}");
-
         state = state.copyWith(
           isStaffLoading: false,
           staffError: "Failed to fetch staffs",
           status: SecurityStatus.failure,
         );
       }
-    } catch (e, stackTrace) {
-      _logger.e(
-        "Exception while fetching staffs",
-        error: e,
-        stackTrace: stackTrace,
-      );
-
+    } catch (e) {
       state = state.copyWith(
         isStaffLoading: false,
         staffError: e.toString(),
@@ -364,7 +301,6 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
         return true;
       }
     } catch (error) {
-      print("Error while Staff Check-In $error");
       state = state.copyWith(status: SecurityStatus.failure);
     } finally {
       state = state.copyWith(isOperationLoading: false);
@@ -397,7 +333,6 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
         return true;
       }
     } catch (error) {
-      print("Error while Staff Check-Out $error");
       state = state.copyWith(status: SecurityStatus.failure);
     } finally {
       state = state.copyWith(isOperationLoading: false);
@@ -534,7 +469,7 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
       );
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
-        print("Vehicle Reports Data: $decoded");
+
         List<dynamic> newList = [];
         if (decoded is Map<String, dynamic> && decoded.containsKey('content')) {
           newList = decoded['content'];
@@ -663,7 +598,7 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
       );
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
-        print("Visitor Reports Data: $decoded");
+
         List<dynamic> newList = [];
         if (decoded is Map<String, dynamic> && decoded.containsKey('content')) {
           newList = decoded['content'];
@@ -738,7 +673,7 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
       );
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
-        print("Vehicle Reports Data: $decoded");
+
         List<dynamic> newList = [];
         if (decoded is Map<String, dynamic> && decoded.containsKey('content')) {
           newList = decoded['content'];

@@ -5,7 +5,7 @@ import '../storage/storage_service.dart';
 
 class ApiClient {
   //  13.205.93.213  192.168.1.39
-  final String baseUrl1 = "http://192.168.1.42:8080/api/v1";
+  final String baseUrl1 = "http://13.205.93.213:8080/api/v1";
 
   final StorageService _storage = StorageService();
 
@@ -63,17 +63,13 @@ class ApiClient {
     }
 
     try {
-      print("starts Refreshing token endpoint.");
       final response = await http.post(
         Uri.parse("$baseUrl1/auth/refresh-token"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"refreshToken": refreshToken}),
       );
-      print("mid Refreshing token endpoint.");
-      print(response.body);
 
       if (response.statusCode == 200) {
-        print("mid 200 OK Refreshing token endpoint.");
         final data = jsonDecode(response.body);
 
         final newAccessToken = data["accessToken"];
@@ -84,12 +80,10 @@ class ApiClient {
 
         return true;
       } else {
-        print(" end else Exception Refreshing token endpoint.");
         _sessionExpiryController.add(null);
         return false;
       }
     } catch (e) {
-      print(" end catch Exception Refreshing token endpoint.");
       _sessionExpiryController.add(null);
       return false;
     }
@@ -107,9 +101,6 @@ class ApiClient {
   Future<http.Response> post(String path, Map<String, dynamic> body) async {
     return _requestWithRetry(() async {
       final headers = await _getHeaders();
-      print("Headers: $headers");
-      print("Body: $body");
-      print("URL: $baseUrl1$path");
 
       return await http
           .post(

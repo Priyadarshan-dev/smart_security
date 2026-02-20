@@ -23,7 +23,11 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Visitors"),
+        title: const Text(
+          "Visitors",
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         centerTitle: true,
         backgroundColor: const Color(0xFF60A5FA),
         foregroundColor: Colors.white,
@@ -55,7 +59,11 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
                           color: Color(0xFFF1F5F9),
                         ),
                         const SizedBox(height: 16),
-                        const Text("No visitors found"),
+                        const Text(
+                          "No visitors found",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ],
                     ),
                   );
@@ -65,6 +73,7 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
                   itemCount: visitors.length,
                   itemBuilder: (context, index) {
                     final visitor = visitors[index];
+
                     return Card(
                       margin: const EdgeInsets.only(bottom: 20),
                       elevation: 2,
@@ -103,6 +112,8 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
                                     children: [
                                       Text(
                                         "Name: ${visitor['visitorName'] ?? 'N/A'}",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: Colors.grey.shade600,
@@ -112,6 +123,8 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
                                       // Mobile
                                       Text(
                                         "Mobile: ${visitor['mobileNumber'] ?? 'N/A'}",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: Colors.grey.shade600,
@@ -121,6 +134,8 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
                                       // Purpose / Visit Type
                                       Text(
                                         "Purpose: ${visitor['visitType'] ?? 'N/A'}${visitor['comments'] != null && visitor['comments'].toString().isNotEmpty ? " / ${visitor['comments']}" : ""}",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: Colors.grey.shade600,
@@ -130,6 +145,8 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
                                       // Date
                                       Text(
                                         "Date: ${visitor['visitDate'] ?? 'N/A'}",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: Colors.grey.shade600,
@@ -144,27 +161,67 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
                             // Action Buttons
                             Row(
                               children: [
+                                // Expanded(
+                                //   child: ElevatedButton.icon(
+                                //     onPressed:
+                                //         state.isOperationLoading
+                                //             ? null
+                                //             : () => Navigator.push(
+                                //               context,
+                                //               MaterialPageRoute(
+                                //                 builder:
+                                //                     (_) => EditVisitorScreen(
+                                //                       visitor: visitor,
+                                //                     ),
+                                //               ),
+                                //             ),
+                                //     icon: Image.asset(
+                                //       'assets/icons/edit_icon.png',
+                                //       width: 18,
+                                //       height: 18,
+                                //       color: Colors.white,
+                                //     ),
+                                //     label: const Text("Edit"),
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: const Color(0xFF6366F1),
+                                //       foregroundColor: Colors.white,
+                                //       shape: RoundedRectangleBorder(
+                                //         borderRadius: BorderRadius.circular(25),
+                                //       ),
+                                //       padding: const EdgeInsets.symmetric(
+                                //         vertical: 12,
+                                //       ),
+                                //       elevation: 2,
+                                //     ),
+                                //   ),
+                                // ),
                                 Expanded(
                                   child: ElevatedButton.icon(
                                     onPressed:
                                         state.isOperationLoading
                                             ? null
-                                            : () => Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder:
-                                                    (_) => EditVisitorScreen(
-                                                      visitor: visitor,
-                                                    ),
-                                              ),
-                                            ),
+                                            : () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder:
+                                                      (_) => EditVisitorScreen(
+                                                        visitor: visitor,
+                                                      ),
+                                                ),
+                                              );
+                                            },
                                     icon: Image.asset(
                                       'assets/icons/edit_icon.png',
                                       width: 18,
                                       height: 18,
                                       color: Colors.white,
                                     ),
-                                    label: const Text("Edit"),
+                                    label: const Text(
+                                      "Edit",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color(0xFF6366F1),
                                       foregroundColor: Colors.white,
@@ -178,6 +235,7 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
                                     ),
                                   ),
                                 ),
+
                                 const SizedBox(width: 16),
                                 Expanded(
                                   child: ElevatedButton.icon(
@@ -195,7 +253,11 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
                                       height: 18,
                                       color: Colors.white,
                                     ),
-                                    label: const Text("Delete"),
+                                    label: const Text(
+                                      "Delete",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color(0xFFF43F5E),
                                       foregroundColor: Colors.white,
@@ -248,6 +310,8 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
             surfaceTintColor: Colors.white,
             title: const Text(
               "Delete Visitor",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
@@ -258,6 +322,8 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
             ),
             content: Text(
               "Are you sure you want to delete ${visitor['visitorName']}?",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             actions: [
               Row(
@@ -274,6 +340,8 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
                       ),
                       child: const Text(
                         "CANCEL",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Colors.black87,
                           fontWeight: FontWeight.bold,
@@ -327,6 +395,8 @@ class _VisitorsListScreenState extends ConsumerState<VisitorsListScreen> {
                               )
                               : const Text(
                                 "DELETE",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                     ),

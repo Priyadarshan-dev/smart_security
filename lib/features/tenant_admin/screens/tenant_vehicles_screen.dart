@@ -9,8 +9,6 @@ import 'package:share_plus/share_plus.dart';
 import 'package:gal/gal.dart';
 import '../provider/tenant_admin_provider.dart';
 
-import 'package:image_picker/image_picker.dart';
-
 import '../../../core/storage/storage_service.dart';
 import '../../../core/widgets/app_loading_widget.dart';
 import '../../../core/widgets/app_error_widget.dart';
@@ -49,6 +47,8 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                   surfaceTintColor: Colors.white,
                   title: const Text(
                     "Add New Vehicle",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -171,6 +171,8 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                       errorText: fieldState.errorText,
                                       label: const Text(
                                         "Vehicle Type*",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           color: Colors.black,
                                           fontWeight: FontWeight.bold,
@@ -267,6 +269,8 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                       errorText: fieldState.errorText,
                                       label: const Text(
                                         "Purpose*",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           color: Colors.black,
                                           fontWeight: FontWeight.bold,
@@ -355,6 +359,8 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                             onPressed: () => Navigator.pop(context),
                             child: const Text(
                               "CANCEL",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 color: Colors.grey,
                                 fontWeight: FontWeight.bold,
@@ -403,14 +409,10 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                             if (context.mounted) {
                                               Navigator.pop(context);
                                               if (success) {
-                                                print(
-                                                  "Vechile Added Successfully :$success",
-                                                );
                                                 SnackbarUtils.showSuccess(
                                                   context,
                                                   "Vehicle added successfully",
                                                 );
-                                                // print("Vehicle added successfully$");
                                               } else {
                                                 SnackbarUtils.showError(
                                                   context,
@@ -432,6 +434,8 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                         )
                                         : const Text(
                                           "ADD VEHICLE",
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 13,
@@ -493,6 +497,8 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                   surfaceTintColor: Colors.white,
                   title: const Text(
                     "Edit Vehicle",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -615,6 +621,8 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                       errorText: fieldState.errorText,
                                       label: const Text(
                                         "Vehicle Type",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           color: Colors.black,
                                           fontWeight: FontWeight.bold,
@@ -711,6 +719,8 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                       errorText: fieldState.errorText,
                                       label: const Text(
                                         "Purpose",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           color: Colors.black,
                                           fontWeight: FontWeight.bold,
@@ -797,6 +807,8 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                             onPressed: () => Navigator.pop(context),
                             child: const Text(
                               "CANCEL",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 color: Colors.grey,
                                 fontWeight: FontWeight.bold,
@@ -870,6 +882,8 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                         )
                                         : const Text(
                                           "UPDATE",
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 13,
@@ -900,6 +914,8 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
             surfaceTintColor: Colors.white,
             title: const Text(
               "Delete Vehicle",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
@@ -910,6 +926,8 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
             ),
             content: const Text(
               "Are you sure you want to delete this vehicle?",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             actions: [
               Row(
@@ -926,6 +944,8 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                       ),
                       child: const Text(
                         "CANCEL",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Colors.black87,
                           fontWeight: FontWeight.bold,
@@ -982,6 +1002,8 @@ class TenantVehiclesScreen extends ConsumerStatefulWidget {
                                   )
                                   : const Text(
                                     "DELETE",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -1020,7 +1042,11 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Vehicles"),
+        title: const Text(
+          "Vehicles",
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         centerTitle: true,
         backgroundColor: const Color(0xFF60A5FA),
         foregroundColor: Colors.white,
@@ -1088,7 +1114,11 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
 
                 if (filtered.isEmpty) {
                   return const Center(
-                    child: Text("No vehicles match your search"),
+                    child: Text(
+                      "No vehicles match your search",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   );
                 }
                 return ListView.builder(
@@ -1135,6 +1165,8 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
                                     children: [
                                       Text(
                                         "Vehicle: ${vehicle['vehicleNumber'] ?? 'N/A'}",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: Colors.grey.shade600,
@@ -1144,6 +1176,8 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
                                       // Driver Name
                                       Text(
                                         "Driver: ${vehicle['driverName'] ?? 'No driver assigned'}",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: Colors.grey.shade600,
@@ -1153,6 +1187,8 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
                                       // Purpose
                                       Text(
                                         "Purpose: ${vehicle['purpose'] ?? 'N/A'}",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: Colors.grey.shade600,
@@ -1162,6 +1198,8 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
                                       // Company Name
                                       Text(
                                         "Company: ${vehicle['company'] ?? 'N/A'}",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: Colors.grey.shade600,
@@ -1193,6 +1231,8 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
                                     ),
                                     label: const Text(
                                       "Edit",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(fontSize: 12),
                                     ),
                                     style: ElevatedButton.styleFrom(
@@ -1226,6 +1266,8 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
                                     ),
                                     label: const Text(
                                       "Delete",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(fontSize: 12),
                                     ),
                                     style: ElevatedButton.styleFrom(
@@ -1258,6 +1300,8 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
                                     ),
                                     label: const Text(
                                       "QR",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(fontSize: 12),
                                     ),
                                     style: ElevatedButton.styleFrom(
@@ -1311,6 +1355,8 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
                 ),
                 label: const Text(
                   "Add Vehicle",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
@@ -1340,7 +1386,11 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: Text("QR Code: $vehicleNumber"),
+            title: Text(
+              "QR Code: $vehicleNumber",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.zero,
             ),
@@ -1363,7 +1413,9 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
                           children: [
                             if (companyName != null && companyName.isNotEmpty)
                               Text(
-                                "Company Name: $companyName",
+                                "$companyName",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -1376,10 +1428,16 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
                                 builder: (context, snapshot) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
-                                    return const Text("Loading...");
+                                    return const Text(
+                                      "Loading...",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    );
                                   }
                                   return Text(
                                     "Company Name: ${snapshot.data ?? ""}",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -1404,6 +1462,8 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
                 const SizedBox(height: 16),
                 const Text(
                   "Present this QR for faster entry/exit",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 12, color: Colors.grey),
                 ),
@@ -1415,7 +1475,11 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
                   Expanded(
                     child: ElevatedButton.icon(
                       icon: const Icon(Icons.share, size: 20),
-                      label: const Text("SHARE"),
+                      label: const Text(
+                        "SHARE",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).primaryColor,
                         foregroundColor: Colors.white,
@@ -1431,7 +1495,11 @@ class _TenantVehiclesScreenState extends ConsumerState<TenantVehiclesScreen> {
                   Expanded(
                     child: ElevatedButton.icon(
                       icon: const Icon(Icons.download, size: 20),
-                      label: const Text("SAVE"),
+                      label: const Text(
+                        "SAVE",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.black87,

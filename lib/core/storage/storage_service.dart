@@ -3,6 +3,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class StorageService {
   final _storage = const FlutterSecureStorage();
 
+  get http => null;
+
   Future<void> saveToken(String token) async {
     await _storage.write(key: 'jwt_token', value: token);
   }

@@ -2,7 +2,7 @@ import '../../../core/utils/image_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:ceedeeyes/core/theme/app_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logger/logger.dart';
+
 import '../provider/security_provider.dart';
 import '../../../core/utils/snackbar_utils.dart';
 import 'package:intl/intl.dart';
@@ -20,7 +20,6 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
   DateTime _startDate = DateTime(DateTime.now().year, DateTime.now().month, 1);
   DateTime _endDate = DateTime.now();
   final scrollController = ScrollController();
-  final logger = Logger();
 
   @override
   void initState() {
@@ -46,7 +45,6 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
       ref
           .read(securityProvider.notifier)
           .fetchVisitorReports(_startDate, _endDate, isLoadMore: true);
-      logger.d("Loading more visitors...");
     }
   }
 
@@ -118,6 +116,8 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
           ),
           title: Text(
             "Visitors",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: Colors.white,
@@ -273,7 +273,13 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
         final checkedIn =
             list.where((v) => v['status'] == 'CHECKED_IN').toList();
         if (checkedIn.isEmpty) {
-          return const Center(child: Text("No visitors currently checked-in"));
+          return const Center(
+            child: Text(
+              "No visitors currently checked-in",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          );
         }
         return ListView.builder(
           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -312,6 +318,8 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
                             children: [
                               Text(
                                 item['visitorName'] ?? 'Unknown',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -319,6 +327,8 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
                               ),
                               Text(
                                 "+91 ${item['mobileNumber'] ?? ''}",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey.shade600,
@@ -391,6 +401,8 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
                                         item['comments'].toString().isNotEmpty
                                     ? " / ${item['comments']}"
                                     : ""),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
@@ -409,6 +421,8 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
                             ),
                             child: Text(
                               item['tenant']['companyName'],
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
@@ -471,7 +485,13 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
           child: visitors.when(
             data: (list) {
               if (list.isEmpty) {
-                return const Center(child: Text("No visitor history found"));
+                return const Center(
+                  child: Text(
+                    "No visitor history found",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                );
               }
 
               // Sort by check-in time descending (latest first)
@@ -552,6 +572,8 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
                                     children: [
                                       Text(
                                         item['visitorName'] ?? 'Unknown',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
@@ -559,6 +581,8 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
                                       ),
                                       Text(
                                         "+91 ${item['mobileNumber'] ?? ''}",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: Colors.grey.shade600,
@@ -649,6 +673,8 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
                                                     .isNotEmpty
                                             ? " / ${item['comments']}"
                                             : ""),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w500,
@@ -661,6 +687,8 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
                                     if (item['checkInTime'] != null)
                                       Text(
                                         "In: ${_formatDateTime(item['checkInTime'])}",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: 11,
                                           color: Colors.green.shade700,
@@ -670,6 +698,8 @@ class _VisitorHistoryScreenState extends ConsumerState<VisitorHistoryScreen> {
                                     if (item['checkOutTime'] != null)
                                       Text(
                                         "Out: ${_formatDateTime(item['checkOutTime'])}",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: 11,
                                           color: Colors.red.shade700,

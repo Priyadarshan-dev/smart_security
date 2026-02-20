@@ -43,7 +43,11 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F9FF),
       appBar: AppBar(
-        title: const Text("Schedule Visitor"),
+        title: const Text(
+          "Schedule Visitor",
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         centerTitle: true,
         backgroundColor: const Color(0xFF60A5FA),
         foregroundColor: Colors.white,
@@ -185,6 +189,8 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
                           errorText: fieldState.errorText,
                           label: const Text(
                             "Visit Type*",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
@@ -407,20 +413,7 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
                       state.isOperationLoading
                           ? null
                           : () async {
-                            if ((_selectedVisitType == "Visitor" ||
-                                    _selectedVisitType == "Interview") &&
-                                (_addressProofImage64 == null ||
-                                    _addressProofImage64!.isEmpty)) {
-                              setState(() {
-                                _addressProofError = true;
-                              });
-                              SnackbarUtils.showError(
-                                context,
-                                "Address proof is required",
-                              );
-                              _buildVisitTypeFields();
-                              return;
-                            }
+                            // Address proof validation removed as it is now optional
 
                             if (_formKey.currentState!.validate()) {
                               final success = await ref
@@ -463,6 +456,8 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
                           )
                           : const Text(
                             "SCHEDULE VISITOR",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -491,6 +486,7 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
             _addressProofImage64 = null;
           });
         },
+        isRequired: false,
       );
     }
     if (_selectedVisitType == "Interview") {
@@ -503,6 +499,7 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
             _addressProofImage64 = null;
           });
         },
+        isRequired: false,
       );
     }
     return const SizedBox.shrink();
@@ -527,7 +524,6 @@ class _AddVisitorScreenState extends ConsumerState<AddVisitorScreen> {
       debugPrint("Error picking image: $e");
       if (mounted) {
         SnackbarUtils.showError(context, "Error capturing image");
-        print("Error While Capturing Image ${e.toString()}");
       }
     }
   }

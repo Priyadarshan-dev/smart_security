@@ -68,6 +68,8 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
               ),
               title: Text(
                 "Visitor Management",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -156,6 +158,8 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
           return const Center(
             child: Text(
               "No scheduled visitors found for today",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
           );
@@ -201,6 +205,8 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                             children: [
                               Text(
                                 item['visitorName'] ?? 'Unknown',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -208,6 +214,8 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                               ),
                               Text(
                                 "+91 ${item['mobileNumber'] ?? ''}",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey.shade600,
@@ -242,7 +250,11 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                               children: const [
                                 Icon(Icons.check_circle_outline, size: 18),
                                 SizedBox(width: 4),
-                                Text("Check-In"),
+                                Text(
+                                  "Check-In",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ],
                             ),
                           )
@@ -268,6 +280,8 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                                 const SizedBox(width: 4),
                                 Text(
                                   "Pending",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     color: Colors.orange.shade800,
                                     fontWeight: FontWeight.bold,
@@ -299,6 +313,8 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                                         item['comments'].toString().isNotEmpty
                                     ? " / ${item['comments']}"
                                     : ""),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
@@ -317,6 +333,8 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                             ),
                             child: Text(
                               item['tenant']['companyName'],
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
@@ -334,7 +352,14 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text(e.toString())),
+      error:
+          (e, _) => Center(
+            child: Text(
+              e.toString(),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
     );
   }
 
@@ -388,6 +413,8 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
             const Center(
               child: Text(
                 "Capture Visitor Photo",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.grey,
@@ -516,6 +543,8 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                 return DropdownMenu<String>(
                   label: const Text(
                     "Visit Type*",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
@@ -620,6 +649,8 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                   child: DropdownMenu<int>(
                     label: const Text(
                       "Select Company*",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
@@ -700,14 +731,24 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
             if (admins.isNotEmpty) ...[
               const Text(
                 "Select Admins*",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               ...admins.map((admin) {
                 final id = admin['id'] as int;
                 return CheckboxListTile(
-                  title: Text(admin['fullName'] ?? 'Admin'),
-                  subtitle: Text(admin['email'] ?? ''),
+                  title: Text(
+                    admin['fullName'] ?? 'Admin',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: Text(
+                    admin['email'] ?? '',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   value: _selectedAdminIds.contains(id),
                   onChanged: (val) {
                     setState(() {
@@ -724,6 +765,8 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                   padding: EdgeInsets.only(left: 16),
                   child: Text(
                     "Select at least one admin",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(color: Colors.red, fontSize: 12),
                   ),
                 ),
@@ -745,15 +788,11 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                   securityState.isOperationLoading
                       ? null
                       : () async {
-                        print("BUTTON CLICKED");
-
                         if (!_walkInFormKey.currentState!.validate()) {
-                          print("FORM INVALID");
                           return;
                         }
 
                         if (_selectedAdminIds.isEmpty) {
-                          print("NO ADMINS SELECTED");
                           return;
                         }
 
@@ -770,8 +809,6 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                           );
                           return;
                         }
-
-                        print("FORM VALID → sending request");
 
                         final success = await ref
                             .read(securityProvider.notifier)
@@ -790,14 +827,12 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
                         if (!mounted) return;
 
                         if (success) {
-                          print("SUCCESS");
                           SnackbarUtils.showSuccess(
                             context,
                             "Approval Request Sent",
                           );
                           Navigator.pop(context);
                         } else {
-                          print("FAILED");
                           SnackbarUtils.showError(
                             context,
                             "Failed to send request",
@@ -807,7 +842,11 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
               child:
                   securityState.isOperationLoading
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text("REQUEST APPROVAL"),
+                      : const Text(
+                        "REQUEST APPROVAL",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
             ),
           ],
         ),
@@ -1306,7 +1345,6 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
     } catch (e) {
       if (mounted) {
         SnackbarUtils.showError(context, "Error capturing image");
-        print("Error While Capturing Image ${e.toString()}");
       }
     }
   }
@@ -1358,7 +1396,6 @@ class _VisitorEntryScreenState extends ConsumerState<VisitorEntryScreen> {
       debugPrint("Error picking image: $e");
       if (mounted) {
         SnackbarUtils.showError(context, "Error capturing image");
-        print("Error While Capturing Image ${e.toString()}");
       }
     }
   }

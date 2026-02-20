@@ -12,7 +12,6 @@ import 'package:intl/intl.dart';
 import '../../shared/widgets/address_proof_widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
-import 'package:logger/logger.dart';
 
 class VehicleEntryScreen extends ConsumerStatefulWidget {
   const VehicleEntryScreen({super.key});
@@ -40,7 +39,6 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
   );
   DateTime _historyEndDate = DateTime.now();
   final vehicleHistoryScrollController = ScrollController();
-  final logger = Logger();
 
   @override
   void initState() {
@@ -78,7 +76,7 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
             _historyEndDate,
             isLoadMore: true,
           );
-      logger.d("Loading more vehicle history...");
+      // Loading more vehicle history
     }
   }
 
@@ -174,6 +172,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
               ),
               title: Text(
                 "Vehicle Management",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -344,7 +344,13 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                   }).toList();
 
               if (filtered.isEmpty) {
-                return const Center(child: Text("No vehicles found"));
+                return const Center(
+                  child: Text(
+                    "No vehicles found",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                );
               }
 
               return ListView.builder(
@@ -389,6 +395,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                   children: [
                                     Text(
                                       "Number: ${vehicle['vehicleNumber'] ?? ''}",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontSize: 15,
                                         color: Colors.grey.shade700,
@@ -396,6 +404,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                     ),
                                     Text(
                                       "Driver: ${vehicle['driverName'] ?? ''}",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontSize: 15,
                                         color: Colors.grey.shade700,
@@ -454,6 +464,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                     SizedBox(width: 4),
                                     Text(
                                       "Check In",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 13,
@@ -480,7 +492,11 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                     height: 18,
                                     color: Colors.white,
                                   ),
-                                  label: const Text("Edit"),
+                                  label: const Text(
+                                    "Edit",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppTheme.infoColor,
                                     foregroundColor: Colors.white,
@@ -505,7 +521,11 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                     height: 18,
                                     color: Colors.white,
                                   ),
-                                  label: const Text("Delete"),
+                                  label: const Text(
+                                    "Delete",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppTheme.dangerColor,
                                     foregroundColor: Colors.white,
@@ -564,6 +584,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                   const SizedBox(width: 12),
                   const Text(
                     "Add Vehicle",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -665,7 +687,13 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                   }).toList();
 
               if (checkedIn.isEmpty) {
-                return const Center(child: Text("No matching vehicles inside"));
+                return const Center(
+                  child: Text(
+                    "No matching vehicles inside",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                );
               }
 
               return ListView.builder(
@@ -711,6 +739,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                   children: [
                                     Text(
                                       "Number: ${vehicle['vehicleNumber'] ?? ''}",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontSize: 15,
                                         color: Colors.grey.shade700,
@@ -718,6 +748,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                     ),
                                     Text(
                                       "Driver: ${vehicle['driverName'] ?? ''}",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontSize: 15,
                                         color: Colors.grey.shade700,
@@ -768,6 +800,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                     SizedBox(width: 4),
                                     Text(
                                       "Check Out",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 13,
@@ -819,7 +853,11 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                     height: 18,
                                     color: Colors.white,
                                   ),
-                                  label: const Text("Delete"),
+                                  label: const Text(
+                                    "Delete",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppTheme.dangerColor,
                                     foregroundColor: Colors.white,
@@ -876,6 +914,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                     surfaceTintColor: Colors.transparent,
                     title: const Text(
                       "New Vehicle Entry",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     shape: const RoundedRectangleBorder(
@@ -1019,6 +1059,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                   ),
                                   label: const Text(
                                     "Type*",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.bold,
@@ -1098,6 +1140,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                   ),
                                   label: const Text(
                                     "Purpose*",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.bold,
@@ -1181,6 +1225,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                   initialSelection: selectedTenantId,
                                   label: const Text(
                                     "Select Company*",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.bold,
@@ -1266,6 +1312,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                         onPressed: () => Navigator.pop(context),
                         child: const Text(
                           "CANCEL",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(color: Colors.grey),
                         ),
                       ),
@@ -1335,6 +1383,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                 )
                                 : const Text(
                                   "REGISTER",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                       ),
@@ -1399,10 +1449,6 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
           break;
       }
     }
-    print(selectedType);
-    print(selectedPurpose);
-    print(vehicle['vehicleType']);
-    print(vehicle['purpose']);
 
     // Attempt to find tenant ID from vehicle's company name if tenantId is missing
     int? selectedTenantId = vehicle['tenantId'];
@@ -1431,6 +1477,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                     surfaceTintColor: Colors.transparent,
                     title: const Text(
                       "Edit Vehicle",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     shape: const RoundedRectangleBorder(
@@ -1576,6 +1624,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                   ),
                                   label: const Text(
                                     "Type*",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.bold,
@@ -1659,6 +1709,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                   ),
                                   label: const Text(
                                     "Purpose*",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.bold,
@@ -1746,6 +1798,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                   initialSelection: selectedTenantId,
                                   label: const Text(
                                     "Select Company*",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.bold,
@@ -1831,6 +1885,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                         onPressed: () => Navigator.pop(context),
                         child: const Text(
                           "CANCEL",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(color: Colors.grey),
                         ),
                       ),
@@ -1900,6 +1956,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                 )
                                 : const Text(
                                   "UPDATE",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                       ),
@@ -1936,11 +1994,15 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                   const SizedBox(height: 16),
                   const Text(
                     "Delete Vehicle",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     "Are you sure you want to delete ${vehicle['vehicleNumber']}?",
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
                   ),
@@ -1959,6 +2021,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                           ),
                           child: const Text(
                             "CANCEL",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: Colors.black87,
                               fontWeight: FontWeight.bold,
@@ -2012,6 +2076,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                   )
                                   : const Text(
                                     "DELETE",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.bold,
@@ -2044,6 +2110,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                 (context, setDialogState) => AlertDialog(
                   title: Text(
                     "Check-in: ${vehicle['vehicleNumber']}",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   shape: const RoundedRectangleBorder(
@@ -2066,7 +2134,9 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                 text: selectedPurpose,
                               ),
                               label: const Text(
-                                "Purpose*",
+                                "Type*",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
@@ -2156,6 +2226,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                               initialSelection: selectedTenantId,
                               label: const Text(
                                 "Select Company*",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
@@ -2238,6 +2310,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                       onPressed: () => Navigator.pop(context),
                       child: const Text(
                         "CANCEL",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(color: Colors.grey),
                       ),
                     ),
@@ -2292,6 +2366,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                       },
                       child: const Text(
                         "CHECK-IN",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -2309,7 +2385,13 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
           child: state.vehicleReports.when(
             data: (history) {
               if (history.isEmpty) {
-                return const Center(child: Text("No history found"));
+                return const Center(
+                  child: Text(
+                    "No history found",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                );
               }
 
               // Sort by check-in time descending (latest first)
@@ -2400,6 +2482,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                   // Vehicle Number
                                   Text(
                                     vehicle['vehicleNumber'] ?? 'N/A',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -2410,6 +2494,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                   // Driver Name
                                   Text(
                                     "${vehicle['driverName'] ?? 'N/A'}",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: 13,
                                       color: Colors.grey.shade600,
@@ -2425,6 +2511,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                                 // Company Name
                                 Text(
                                   "Company: ${vehicle['company'] ?? vehicle['companyName'] ?? 'N/A'}",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontSize: 11,
                                     color: Colors.grey.shade700,
@@ -2545,6 +2633,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                 ),
                 const Text(
                   "Scan Vehicle QR",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
                 const SizedBox(height: 16),
@@ -2596,6 +2686,8 @@ class _VehicleEntryScreenState extends ConsumerState<VehicleEntryScreen> {
                 const SizedBox(height: 16),
                 const Text(
                   "Align QR code within the frame",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 16),
